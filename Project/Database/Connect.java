@@ -10,7 +10,7 @@ public class Connect {
  */
 
     public static Connection connect() throws SQLException{
-        String url = "jdbc:sqlite:/Users/muhamed-pt7045/Desktop/UMS/UMS/UMS/db/ums.db"; //"jdbc:sqlite:E:Github/Internship/UMS/db/ums.db"
+        String url = "jdbc:sqlite:/Users/muhamed-pt7045/Desktop/UMS/UMS/db/ums.db"; //"jdbc:sqlite:E:Github/Internship/UMS/db/ums.db"
         Connection conn = null;
             conn = DriverManager.getConnection(url);
         return conn;
