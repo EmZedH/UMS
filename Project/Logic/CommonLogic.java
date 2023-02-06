@@ -2,59 +2,59 @@ package Logic;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
-import UI.Display;
+import UI.CommonDisplay;
 
-public class StartupLogic {
+public class CommonLogic {
     public static void startup(){
-    Display.startupPage();
+    CommonDisplay.startupPage();
 
-    try{
-    Scanner in = new Scanner(System.in);
+    try(Scanner in = new Scanner(System.in)){
+    // Scanner in = new Scanner(System.in);
     Integer inp = in.nextInt();
     switch(inp){
         case 1:
         userSelect();
         break;
         case 2:
-        Display.thankYou();
+        CommonDisplay.thankYou();
         System.exit(0);
         break;
         default:
-        Display.properPage();
+        CommonDisplay.properPage();
         startup();
     }
     }
     catch(InputMismatchException e){
-        Display.properPage();
+        CommonDisplay.properPage();
         startup();
         System.exit(0);
     }
     }
 
 
-    public static String userName(){
-        Display.usernamePage();
+    public static int userID(){
+        CommonDisplay.userID();
         try{
             Scanner in = new Scanner(System.in);
-        String usrName = in.nextLine();
-        return usrName;
+        int uID = in.nextInt();
+        return uID;
     }
         catch(InputMismatchException e){
             System.out.println(e.getMessage());
-            Display.properPage();
-            return userName();
+            CommonDisplay.properPage();
+            return userID();
         }
     }
     
 
     public static void userSelect(){
-        Display.userSelectPage();
+        CommonDisplay.userSelectPage();
         Scanner in = new Scanner(System.in);
         Integer inp = in.nextInt();
         switch(inp){
     
             case 4:
-            Display.thankYou();
+            CommonDisplay.thankYou();
             System.exit(0);
             break;
     
@@ -68,27 +68,27 @@ public class StartupLogic {
             AdminLogic.adminStartup();
             break;
             default:
-            Display.properPage();
+            CommonDisplay.properPage();
             userSelect();
             System.exit(0);
             break;
         }
         }
         public static String password() {
-            Display.passwordPage();
+            CommonDisplay.passwordPage();
             try{
                 Scanner in = new Scanner(System.in);
                 String password = in.nextLine();
                 return password;
             }
             catch(InputMismatchException e){
-                Display.properPage();
+                CommonDisplay.properPage();
                 return password();
             }
         }
 
         public static void sqlError(int user) {
-            Display.sqlError();
+            CommonDisplay.sqlError();
             try {
                 Scanner in = new Scanner(System.in);
                 Integer inp = in.nextInt();
@@ -108,22 +108,22 @@ public class StartupLogic {
                     }
                     break;
                     case 2:
-                    StartupLogic.userSelect();
+                    CommonLogic.userSelect();
                     break;
                     default:
-                    Display.properPage();
+                    CommonDisplay.properPage();
                     sqlError(user);
                 }
 
             } catch (InputMismatchException e) {
-                Display.properPage();
+                CommonDisplay.properPage();
                 sqlError(user);
                 System.exit(0);
             }
         }
 
         public static void wrongCredentials(int user){
-            Display.wrongUsernamePassword();
+            CommonDisplay.wrongUsernamePassword();
             try {
                 Scanner in = new Scanner(System.in);
                 Integer inp = in.nextInt();
@@ -143,17 +143,19 @@ public class StartupLogic {
                     }
                     break;
                     case 2:
-                    StartupLogic.userSelect();
+                    CommonLogic.userSelect();
                     break;
                     default:
-                    Display.properPage();
+                    CommonDisplay.properPage();
                     wrongCredentials(user);
                 }
 
             } catch (InputMismatchException e) {
-                Display.properPage();
+                CommonDisplay.properPage();
                 wrongCredentials(user);
                 System.exit(0);
             }
         }
+
+        
 }
