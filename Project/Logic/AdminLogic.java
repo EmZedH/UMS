@@ -62,8 +62,9 @@ public class AdminLogic {
                 addUser(user);
                 break;
 
-                //Deleting User
+                //Editing User
                 case 2:
+                editUser(user);
                 break;
 
                 //Deleting User
@@ -74,14 +75,18 @@ public class AdminLogic {
                 //View User
                 case 4:
                 int choice;
-                String[] arr = {"All User","Student","Staff","Admin"};
                 while(true){
+                    String[] arr = {"All User","Student","Staff","Admin","Back"};
                     DisplayUtility.optionDialog("Select User", arr);
                     try{
                     in = new Scanner(System.in);
                     choice = in.nextInt();
                     if(choice==1 || choice==2 || choice==3 || choice==4){
-                        break;
+                        Connect.selectUserAll(choice);
+                        continue;
+                    }
+                    else if(choice == 5){
+                        AdminLogic.userManage(user);
                     }
                     else{
                         CommonDisplay.properPage();
@@ -92,10 +97,8 @@ public class AdminLogic {
                         continue;
                     }
                 }
-                Connect.selectUserAll(choice);
-                AdminLogic.adminChoice(user);
-                break;
-                //Go Bakc
+                
+                //Go Back
                 case 5:
                 AdminLogic.adminChoice(user);
                 break;
@@ -134,9 +137,15 @@ public class AdminLogic {
         DisplayUtility.singleDialog("Enter the Aadhar number");
         in = new Scanner(System.in);
         String uAadhar = in.nextLine();
-        DisplayUtility.singleDialog("Enter the Date of Birth (Format YYYY-MM-DD)");
-        in = new Scanner(System.in);
-        String uDOB = in.nextLine();
+
+        String uDOB="";
+        boolean flag = true;
+        while(flag){
+            DisplayUtility.singleDialog("Enter the Date of Birth (Format YYYY-MM-DD)");
+            in = new Scanner(System.in);
+            uDOB = in.nextLine();
+            flag = !CommonLogic.dateFormatInput(uDOB);
+        }
 
         String uGender;
         while(true){
@@ -153,7 +162,7 @@ public class AdminLogic {
                 uGender = "F";
                 break;
             case 3:
-                uGender = "T";
+                uGender = "O";
                 break;
             default:
             CommonDisplay.properPage();
@@ -203,7 +212,7 @@ public class AdminLogic {
                     DisplayUtility.singleDialog("Enter the unique admin ID");
                     in = new Scanner(System.in);
                     aID = in.nextInt();
-                    if(Connect.returnAdmin(aID)==null){
+                    if(!Connect.verifyAdmin(aID)){
                         break;}
                     DisplayUtility.singleDialog("Admin ID already exists. Please enter different admin ID");
                     continue;
@@ -212,7 +221,7 @@ public class AdminLogic {
                     continue;
                 }
             }
-            Connect.addAdmin(aID, uName, uAadhar, uDOB, uGender, uAddress, uCollegeName, uCollegeAddress, uCollegeTelephone, uPassword, aID);
+            Connect.addAdmin(uID, uName, uAadhar, uDOB, uGender, uAddress, uCollegeName, uCollegeAddress, uCollegeTelephone, uPassword, aID);
             break;
 
             default:
@@ -226,10 +235,6 @@ public class AdminLogic {
         }
 
     }
-
-
-
-        // Connect.addAdmin(uID, uName, uAadhar, uDOB, uGender, uAddress, uCollegeName, uCollegeAddress, uCollegeTelephone, uPassword);
         CommonDisplay.processSuccess();
         AdminLogic.adminChoice(user);
     }
@@ -240,25 +245,40 @@ public class AdminLogic {
             Scanner in = new Scanner(System.in);
             Integer inp = in.nextInt();
             if(Connect.returnUser(inp)!=null && user.getID()!=inp){
-                String[] msg = {"Confirm Delete","Back"};
-                DisplayUtility.dialogWithHeader("Warning", "Account ID: "+inp+", Name: "+ user.getName() +" is selected for deletion");
-                DisplayUtility.optionDialog("Confirm? ", msg);
+                DisplayUtility.dialogWithHeader("Warning", "Account ID: "+inp+", Name: "+ Connect.returnUser(inp).getName() +" is selected for deletion");
+                while(true){
+                    String[] msg = {"Confirm Delete","Back"};
+                DisplayUtility.optionDialog("Confirm? (All data will be deleted)", msg);
+                try{
                 in = new Scanner(System.in);
                 int i = in.nextInt();
                 switch(i){
                     case 1:
                     Connect.deleteUser(inp);
                     CommonDisplay.processSuccess();
-                    AdminLogic.adminChoice(user);
+                    AdminLogic.userManage(user);
                     break;
                     case 2:
-                    AdminLogic.adminChoice(user);
+                    AdminLogic.userManage(user);
+                    break;
+                    default:
+                    CommonDisplay.properPage();
+                    continue;
                 }
-            return;}
+                break;}
+                catch(InputMismatchException e){
+                    CommonDisplay.properPage();
+                    continue;
+                }
+            }
+            return;
+        }
             else if(user.getID()==inp){
-                String[] msg = {"Confirm Delete","Back"};
                 DisplayUtility.singleDialog("Warning: Account selected is currently logged in.");
+                while(true){
+                    String[] msg = {"Confirm Delete","Back"};
                 DisplayUtility.optionDialog("Confirm? (You will be logged out once deleted)", msg);
+                try{
                 in = new Scanner(System.in);
                 int i = in.nextInt();
                 switch (i) {
@@ -268,9 +288,19 @@ public class AdminLogic {
                         CommonLogic.userSelect();
                     break;
                     case 2:
-                    AdminLogic.adminChoice(user);
+                    AdminLogic.userManage(user);
                         break;
+                    default:
+                    CommonDisplay.properPage();
+                    continue;
                 }
+                break;
+            }
+            catch(InputMismatchException e){
+                CommonDisplay.properPage();
+                continue;
+            }
+            }
                 return;
             }
                 DisplayUtility.singleDialog("User ID doesn't exist. Please enter different ID.");
@@ -280,8 +310,155 @@ public class AdminLogic {
             deleteUser(user);
         }
     }
+    
+    public static void editUser(User user) throws SQLException{
+        DisplayUtility.singleDialog("Enter user ID to edit");
+        try {
+            Scanner in = new Scanner(System.in);
+            int uID = in.nextInt();
+            User userVar = Connect.returnUser(uID);
+            boolean flag = true;
+            if(userVar!=null){
+                while (flag) {
+                    userVar = Connect.returnUser(uID);
+                    String[] list = {"ID","Name","Aadhar","Date of Birth","Gender","Address","College Name","College Address","College Telephone","Password","Change ID","Back"};
+                    DisplayUtility.userPageDialog("Select Property to Edit", userVar.getName(), userVar.getID(), list);
+                    Scanner ch = new Scanner(System.in);
+                    int choice = ch.nextInt();
+                    switch(choice){
+                        //Edit UID
+                        case 1:
+                        while(true){
+                            try {
+                                DisplayUtility.singleDialog("Enter the unique user ID");
+                                in = new Scanner(System.in);
+                                int inputID = in.nextInt();
+                                if(Connect.returnUser(inputID)==null && uID !=inputID){
+                                    Connect.editUser(uID, "UID", String.valueOf(inputID));
+                                    uID = inputID;
+                                    // userVar = Connect.returnUser(inputID);
+                                    break;}
 
-    void addAdmin(){
+                                else if(uID==inputID){
+                                    DisplayUtility.singleDialog("Same User ID as before. No changes made");
+                                    break;
+                                }
+                                DisplayUtility.singleDialog("User ID already exists. Please enter different user ID");
+                            } catch (InputMismatchException e) {
+                                CommonDisplay.properPage();
+                                continue;
+                            }
+                        }
+                        break;
+                        //Edit name
+                        case 2:
+                        DisplayUtility.singleDialog("Enter the name");
+                        in = new Scanner(System.in);
+                        Connect.editUser(uID, "UNAME", in.nextLine());
+                        break;
 
+                        //Edit Aadhar
+                        case 3:
+                        DisplayUtility.singleDialog("Enter the aadhar");
+                        in = new Scanner(System.in);
+                        Connect.editUser(uID, "UAADHAR", in.nextLine());
+                        break;
+
+                        //Edit DOB
+                        case 4:
+                        DisplayUtility.singleDialog("Enter the Date of Birth (Format: YYYY-MM-DD)");
+                        in = new Scanner(System.in);
+                        Connect.editUser(uID, "UDOB",in.nextLine());
+                        break;
+
+                        //Edit Gender
+                        case 5:
+                        while(true){
+                            String arr[] = {"Male","Female","Other"};
+                            DisplayUtility.optionDialog("Select the Gender", arr);
+                            try{
+                            in = new Scanner(System.in);
+                            Integer g = in.nextInt();
+                            switch (g) {
+                            case 1:
+                            Connect.editUser(uID, "UGENDER", "M");
+                                break;
+                            case 2:
+                            Connect.editUser(uID, "UGENDER", "F");
+                                break;
+                            case 3:
+                            Connect.editUser(uID, "UGENDER", "O");
+                                break;
+                            default:
+                            CommonDisplay.properPage();
+                            continue;
+                            }
+                            break;}
+                            catch(InputMismatchException e){
+                                CommonDisplay.properPage();
+                                continue;
+                            }
+                            
+                        }
+                        break;
+
+                        //Edit Address
+                        case 6:
+                        DisplayUtility.singleDialog("Enter the address");
+                        in = new Scanner(System.in);
+                        Connect.editUser(uID, "UADDRESS", in.nextLine());
+                        break;
+
+                        //Edit College Name
+                        case 7:
+                        DisplayUtility.singleDialog("Enter the College Name");
+                        in = new Scanner(System.in);
+                        Connect.editUser(uID, "UCOLLEGENAME", in.nextLine());
+                        break;
+                        
+                        //Edit College Address
+                        case 8:
+                        DisplayUtility.singleDialog("Enter the College Address");
+                        in = new Scanner(System.in);
+                        Connect.editUser(uID, "UCOLLEGEADDRESS", in.nextLine());
+                        break;
+
+                        //Edit College Telephone
+                        case 9:
+                        DisplayUtility.singleDialog("Enter the College Telephone");
+                        in = new Scanner(System.in);
+                        Connect.editUser(uID, "UCOLLEGETELEPHONE", in.nextLine());
+                        break;
+
+                        //Edit Password
+                        case 10:
+                        DisplayUtility.singleDialog("Enter the Password");
+                        in = new Scanner(System.in);
+                        Connect.editUser(uID, "UPASSWORD", in.nextLine());
+                        break;
+                        
+                        //Change ID
+                        case 11:
+                        editUser(user);
+                        return;
+                        //Go Back
+                        case 12:
+                        flag=false;
+                        break;
+                        default:
+                        CommonDisplay.properPage();
+                        continue;
+                    }
+                    continue;
+                }
+            }
+            else{
+            DisplayUtility.singleDialog("User ID doesn't exist. Please enter different ID.");
+            editUser(user);}
+            AdminLogic.userManage(user);
+        } catch (InputMismatchException e) {
+            CommonDisplay.properPage();
+            editUser(user);
+        }
     }
 }

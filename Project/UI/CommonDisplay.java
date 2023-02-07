@@ -47,7 +47,7 @@ public class CommonDisplay {
         // System.out.println();
         // System.out.println("---------------------------------------");
         // System.out.println();
-        String[] arr = {"Try Again","Back"};
+        String[] arr = {"Login Again","Back"};
         DisplayUtility.optionDialog("SQL ERROR", arr);
     }
     public static void startupPage(){

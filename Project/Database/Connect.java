@@ -1,6 +1,9 @@
 package Database;
-import java.rmi.server.UID;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import UI.DisplayUtility;
 public class Connect {
 
     static String url = "jdbc:sqlite:/Users/muhamed-pt7045/Desktop/UMS/UMS/db/ums.db"; //"jdbc:sqlite:E:Github/Internship/UMS/db/ums.db"
@@ -21,56 +24,55 @@ public class Connect {
         String sqlAdmin = "SELECT * FROM ADMINISTRATION";
         if(choice==1){
         try(Connection conn = connect();Statement stmt = conn.createStatement();ResultSet rs = stmt.executeQuery(sqlUser)){
+            ArrayList<String[]> str = new ArrayList<>();
             while(rs.next()){
-                System.out.println(rs.getString("uid")+"       "+
-                rs.getString("uName") + "       " +
-                rs.getString("uAadhar") + "       "+
-                rs.getString("uDOB") + "       "+
-                rs.getString("uGender") + "       "+
-                rs.getString("uAddress") + "       "+
-                rs.getString("uCollegeName") + "       "+
-                rs.getString("uCollegeAddress") + "       "+
-                rs.getString("uCollegeTelephone") + "       "+
-                rs.getString("uPassword") + "       "
-                );
+                String[] s = {rs.getString("uid"),rs.getString("uName"),rs.getString("uAadhar"),rs.getString("uDOB"),rs.getString("uGender"),rs.getString("uAddress"),rs.getString("uCollegeName"),rs.getString("uCollegeAddress"),rs.getString("uCollegeTelephone"),rs.getString("uPassword")};
+                str.add(s);
+            }
+            Object[] objStr = str.toArray();
+            String[][] si = Arrays.copyOf(objStr, objStr.length,String[][].class);
+            String[] headings = {"USER ID","NAME","AADHAR","DATE OF BIRTH","GENDER","ADDRESS","COLLEGE NAME","COLLEGE ADDRESS","COLLEGE TELEPHONE","PASSWORD"};
+            DisplayUtility.printTable("USERDETAILS", headings, si);
             }
             }
-        }
+        
         else if(choice == 2){
             try(Connection conn = connect();Statement stmt = conn.createStatement();ResultSet rs = stmt.executeQuery(sqlStudent)){
-                while(rs.next()){
-                    System.out.println(rs.getString("sID")+"       "+
-                    rs.getString("sName") + "       " +
-                    rs.getString("sSem") + "       "+
-                    rs.getString("sYear") + "       "+
-                    rs.getString("sSection") + "       "+
-                    rs.getString("sSectionID") + "       "+
-                    rs.getString("sDepartmentID") + "       "+
-                    rs.getString("sCGPA") + "       "+
-                    rs.getString("userID") + "       "
-                    );
-                }
+                ArrayList<String[]> str = new ArrayList<>();
+            while(rs.next()){
+                String[] s = {rs.getString("sID"),rs.getString("sName"),rs.getString("sSem"),rs.getString("sYear"),rs.getString("sSectionID"),rs.getString("sDepartmentID"),rs.getString("sCGPA"),rs.getString("userID")};
+                str.add(s);
+            }
+            Object[] objStr = str.toArray();
+            String[][] si = Arrays.copyOf(objStr, objStr.length,String[][].class);
+            String[] headings = {"STUDENT ID","NAME","SEMESTER","YEAR","SECTION ID","DEPARTMENT ID","CCGPA","USER ID"};
+            DisplayUtility.printTable("STUDENT DETAILS", headings, si);
             }
         }
         else if(choice == 3){
             try(Connection conn = connect();Statement stmt = conn.createStatement();ResultSet rs = stmt.executeQuery(sqlStaff)){
-                while(rs.next()){
-                    System.out.println(rs.getString("pID")+"       "+
-                    rs.getString("pName") + "       " +
-                    rs.getString("pDepartmentID") + "       "+
-                    rs.getString("userID")
-                    );
-                }
+                ArrayList<String[]> str = new ArrayList<>();
+            while(rs.next()){
+                String[] s = {rs.getString("pID"),rs.getString("pName"),rs.getString("pDepartmentID"),rs.getString("userID")};
+                str.add(s);
+            }
+            Object[] objStr = str.toArray();
+            String[][] si = Arrays.copyOf(objStr, objStr.length,String[][].class);
+            String[] headings = {"STAFF ID","NAME","DEPARTMENT ID","USER ID"};
+            DisplayUtility.printTable("STAFF DETAILS", headings, si);
             }
         }
         else if(choice == 4){
             try(Connection conn = connect();Statement stmt = conn.createStatement();ResultSet rs = stmt.executeQuery(sqlAdmin)){
-                while(rs.next()){
-                    System.out.println(rs.getString("adminID")+"       "+
-                    rs.getString("aName") + "       " +
-                    rs.getString("userID")
-                    );
-                }
+                ArrayList<String[]> str = new ArrayList<>();
+            while(rs.next()){
+                String[] s = {rs.getString("adminID"),rs.getString("aName"),rs.getString("userID")};
+                str.add(s);
+            }
+            Object[] objStr = str.toArray();
+            String[][] si = Arrays.copyOf(objStr, objStr.length,String[][].class);
+            String[] headings = {"ADMIN ID","NAME","USER ID"};
+            DisplayUtility.printTable("STAFF DETAILS", headings, si);
             }
         }
         return;
@@ -105,16 +107,6 @@ public class Connect {
             return new User(rs.getInt("uID"), rs.getString("uName"), rs.getString("uAadhar"), rs.getString("uDOB"), rs.getString("uGender"), rs.getString("uAddress"), rs.getString("uCollegeName"), rs.getString("uCollegeAddress"), rs.getString("uCollegeTelephone"), rs.getString("uPassword"));}
             return null;}
     }
-
-    // public static User returnUser(String uName) throws SQLException/*,NullPointerException*/{
-    //     String sql = "SELECT * FROM USERDETAILS WHERE UNAME = ?";
-    //     try(Connection conn = connect();PreparedStatement pstmt = conn.prepareStatement(sql)){
-    //         pstmt.setString(1,uName);
-    //         ResultSet rs = pstmt.executeQuery();
-    //         if(rs.next()){
-    //         return new User(rs.getInt("uID"), rs.getString("uName"), rs.getString("uAadhar"), rs.getString("uDOB"), rs.getString("uGender"), rs.getString("uAddress"), rs.getString("uCollegeName"), rs.getString("uCollegeAddress"), rs.getString("uCollegeTelephone"), rs.getString("uPassword"));}
-    //         return null;}
-    //     }
 
     public static void addAdmin(int uID,String uName, String uAadhar, String uDOB, String uGender, String uAddress, String uCollegeName, String uCollegeAddress, String uCollegeTelephone, String uPassword, int adminID) throws SQLException{
         String sqlUser = "INSERT INTO USERDETAILS VALUES (?,?,?,date(?),?,?,?,?,?,?)";
@@ -160,14 +152,21 @@ public class Connect {
         }
     }
 
-    public static Admin returnAdmin(int uID) throws SQLException/*,NullPointerException*/{
-        String sql = "SELECT * FROM ADMINISTRATION WHERE USERID = ?";
+    public static void editUser(int uID,String column,String value) throws SQLException{
+        String sql = "UPDATE USERDETAILS SET "+column+" = ? WHERE UID = ?";
         try(Connection conn = connect();PreparedStatement pstmt = conn.prepareStatement(sql)){
-            pstmt.setInt(1,uID);
+            pstmt.setString(1,value);
+            pstmt.setInt(2,uID);
+            pstmt.executeUpdate();
+        }
+    }
+
+    public static boolean verifyAdmin(int adminID) throws SQLException/*,NullPointerException*/{
+        String sql = "SELECT * FROM ADMINISTRATION WHERE ADMINID = ?";
+        try(Connection conn = connect();PreparedStatement pstmt = conn.prepareStatement(sql)){
+            pstmt.setInt(1,adminID);
             ResultSet rs = pstmt.executeQuery();
-            if(rs.next()){
-            return new Admin(rs.getInt("adminID"), rs.getString("aName"),rs.getInt("userID"));}
-            return null;
+            return rs.next() ? true:false;
         }
     }
 }

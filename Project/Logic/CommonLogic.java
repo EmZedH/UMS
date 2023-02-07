@@ -3,13 +3,13 @@ package Logic;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 import UI.CommonDisplay;
+import UI.DisplayUtility;
 
 public class CommonLogic {
     public static void startup(){
     CommonDisplay.startupPage();
 
     try(Scanner in = new Scanner(System.in)){
-    // Scanner in = new Scanner(System.in);
     Integer inp = in.nextInt();
     switch(inp){
         case 1:
@@ -118,7 +118,7 @@ public class CommonLogic {
             } catch (InputMismatchException e) {
                 CommonDisplay.properPage();
                 sqlError(user);
-                System.exit(0);
+                return;
             }
         }
 
@@ -157,5 +157,22 @@ public class CommonLogic {
             }
         }
 
-        
+        public static boolean dateFormatInput(String date) {
+            if(date.length()==10 && date.charAt(4) == '-' && date.charAt(7)=='-'){
+                try {
+
+                    int year = Integer.parseInt(date.substring(0, 4));
+                    int month = Integer.parseInt(date.substring(5, 7));
+                    int day = Integer.parseInt(date.substring(8));
+                    if((year>0 && month>0 && day>0)&& (((month==1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) && (day<=31)) || ((month == 4 || month == 6 || month == 9 || month == 11) && (day<=30)) || (month == 2 && day<=28) || (year%4==0 && month==2 && day==29))){
+                        return true;
+                    }
+                } catch (NumberFormatException e) {
+                    DisplayUtility.singleDialog("Please ensure correct date is input or check the format");
+                    return false;
+                }
+            }
+            DisplayUtility.singleDialog("Please ensure correct date is input or check the format");
+            return false;
+        }
 }
