@@ -53,7 +53,7 @@ public class CommonLogic {
         Integer inp = in.nextInt();
         switch(inp){
     
-            case 4:
+            case 5:
             CommonDisplay.thankYou();
             System.exit(0);
             break;
@@ -65,7 +65,10 @@ public class CommonLogic {
             System.out.println("Yet To Implement...");
             break;
             case 3:
-            AdminLogic.adminStartup();
+            System.out.println("Yet To Implement...");
+            break;            
+            case 4:
+            SuperAdminLogic.startup();
             break;
             default:
             CommonDisplay.properPage();
@@ -102,8 +105,12 @@ public class CommonLogic {
                         case 2:
                             break;
 
+
                         case 3:
-                        AdminLogic.adminStartup();
+                        break;
+
+                        case 4:
+                        SuperAdminLogic.startup();
                             break;
                     }
                     break;
@@ -131,14 +138,16 @@ public class CommonLogic {
                     case 1:
                     switch (user) {
                         case 1:
-                            
                             break;
                     
                         case 2:
                             break;
 
                         case 3:
-                        AdminLogic.adminStartup();
+                        break;
+
+                        case 4:
+                        SuperAdminLogic.startup();
                             break;
                     }
                     break;
@@ -153,7 +162,6 @@ public class CommonLogic {
             } catch (InputMismatchException e) {
                 CommonDisplay.properPage();
                 wrongCredentials(user);
-                System.exit(0);
             }
         }
 

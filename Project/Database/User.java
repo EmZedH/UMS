@@ -7,20 +7,16 @@ public class User{
     private String uDOB;
     private String uGender;
     private String uAddress;
-    private String uCollegeName;
-    private String uCollegeAddress;
-    private String uCollegeTelephone;
+    private String uRole;
     private String uPassword;
-    User(int uID,String uName, String uAadhar, String uDOB, String uGender, String uAddress, String uCollegeName, String uCollegeAddress, String uCollegeTelephone, String uPassword){
+    User(int uID,String uName, String uAadhar, String uDOB, String uGender, String uAddress, String uRole, String uPassword){
         this.uID = uID;
         this.uName = uName;
         this.uAadhar = uAadhar;
         this.uDOB = uDOB;
         this.uGender = uGender;
         this.uAddress = uAddress;
-        this.uCollegeName = uCollegeName;
-        this.uCollegeAddress = uCollegeAddress;
-        this.uCollegeTelephone = uCollegeTelephone;
+        this.uRole = uRole;
         this.uPassword = uPassword;
     }
     public int getID(){
@@ -41,16 +37,34 @@ public class User{
     public String getAddress(){
         return this.uAddress;
     }
-    public String getCollegeName(){
-        return this.uCollegeName;
-    }
-    public String getCollegeAddress(){
-        return this.uCollegeAddress;
-    }
-    public String getCollegeTelephone(){
-        return this.uCollegeTelephone;
-    }
     public String getPassword(){
         return this.uPassword;
+    }
+    public String getRole(){
+        return this.uRole;
+    }
+    public void setID(int uID) {
+        this.uID = uID;
+    }
+    public void setName(String uName) {
+        this.uName = uName;
+    }
+    public void setAadhar(String uAadhar) {
+        this.uAadhar = uAadhar;
+    }
+    public void setDOB(String uDOB) {
+        this.uDOB = uDOB;
+    }
+    public void setGender(String uGender) {
+        this.uGender = uGender;
+    }
+    public void setAddress(String uAddress) {
+        this.uAddress = uAddress;
+    }
+    public void setRole(String uRole) {
+        this.uRole = uRole;
+    }
+    public void setPassword(String uPassword) {
+        this.uPassword = uPassword;
     }
 }

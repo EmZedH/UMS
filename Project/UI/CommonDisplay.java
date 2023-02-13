@@ -91,13 +91,13 @@ public class CommonDisplay {
         // System.out.println("---------------------------------------");
         // System.out.println();
         // System.out.println("             1. Student ");
-        // System.out.println("             2. Staff ");
+        // System.out.println("             2. Professor ");
         // System.out.println("             3. Admin ");
         // System.out.println("             4. Exit ");
         // System.out.println();
         // System.out.println("---------------------------------------");
         // System.out.println();
-        String[] arr = {"Student","Staff","Admin","Exit"};
+        String[] arr = {"Student","Professor","College Admin","Super Admin","Exit"};
         DisplayUtility.optionDialog("Login Page", arr);
     }
     public static void wrongUsernamePassword(){
