@@ -80,7 +80,7 @@ public class DisplayUtility {
 
     public static void userPageDialog(String heading,String name, int id, String[] msg) {
         String p = "";
-        String ki="";
+        String ki= "";
         int flag=1;
         for (int i = 0; i < msg.length+10; i++) {
             if(i==1 || i==3 || i==msg.length+6 || i==msg.length+8){

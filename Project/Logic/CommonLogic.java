@@ -65,7 +65,8 @@ public class CommonLogic {
             System.out.println("Yet To Implement...");
             break;
             case 3:
-            System.out.println("Yet To Implement...");
+            // System.out.println("Yet To Implement...");
+            CollegeAdminLogic.startup();
             break;            
             case 4:
             SuperAdminLogic.startup();
@@ -100,13 +101,11 @@ public class CommonLogic {
                     switch (user) {
                         case 1:
                             
-                            break;
-                    
+                        break;
                         case 2:
-                            break;
-
-
+                        break;
                         case 3:
+                        CollegeAdminLogic.startup();
                         break;
 
                         case 4:
@@ -144,6 +143,7 @@ public class CommonLogic {
                             break;
 
                         case 3:
+                        CollegeAdminLogic.startup();
                         break;
 
                         case 4:

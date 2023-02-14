@@ -17,12 +17,13 @@ public class Connect {
     }
 
 
-    public static void selectUserAll(int choice) throws SQLException{
+    public static void selectEntityAll(int choice) throws SQLException{
         String sqlUser = "SELECT * FROM USER";
         String sqlStudent = "SELECT S_ID, U_NAME, SEC_NAME, S_SEM, S_YEAR, DEPT_NAME, S_DEGREE, S_CGPA, C_NAME, U_PASSWORD, USER_ID FROM STUDENT INNER JOIN USER ON USER.U_ID = STUDENT.USER_ID INNER JOIN SECTION ON SECTION.SEC_ID = STUDENT.SEC_ID INNER JOIN DEPARTMENT ON DEPARTMENT.DEPT_ID = STUDENT.DEPT_ID INNER JOIN COLLEGE ON COLLEGE.C_ID = STUDENT.COLLEGE_ID";
         String sqlProfessor = "SELECT P_ID, U_NAME, DEPT_NAME, C_NAME,U_PASSWORD, USER_ID FROM PROFESSOR INNER JOIN USER ON USER.U_ID = PROFESSOR.USER_ID INNER JOIN DEPARTMENT ON DEPARTMENT.DEPT_ID = PROFESSOR.DEPT_ID INNER JOIN COLLEGE ON COLLEGE.C_ID = PROFESSOR.COLLEGE_ID;";
         String sqlCollegeAdmin = "SELECT CA_ID,U_NAME,C_NAME,U_PASSWORD,USER_ID FROM COLLEGE_ADMIN INNER JOIN COLLEGE ON COLLEGE.C_ID = COLLEGE_ADMIN.COLLEGE_ID INNER JOIN USER ON USER.U_ID = COLLEGE_ADMIN.USER_ID";
         String sqlSuperAdmin = "SELECT SA_ID,U_NAME,U_PASSWORD,USER_ID FROM SUPER_ADMIN INNER JOIN USER ON USER.U_ID = SUPER_ADMIN.USER_ID";
+        String sqlDepartment = "SELECT DEPT_ID, DEPT_NAME, C_NAME FROM DEPARTMENT INNER JOIN COLLEGE ON DEPARTMENT.COLLEGE_ID = COLLEGE.C_ID";
         if(choice==1){
         try(Connection conn = connect();Statement stmt = conn.createStatement();ResultSet rs = stmt.executeQuery(sqlUser)){
             ArrayList<String[]> str = new ArrayList<>();
@@ -41,7 +42,7 @@ public class Connect {
             try(Connection conn = connect();Statement stmt = conn.createStatement();ResultSet rs = stmt.executeQuery(sqlStudent)){
                 ArrayList<String[]> str = new ArrayList<>();
             while(rs.next()){
-                String[] s = {rs.getString("S_ID"),rs.getString("U_NAME"),rs.getString("SEC_NAME"),rs.getString("S_SEM"),rs.getString("S_YEAR"),rs.getString("DEPT_NAME"),rs.getString("S_DEGREE"),rs.getString("S_CGPA"),rs.getString("C_NAME"),rs.getString("U_PASSWORD"),rs.getString("USER_ID")};
+                String[] s = {rs.getString("S_ID"),rs.getString("U_NAME"),rs.getString("SEC_NAME"),rs.getString("S_SEM"),rs.getString("S_YEAR"),rs.getString("DEPT_NAME"),rs.getString("S_DEGREE"),String.format("%.2f",rs.getFloat("S_CGPA")),rs.getString("C_NAME"),rs.getString("U_PASSWORD"),rs.getString("USER_ID")};
                 str.add(s);
             }
             Object[] objStr = str.toArray();
@@ -87,6 +88,19 @@ public class Connect {
             String[][] si = Arrays.copyOf(objStr, objStr.length,String[][].class);
             String[] headings = {"SUPER ADMIN ID","NAME","PASSWORD","USER ID"};
             DisplayUtility.printTable("SUPER ADMIN DETAILS", headings, si);
+            }
+        }
+        else if(choice == 6){
+            try (Connection conn = connect();Statement stmt = conn.createStatement();ResultSet rs = stmt.executeQuery(sqlDepartment)) {
+                ArrayList<String[]> str = new ArrayList<>();
+                while (rs.next()) {
+                    String[] s = {rs.getString("DEPT_ID"),rs.getString("DEPT_NAME"),rs.getString("C_NAME")};
+                    str.add(s);
+                }
+                Object[] objStr = str.toArray();
+                String[][] si = Arrays.copyOf(objStr, objStr.length,String[][].class);
+                String[] headings = {"DEPARTMENT ID","DEPARTMENT NAME","COLLEGE NAME"};
+                DisplayUtility.printTable("DEPARTMENT DETAILS", headings, si);
             }
         }
         return;
@@ -158,6 +172,29 @@ public class Connect {
                 return new SuperAdmin(rs.getInt("SA_ID"), rs.getInt("USER_ID"));
             }
             return null;
+        }
+    }
+
+    public static Department returnDept(int deptID, int collegeID) throws SQLException {
+        String sql = "SELECT * FROM DEPARTMENT WHERE DEPT_ID = ? AND COLLEGE_ID = ?";
+        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1,deptID);
+            pstmt.setInt(2,collegeID);
+            ResultSet rs = pstmt.executeQuery();
+            if(rs.next()){
+                return new Department(rs.getInt("DEPT_ID"),rs.getString("DEPT_NAME"),rs.getInt("COLLEGE_ID"));
+            }
+            return null;
+        }
+    }
+
+    public static void addDepartment(int deptID,String deptName, int collegeID) throws SQLException {
+        String sql = "INSERT INTO DEPARTMENT VALUES (?,?,?)";
+        try(Connection conn = connect();PreparedStatement pstmt = conn.prepareStatement(sql)){
+            pstmt.setInt(1, deptID);
+            pstmt.setString(2,deptName);
+            pstmt.setInt(3,collegeID);
+            pstmt.executeUpdate();
         }
     }
 
@@ -267,7 +304,8 @@ public class Connect {
             pstmtAdmin.setInt(1,sAdminID);
             pstmtAdmin.setInt(2,uID);
             pstmtAdmin.executeUpdate();
-            conn.commit();}
+            conn.commit();
+        }
             catch(SQLException e){
                 conn.rollback();
                 throw new SQLException();
@@ -302,6 +340,34 @@ public class Connect {
             pstmtSAdmin.execute();
             conn.commit();}
             catch(SQLException e){
+                conn.rollback();
+                throw new SQLException();
+            }
+        }
+    }
+
+    public static void deleteDept(int deptID) throws SQLException{
+        String sqlDept = "DELETE FROM DEPARTMENT WHERE DEPT_ID = ?";
+        String sqlSec = "DELETE FROM SECTION WHERE DEPT_ID = ?";
+        String sqlStudent = "DELETE FROM STUDENT WHERE DEPT_ID = ?";
+        String sqlProfessor = "DELETE FROM PROFESSOR WHERE DEPT_ID = ?";
+        try(Connection conn = connect();
+        PreparedStatement pstmtDept = conn.prepareStatement(sqlDept);
+        PreparedStatement pstmtSec = conn.prepareStatement(sqlSec);
+        PreparedStatement pstmtStudent = conn.prepareStatement(sqlStudent);
+        PreparedStatement pstmtProfessor = conn.prepareStatement(sqlProfessor)){
+            try{
+                conn.setAutoCommit(false);
+                pstmtDept.setInt(1,deptID);
+                pstmtDept.execute();
+                pstmtSec.setInt(1,deptID);
+                pstmtSec.execute();
+                pstmtStudent.setInt(1,deptID);
+                pstmtStudent.execute();
+                pstmtProfessor.setInt(1,deptID);
+                pstmtProfessor.execute();
+                conn.commit();
+            }catch(SQLException e){
                 conn.rollback();
                 throw new SQLException();
             }
@@ -394,7 +460,10 @@ public class Connect {
                 pstmtCollegeAdmin.setInt(2, collegeAdmin.getUserID());
                 pstmtCollegeAdmin.setInt(3, collegeAdmin.getCollegeID());
                 pstmtCollegeAdmin.setInt(4, uID);
+                pstmtCollegeAdmin.executeUpdate();
+                conn.commit();
             } catch (SQLException e) {
+                e.printStackTrace();
                 conn.rollback();
                 throw new SQLException();
             }
@@ -420,6 +489,49 @@ public class Connect {
                 pstmtSuperAdmin.setInt(1, superAdmin.getSaID());
                 pstmtSuperAdmin.setInt(2, superAdmin.getUserID());
                 pstmtSuperAdmin.setInt(3, uID);
+                pstmtSuperAdmin.executeUpdate();
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw new SQLException();
+            }
+        }
+    }
+
+    public static void editDepartment(int deptID, int collegeID, Department dept) throws SQLException {
+        String sqlDept = "UPDATE DEPARTMENT SET DEPT_ID = ?, DEPT_NAME = ?, COLLEGE_ID = ? WHERE DEPT_ID = ? AND COLLEGE_ID = ?";
+        String sqlSec = "UPDATE SECTION SET DEPT_ID = ?, COLLEGE_ID = ? WHERE DEPT_ID = ? AND COLLEGE_ID = ?";
+        String sqlStudent = "UPDATE STUDENT SET DEPT_ID = ?,COLLEGE_ID = ? WHERE DEPT_ID = ? AND COLLEGE_ID = ?";
+        String sqlProfessor = "UPDATE PROFESSOR SET DEPT_ID = ?,COLLEGE_ID = ? WHERE DEPT_ID = ? AND COLLEGE_ID = ?";
+        try (Connection conn = connect();
+        PreparedStatement pstmtDept = conn.prepareStatement(sqlDept);
+        PreparedStatement pstmtSec = conn.prepareStatement(sqlSec);
+        PreparedStatement pstmtStudent = conn.prepareStatement(sqlStudent);
+        PreparedStatement pstmtProfessor = conn.prepareStatement(sqlProfessor)) {
+            try {
+                conn.setAutoCommit(false);
+                pstmtDept.setInt(1, dept.getDeptID());
+                pstmtDept.setString(2, dept.getDeptName());
+                pstmtDept.setInt(3, dept.getCollegeID());
+                pstmtDept.setInt(4, deptID);
+                pstmtDept.setInt(5, collegeID);
+                pstmtDept.executeUpdate();
+                pstmtSec.setInt(1, dept.getDeptID());
+                pstmtSec.setInt(2, dept.getCollegeID());
+                pstmtSec.setInt(3, deptID);
+                pstmtSec.setInt(4, collegeID);
+                pstmtSec.executeUpdate();
+                pstmtStudent.setInt(1, dept.getDeptID());
+                pstmtStudent.setInt(2, dept.getCollegeID());
+                pstmtStudent.setInt(3, deptID);
+                pstmtStudent.setInt(4, collegeID);
+                pstmtStudent.executeUpdate();
+                pstmtProfessor.setInt(1, dept.getDeptID());
+                pstmtProfessor.setInt(2, dept.getCollegeID());
+                pstmtProfessor.setInt(3, deptID);
+                pstmtProfessor.setInt(4, collegeID);
+                pstmtProfessor.executeUpdate();
+                conn.commit();
             } catch (SQLException e) {
                 conn.rollback();
                 throw new SQLException();
@@ -436,19 +548,22 @@ public class Connect {
         }
     }
 
-    public static boolean verifyDepartment(int deptID) throws SQLException{
-        String sql = "SELECT * FROM DEPARTMENT WHERE DEPT_ID = ?";
+    public static boolean verifyDepartment(int deptID,int collegeID) throws SQLException{
+        String sql = "SELECT * FROM DEPARTMENT WHERE DEPT_ID = ? AND COLLEGE_ID = ?";
         try(Connection conn = connect();PreparedStatement pstmt = conn.prepareStatement(sql)){
             pstmt.setInt(1,deptID);
+            pstmt.setInt(2,collegeID);
             ResultSet rs = pstmt.executeQuery();
             return rs.next() ? true:false;
         }
     }
 
-    public static boolean verifySection(int secID) throws SQLException{
-        String sql = "SELECT * FROM SECTION WHERE SEC_ID = ?";
+    public static boolean verifySection(int secID, int deptID, int collegeID) throws SQLException{
+        String sql = "SELECT * FROM SECTION WHERE SEC_ID = ? AND DEPT_ID = ? AND COLLEGE_ID = ?";
         try (Connection conn = connect();PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, secID);
+            pstmt.setInt(2,deptID);
+            pstmt.setInt(3,collegeID);
             ResultSet rs = pstmt.executeQuery();
             return rs.next()?true:false;
         }
@@ -463,28 +578,34 @@ public class Connect {
         }
     }
 
-    public static boolean verifyCollegeAdmin(int cAdminID) throws SQLException{
-        String sql = "SELECT * FROM COLLEGE_ADMIN  WHERE CA_ID = ?";
+    public static boolean verifyCollegeAdmin(int cAdminID, int collegeID) throws SQLException{
+        String sql = "SELECT * FROM COLLEGE_ADMIN  WHERE CA_ID = ? AND COLLEGE_ID = ?";
         try(Connection conn = connect();PreparedStatement pstmt = conn.prepareStatement(sql)){
             pstmt.setInt(1,cAdminID);
+            pstmt.setInt(2, collegeID);
             ResultSet rs = pstmt.executeQuery();
             return rs.next() ? true:false;
         }
     }
 
-    public static boolean verifyProfessor(int pID) throws SQLException{
-        String sql = "SELECT * FROM PROFESSOR WHERE P_ID = ?";
+    public static boolean verifyProfessor(int pID,int deptID, int collegeID) throws SQLException{
+        String sql = "SELECT * FROM PROFESSOR WHERE P_ID = ? AND DEPT_ID = ? AND COLLEGE_ID = ?";
         try(Connection conn = connect();PreparedStatement pstmt = conn.prepareStatement(sql)){
             pstmt.setInt(1,pID);
+            pstmt.setInt(2, deptID);
+            pstmt.setInt(3, collegeID);
             ResultSet rs = pstmt.executeQuery();
             return rs.next() ? true:false;
         }
     }
 
-    public static boolean verifyStudent(int sID) throws SQLException{
-        String sql = "SELECT * FROM STUDENT WHERE S_ID = ?";
+    public static boolean verifyStudent(int sID,int secID, int deptID, int collegeID) throws SQLException{
+        String sql = "SELECT * FROM STUDENT WHERE S_ID = ? AND SEC_ID = ? AND DEPT_ID = ? AND COLLEGE_ID = ?";
         try (Connection conn = connect();PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1,sID);
+            pstmt.setInt(2,secID);
+            pstmt.setInt(3,deptID);
+            pstmt.setInt(4,collegeID);
             ResultSet rs = pstmt.executeQuery();
             return rs.next() ? true:false;
         }

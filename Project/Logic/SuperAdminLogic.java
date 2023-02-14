@@ -4,12 +4,13 @@ import java.sql.SQLException;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-
+import Database.CollegeAdmin;
 import Database.Connect;
+import Database.Department;
 import Database.Professor;
 import Database.Student;
+import Database.SuperAdmin;
 import Database.User;
-import UI.SuperAdminDisplay;
 import UI.CommonDisplay;
 import UI.DisplayUtility;
 
@@ -22,7 +23,7 @@ public class SuperAdminLogic {
         try {
         if(Connect.verifyUserIDPassword(uID, password,"\"SUPER ADMIN\"")){
             CommonDisplay.loginVerified();
-            SuperAdminLogic.startPage(Connect.returnUser(uID));
+            startPage(Connect.returnUser(uID));
         }
         else{
             CommonLogic.wrongCredentials(4);
@@ -35,13 +36,16 @@ public class SuperAdminLogic {
 
 
     public static void startPage(User user) throws SQLException{
-        SuperAdminDisplay.firstPage(user);
+        DisplayUtility.userPageDialog("Super Admin Page", user.getName(), user.getID(), new String[]{"User","Course","Department","Record","Registered Student","Section","Tests","Transactions","Colleges","Log Out"});
         try {
             Scanner in = new Scanner(System.in);
             Integer inp = in.nextInt();
             switch(inp){
                 case 1:
                 userManage(user);
+                break;
+                case 3:
+                deptManage(user);
                 break;
                 case 10:
                 CommonLogic.userSelect();
@@ -60,6 +64,7 @@ public class SuperAdminLogic {
         DisplayUtility.optionDialog("Select Option", options);
             Scanner in = new Scanner(System.in);
             Integer inp = in.nextInt();
+            try{
             switch(inp){
                 //Adding User
                 case 1:
@@ -86,7 +91,7 @@ public class SuperAdminLogic {
                     in = new Scanner(System.in);
                     choice = in.nextInt();
                     if(choice==1 || choice==2 || choice==3 || choice==4 || choice == 5){
-                        Connect.selectUserAll(choice);
+                        Connect.selectEntityAll(choice);
                         continue;
                     }
                     else if(choice == 6){
@@ -104,17 +109,241 @@ public class SuperAdminLogic {
                 
                 //Go Back
                 case 5:
-                SuperAdminLogic.startPage(user);
+                startPage(user);
                 break;
                 default:
                 CommonDisplay.properPage();
                 userManage(user);
                 return;
 
+            }}
+            catch(InputMismatchException e){
+                CommonDisplay.properPage();
+                userManage(user);
             }
             return;
     }
-    
+
+    public static void deptManage(User user) throws SQLException{
+        DisplayUtility.optionDialog("Select Option", new String[]{"Add Department","Edit Department","Delete Department","View Department","Back"});
+        try{
+        Scanner in = new Scanner(System.in);
+        int inp = in.nextInt();
+            int collegeID;
+            int deptID;
+            String deptName;
+        switch (inp) {
+
+            //ADD DEPARTMENT
+            case 1:
+            while (true) {
+                try{
+                DisplayUtility.singleDialog("Enter the College ID");
+                in = new Scanner(System.in);
+                collegeID = in.nextInt();
+                if(Connect.verifyCollege(collegeID)){
+                    break;
+                }
+                DisplayUtility.singleDialog("College ID doesn't exist. Please try again");
+                continue;
+            }catch(InputMismatchException e){
+                CommonDisplay.properPage();
+                continue;
+            }
+        }
+        while (true) {
+            try {
+                DisplayUtility.singleDialog("Enter unique Department ID");
+                in = new Scanner(System.in);
+                deptID = in.nextInt();
+                if(!Connect.verifyDepartment(deptID, collegeID)){
+                    break;
+                }
+                DisplayUtility.singleDialog("Department ID already exists. Please try again");
+                continue;
+            } catch (InputMismatchException e) {
+                CommonDisplay.properPage();
+                continue;
+            }
+        }
+        DisplayUtility.singleDialog("Enter the Department Name");
+        in = new Scanner(System.in);
+        deptName = in.nextLine();
+        Connect.addDepartment(deptID, deptName, collegeID);
+        CommonDisplay.processSuccess();
+        deptManage(user);
+            break;
+
+            //EDIT DEPARTMENT
+            case 2:
+            while (true) {
+                try{
+                DisplayUtility.singleDialog("Enter the College ID");
+                in = new Scanner(System.in);
+                collegeID = in.nextInt();
+                if(Connect.verifyCollege(collegeID)){
+                    break;
+                }
+                DisplayUtility.singleDialog("College ID doesn't exist. Please try again");
+                continue;
+            }catch(InputMismatchException e){
+                CommonDisplay.properPage();
+                continue;
+            }
+        }
+        while (true) {
+            try {
+                DisplayUtility.singleDialog("Enter Department ID");
+                in = new Scanner(System.in);
+                deptID = in.nextInt();
+                if(Connect.verifyDepartment(deptID, collegeID)){
+                    break;
+                }
+                DisplayUtility.singleDialog("Department ID doesn't exist. Please try again");
+                continue;
+            } catch (InputMismatchException e) {
+                CommonDisplay.properPage();
+                continue;
+            }
+        }
+        Department department = Connect.returnDept(deptID, collegeID);
+        while (true) {
+            try {
+                DisplayUtility.userPageDialog("Select Property to Edit", department.getDeptName(), deptID, new String[]{"Department ID","Department Name","College ID","Back"});
+                in = new Scanner(System.in);
+                int choice = in.nextInt();
+                if(choice == 1){
+                    while(true){
+                        try{
+                        DisplayUtility.singleDialog("Enter the unique Department ID");
+                        in = new Scanner(System.in);
+                        department.setDeptID(in.nextInt());
+                        if(!Connect.verifyDepartment(department.getDeptID(), department.getCollegeID())){
+                            break;
+                        }
+                        DisplayUtility.singleDialog("Department ID already exists. Please enter different ID");
+                    }
+                        catch(SQLException e){
+                            CommonDisplay.properPage();
+                            continue;
+                        }
+
+                    }
+                }
+                else if(choice == 2){
+                    DisplayUtility.singleDialog("Enter the Department name");
+                    in = new Scanner(System.in);
+                    department.setDeptName(in.nextLine());
+                }
+                else if(choice == 3){
+                    while (true) {
+                        try {
+                            DisplayUtility.singleDialog("Enter the College ID");
+                            in = new Scanner(System.in);
+                            department.setCollegeID(in.nextInt());
+                            if(Connect.verifyCollege(department.getCollegeID())){
+                                break;
+                            }
+                            DisplayUtility.singleDialog("College ID doesn't exist. Please try again");
+                        } catch (InputMismatchException e) {
+                            CommonDisplay.properPage();
+                            continue;
+                        }
+                    }
+                    if(Connect.verifyDepartment(department.getDeptID(), department.getCollegeID())){
+                        DisplayUtility.singleDialog("Same Dept ID exists in College with ID "+department.getCollegeID());
+                        while (true) {
+                            try{
+                            DisplayUtility.singleDialog("Enter unique Department ID");
+                            in = new Scanner(System.in);
+                            department.setDeptID(in.nextInt());
+                            if(!Connect.verifyDepartment(department.getDeptID(), department.getCollegeID())){
+                                break;
+                            }
+                        }
+                            catch(InputMismatchException e){
+                                CommonDisplay.properPage();
+                                continue;
+                            }
+
+                        }
+                    }
+                }
+                else if(choice == 4){
+                    break;
+                }
+                else{
+                    CommonDisplay.properPage();
+                    continue;
+                }
+                Connect.editDepartment(deptID, collegeID, department);
+                collegeID = department.getCollegeID();
+                deptID = department.getDeptID();
+                CommonDisplay.processSuccess();
+            } catch (InputMismatchException e) {
+                CommonDisplay.properPage();
+                continue;
+            }
+        }
+        deptManage(user);
+            break;
+
+            //DELETE DEPARTMENT
+            case 3:
+            while (true) {
+                try{
+                DisplayUtility.singleDialog("Enter the College ID");
+                in = new Scanner(System.in);
+                collegeID = in.nextInt();
+                if(Connect.verifyCollege(collegeID)){
+                    break;
+                }
+                DisplayUtility.singleDialog("College ID doesn't exist. Please try again");
+                continue;
+            }catch(InputMismatchException e){
+                CommonDisplay.properPage();
+                continue;
+            }
+        }
+        while (true) {
+            try {
+                DisplayUtility.singleDialog("Enter Department ID");
+                in = new Scanner(System.in);
+                deptID = in.nextInt();
+                if(Connect.verifyDepartment(deptID, collegeID)){
+                    break;
+                }
+                DisplayUtility.singleDialog("Department ID doesn't exist. Please try again");
+                continue;
+            } catch (InputMismatchException e) {
+                CommonDisplay.properPage();
+                continue;
+            }
+        }
+        Connect.deleteDept(deptID);
+        CommonDisplay.processSuccess();
+        deptManage(user);
+            break;
+
+            //VIEW DEPARTMENT
+            case 4:
+            Connect.selectEntityAll(6);
+            deptManage(user);
+            break;
+            case 5:
+            startPage(user);
+            break;
+            default:
+            CommonDisplay.properPage();
+            deptManage(user);
+            return;
+        }}
+        catch(InputMismatchException e){
+            CommonDisplay.properPage();
+            deptManage(user);
+        }
+        return;
+    }
 
     public static void addUser(User user) throws SQLException{
         Scanner in = new Scanner(System.in);
@@ -193,6 +422,49 @@ public class SuperAdminLogic {
         int secID;
 
         while(true){
+            try {
+                DisplayUtility.singleDialog("Enter the College ID");
+                in = new Scanner(System.in);
+                collegeID = in.nextInt();
+                if(Connect.verifyCollege(collegeID)){
+                    break;}
+                DisplayUtility.singleDialog("College ID doesn't exist. Please try again");
+                continue;
+            } catch (InputMismatchException e) {
+                CommonDisplay.properPage();
+                continue;
+            }
+        }
+        while (true) {
+            try {
+                DisplayUtility.singleDialog("Enter the Department ID");
+                in = new Scanner(System.in);
+                deptID = in.nextInt();
+                if(Connect.verifyDepartment(deptID,collegeID)){
+                    break;
+                }
+                DisplayUtility.singleDialog("Department ID doesn't exixt. Please try again");
+            } catch (InputMismatchException e) {
+                CommonDisplay.properPage();
+                continue;
+            }
+        }
+        while (true) {
+            try {
+                DisplayUtility.singleDialog("Enter the Section ID");
+                in = new Scanner(System.in);
+                secID = in.nextInt();
+                if(Connect.verifySection(secID,deptID,collegeID)){
+                    break;
+                }
+                DisplayUtility.singleDialog("Section ID doesn't exist. Please try again");
+            } catch (InputMismatchException e) {
+                CommonDisplay.properPage();
+                continue;
+            }
+        }
+
+        while(true){
         String arr[] = {"Student","Professor","College Admin","Super Admin"};
         DisplayUtility.optionDialog("Select Role", arr);
         try{
@@ -212,7 +484,7 @@ public class SuperAdminLogic {
                     DisplayUtility.singleDialog("Enter the unique Student ID");
                     in = new Scanner(System.in);
                     sID = in.nextInt();
-                    if(!Connect.verifyStudent(sID)){
+                    if(!Connect.verifyStudent(sID,secID, deptID, collegeID)){
                         break;
                     }
                     DisplayUtility.singleDialog("ID already exists. Please enter different student ID");
@@ -371,48 +643,7 @@ public class SuperAdminLogic {
                     continue;
                 }
             }
-            while (true) {
-                try {
-                    DisplayUtility.singleDialog("Enter the Section ID");
-                    in = new Scanner(System.in);
-                    secID = in.nextInt();
-                    if(Connect.verifySection(secID)){
-                        break;
-                    }
-                    DisplayUtility.singleDialog("Section ID doesn't exist. Please try again");
-                } catch (InputMismatchException e) {
-                    CommonDisplay.properPage();
-                    continue;
-                }
-            }
-            while (true) {
-                try {
-                    DisplayUtility.singleDialog("Enter the Department ID");
-                    in = new Scanner(System.in);
-                    deptID = in.nextInt();
-                    if(Connect.verifyDepartment(deptID)){
-                        break;
-                    }
-                    DisplayUtility.singleDialog("Department ID doesn't exixt. Please try again");
-                } catch (InputMismatchException e) {
-                    CommonDisplay.properPage();
-                    continue;
-                }
-            }
-            while(true){
-                try {
-                    DisplayUtility.singleDialog("Enter the College ID");
-                    in = new Scanner(System.in);
-                    collegeID = in.nextInt();
-                    if(Connect.verifyCollege(collegeID)){
-                        break;}
-                    DisplayUtility.singleDialog("College ID doesn't exist. Please try again");
-                    continue;
-                } catch (InputMismatchException e) {
-                    CommonDisplay.properPage();
-                    continue;
-                }
-            }
+            
             
             Connect.addStudent(uID, uName, uAadhar, uDOB, uGender, uAddress, uRole, uPassword, sID, sem, year, degree, cgpa, secID, deptID, collegeID);
             break;
@@ -425,7 +656,7 @@ public class SuperAdminLogic {
                     DisplayUtility.singleDialog("Enter the unique Professor ID");
                     in = new Scanner(System.in);
                     pID = in.nextInt();
-                    if(!Connect.verifyProfessor(pID)){
+                    if(!Connect.verifyProfessor(pID,deptID,collegeID)){
                         break;
                     }
                     DisplayUtility.singleDialog("ID already exists. Please enter different professor ID");
@@ -439,7 +670,7 @@ public class SuperAdminLogic {
                     DisplayUtility.singleDialog("Enter the Department ID");
                     in = new Scanner(System.in);
                     deptID = in.nextInt();
-                    if(Connect.verifyDepartment(deptID)){
+                    if(Connect.verifyDepartment(deptID,collegeID)){
                         break;
                     }
                     DisplayUtility.singleDialog("Department ID doesn't exixt. Please try again");
@@ -473,7 +704,7 @@ public class SuperAdminLogic {
                     DisplayUtility.singleDialog("Enter the unique College Admin ID");
                     in = new Scanner(System.in);
                     caID = in.nextInt();
-                    if(!Connect.verifyCollegeAdmin(caID)){
+                    if(!Connect.verifyCollegeAdmin(caID,collegeID)){
                         break;}
                     DisplayUtility.singleDialog("ID already exists. Please enter different admin ID");
                     continue;
@@ -524,7 +755,8 @@ public class SuperAdminLogic {
             CommonDisplay.properPage();
             continue;
         }
-        break;}
+        break;
+    }
         catch(InputMismatchException e){
             CommonDisplay.properPage();
             continue;
@@ -718,7 +950,7 @@ public static void editUser(User user) throws SQLException{
                             switch (g) {
                                 case 1:
                                 i = 1;
-                                while(Connect.verifyProfessor(i)){
+                                while(Connect.verifyProfessor(i,student.getDeptID(),student.getCollegeID())){
                                     i++;
                                 }
                                 userVar.setRole("PROFESSOR");
@@ -727,7 +959,7 @@ public static void editUser(User user) throws SQLException{
                                 break;
                                 case 2:
                                 i = 1;
-                                while(Connect.verifyCollegeAdmin(i)){
+                                while(Connect.verifyCollegeAdmin(i,student.getCollegeID())){
                                     i++;
                                 }
                                 userVar.setRole("COLLEGE ADMIN");
@@ -769,7 +1001,7 @@ public static void editUser(User user) throws SQLException{
                         DisplayUtility.singleDialog("Enter the unique Student ID");
                         in = new Scanner(System.in);
                         int c1 = in.nextInt();
-                        if(!Connect.verifyStudent(c1)){
+                        if(!Connect.verifyStudent(c1,student.getSecID(),student.getDeptID(),student.getCollegeID())){
                             student.setsID(c1);
                             break;
                         }
@@ -917,7 +1149,7 @@ public static void editUser(User user) throws SQLException{
                             in = new Scanner(System.in);
                             // secID = in.nextInt();
                             student.setSecID(in.nextInt());
-                            if(Connect.verifySection(student.getSecID())){
+                            if(Connect.verifySection(student.getSecID(),student.getDeptID(),student.getCollegeID())){
                                 break;
                             }
                             DisplayUtility.singleDialog("Section ID doesn't exist. Please try again");
@@ -943,6 +1175,36 @@ public static void editUser(User user) throws SQLException{
                             continue;
                         }
                     }
+                    while (true) {
+                        try {
+                            DisplayUtility.singleDialog("Enter the Department ID");
+                            in = new Scanner(System.in);
+                            // deptID = in.nextInt();
+                            student.setDeptID(in.nextInt(uID));
+                            if(Connect.verifyDepartment(student.getDeptID(),student.getCollegeID())){
+                                break;
+                            }
+                            DisplayUtility.singleDialog("Department ID doesn't exixt. Please try again");
+                        } catch (InputMismatchException e) {
+                            CommonDisplay.properPage();
+                            continue;
+                        }
+                    } 
+                    while (true) {
+                        try {
+                            DisplayUtility.singleDialog("Enter the Section ID");
+                            in = new Scanner(System.in);
+                            // secID = in.nextInt();
+                            student.setSecID(in.nextInt());
+                            if(Connect.verifySection(student.getSecID(),student.getDeptID(),student.getCollegeID())){
+                                break;
+                            }
+                            DisplayUtility.singleDialog("Section ID doesn't exist. Please try again");
+                        } catch (InputMismatchException e) {
+                            CommonDisplay.properPage();
+                            continue;
+                        }
+                    }
                     break;
                     case 14:
                     while (true) {
@@ -951,7 +1213,7 @@ public static void editUser(User user) throws SQLException{
                             in = new Scanner(System.in);
                             // deptID = in.nextInt();
                             student.setDeptID(in.nextInt(uID));
-                            if(Connect.verifyDepartment(student.getDeptID())){
+                            if(Connect.verifyDepartment(student.getDeptID(),student.getCollegeID())){
                                 break;
                             }
                             DisplayUtility.singleDialog("Department ID doesn't exixt. Please try again");
@@ -959,7 +1221,22 @@ public static void editUser(User user) throws SQLException{
                             CommonDisplay.properPage();
                             continue;
                         }
-                    }   
+                    }  
+                    while (true) {
+                        try {
+                            DisplayUtility.singleDialog("Enter the Section ID");
+                            in = new Scanner(System.in);
+                            // secID = in.nextInt();
+                            student.setSecID(in.nextInt());
+                            if(Connect.verifySection(student.getSecID(),student.getDeptID(),student.getCollegeID())){
+                                break;
+                            }
+                            DisplayUtility.singleDialog("Section ID doesn't exist. Please try again");
+                        } catch (InputMismatchException e) {
+                            CommonDisplay.properPage();
+                            continue;
+                        }
+                    } 
                     break;
                     case 15:
                     flag=false;
@@ -1084,16 +1361,16 @@ public static void editUser(User user) throws SQLException{
                         switch (g) {
                         case 1:
                         i = 1;
-                        while(Connect.verifyStudent(i)){
+                        while(Connect.verifyStudent(i,1,professor.getDeptID(),professor.getCollegeID())){
                             i++;
                         }
                         userVar.setRole("STUDENT");
                         Connect.deleteUser(uID);
-                        Connect.addStudent(uID, userVar.getName(), userVar.getAadhar(), userVar.getDOB(), userVar.getGender(), userVar.getAddress(), userVar.getRole(), userVar.getPassword(), i, 1, 1, "B. Tech", 0, 1, 1, 1);
+                        Connect.addStudent(uID, userVar.getName(), userVar.getAadhar(), userVar.getDOB(), userVar.getGender(), userVar.getAddress(), userVar.getRole(), userVar.getPassword(), i, 1, 1, "B. Tech", 0, 1, professor.getDeptID(), professor.getCollegeID());
                             break;
                         case 2:
                         i = 1;
-                        while(Connect.verifyCollegeAdmin(i)){
+                        while(Connect.verifyCollegeAdmin(i,professor.getCollegeID())){
                             i++;
                         }
                         userVar.setRole("COLLEGE ADMIN");
@@ -1135,7 +1412,7 @@ public static void editUser(User user) throws SQLException{
                         DisplayUtility.singleDialog("Enter the unique Professor ID");
                         in = new Scanner(System.in);
                         int c1 = in.nextInt();
-                        if(!Connect.verifyProfessor(c1)){
+                        if(!Connect.verifyProfessor(c1,professor.getDeptID(),professor.getCollegeID())){
                             professor.setpID(c1);
                             break;
                         }
@@ -1168,6 +1445,21 @@ public static void editUser(User user) throws SQLException{
                             continue;
                         }
                     }
+                    while (true) {
+                        try {
+                            DisplayUtility.singleDialog("Enter the Department ID");
+                            in = new Scanner(System.in);
+                            // deptID = in.nextInt();
+                            professor.setDeptID(in.nextInt(uID));
+                            if(Connect.verifyDepartment(professor.getDeptID(),professor.getCollegeID())){
+                                break;
+                            }
+                            DisplayUtility.singleDialog("Department ID doesn't exixt. Please try again");
+                        } catch (InputMismatchException e) {
+                            CommonDisplay.properPage();
+                            continue;
+                        }
+                    }  
                     break;
                     case 11:
                     while (true) {
@@ -1176,7 +1468,7 @@ public static void editUser(User user) throws SQLException{
                             in = new Scanner(System.in);
                             // deptID = in.nextInt();
                             professor.setDeptID(in.nextInt(uID));
-                            if(Connect.verifyDepartment(professor.getDeptID())){
+                            if(Connect.verifyDepartment(professor.getDeptID(),professor.getCollegeID())){
                                 break;
                             }
                             DisplayUtility.singleDialog("Department ID doesn't exixt. Please try again");
@@ -1208,9 +1500,205 @@ public static void editUser(User user) throws SQLException{
          
         }
         else if(userVar!=null && userVar.getRole().equals("COLLEGE ADMIN")){ 
-            Student student = Connect.returnStudent(uID);
-            if(student!=null){
-                
+            CollegeAdmin collegeAdmin = Connect.returnCollegeAdmin(uID);
+            if(collegeAdmin!=null){
+                DisplayUtility.userPageDialog("Edit College Admin",userVar.getName(), userVar.getID(), new String[]{
+                    "User ID","Name","Aadhar","Date of Birth","Gender","Address","Role","Password",
+                    "College Admin ID","College","Back"});
+                    in = new Scanner(System.in);
+                    int choiceCAdmin = in.nextInt();
+                    switch (choiceCAdmin) {
+                        case 1:
+                            while(true){
+                                try{
+                                DisplayUtility.singleDialog("Enter the unique User ID");
+                                in = new Scanner(System.in);
+                                int c1 = in.nextInt();
+                                if(Connect.returnUser(c1) == null){
+                                    userVar.setID(c1);
+                                    collegeAdmin.setUserID(c1);
+                                    break;
+                                }
+                                else if(c1 == userVar.getID()){
+                                    DisplayUtility.singleDialog("Same User ID entered. No changes made");
+                                    successFlag = false;
+                                    break;
+                                }
+                                DisplayUtility.singleDialog("User ID exists. Please enter different User ID");
+                                continue;
+                            }
+                                catch(InputMismatchException e){
+                                    CommonDisplay.properPage();
+                                    continue;
+                                }
+                            }
+                        break;
+                        case 2:
+                        in = new Scanner(System.in);
+                        DisplayUtility.singleDialog("Enter the User name");
+                        userVar.setName(in.nextLine());
+                        break;
+                        case 3:
+                        in = new Scanner(System.in);
+                        DisplayUtility.singleDialog("Enter User Aadhar");
+                        userVar.setAadhar(in.nextLine());
+                        break;
+                        case 4:
+                        while (true) {
+                            in = new Scanner(System.in);
+                            DisplayUtility.singleDialog("Enter the Date of Birth");
+                            String date = in.nextLine();
+                            if(CommonLogic.dateFormatInput(date)){
+                                userVar.setDOB(date);
+                                break;
+                            }
+                        }
+                        break;
+                        case 5:
+                        while(true){
+                            String arr[] = {"Male","Female","Other"};
+                            DisplayUtility.optionDialog("Select the Gender", arr);
+                            try{
+                            in = new Scanner(System.in);
+                            Integer g = in.nextInt();
+                            switch (g) {
+                            case 1:
+                            userVar.setGender("M");
+                                break;
+                            case 2:
+                            userVar.setGender("F");
+                                break;
+                            case 3:
+                            userVar.setGender("O");
+                                break;
+                            default:
+                            CommonDisplay.properPage();
+                            continue;
+                            }
+                            break;}
+                            catch(InputMismatchException e){
+                                CommonDisplay.properPage();
+                                continue;
+                            }
+                            
+                        }
+                        break;
+                        case 6:
+                        in = new Scanner(System.in);
+                        DisplayUtility.singleDialog("Enter the Address");
+                        userVar.setAddress(in.nextLine());
+                        break;
+                        case 7:
+                        DisplayUtility.dialogWithHeader("Warning", "College Admin data will be lost if you proceed");
+                        while(true){
+                            String arr[] = {"Student","Professor","Super Admin"};
+                            DisplayUtility.optionDialog("Select the Role", arr);
+                            try{
+                            in = new Scanner(System.in);
+                            Integer g = in.nextInt();
+                            int i = 1;
+                            switch (g) {
+                            case 1:
+                            i = 1;
+                            while(Connect.verifyStudent(i,1,1,collegeAdmin.getCollegeID())){
+                                i++;
+                            }
+                            userVar.setRole("STUDENT");
+                            Connect.deleteUser(uID);
+                            Connect.addStudent(uID, userVar.getName(), userVar.getAadhar(), userVar.getDOB(), userVar.getGender(), userVar.getAddress(), userVar.getRole(), userVar.getPassword(), i, 1, 1, "B. Tech", 0, 1, 1, collegeAdmin.getCollegeID());
+                                break;
+                            case 2:
+                            i = 1;
+                            while(Connect.verifyProfessor(i,1,collegeAdmin.getCollegeID())){
+                                i++;
+                            }
+                            userVar.setRole("PROFESSOR");
+                            Connect.deleteUser(uID);
+                            Connect.addProfessor(uID, userVar.getName(), userVar.getAadhar(), userVar.getDOB(), userVar.getGender(), userVar.getAddress(), userVar.getRole(), userVar.getPassword(),i ,1,collegeAdmin.getCollegeID() );
+                            break;
+                            case 3:
+                            i = 1;
+                            while(Connect.verifySuperAdmin(i)){
+                                i++;
+                            }
+                            userVar.setRole("SUPER ADMIN");
+                            Connect.deleteUser(uID);
+                            Connect.addSuperAdmin(uID, userVar.getName(), userVar.getAadhar(), userVar.getDOB(), userVar.getGender(), userVar.getAddress(), userVar.getRole(), userVar.getPassword(),i);
+                            break;
+                            case 4:
+                            break;
+                            default:
+                            CommonDisplay.properPage();
+                            continue;
+                            }
+                            DisplayUtility.singleDialog("Default values updated to new role");
+                            break;}
+                            catch(InputMismatchException e){
+                                CommonDisplay.properPage();
+                                continue;
+                            }
+                            
+                        }
+                        break;
+                        case 8:
+                        in = new Scanner(System.in);
+                        DisplayUtility.singleDialog("Enter the password");
+                        userVar.setPassword(in.nextLine());
+                        break;
+                        case 9:
+                        while(true){
+                            try{
+                            DisplayUtility.singleDialog("Enter the unique College Admin ID");
+                            in = new Scanner(System.in);
+                            int c1 = in.nextInt();
+                            if(!Connect.verifyCollegeAdmin(c1,collegeAdmin.getCollegeID())){
+                                collegeAdmin.setCaID(c1);
+                                break;
+                            }
+                            else if(c1 == collegeAdmin.getCaID()){
+                                DisplayUtility.singleDialog("Same College Admin ID entered. No changes made");
+                                successFlag=false;
+                                break;
+                            }
+                            DisplayUtility.singleDialog("College Admin ID already exists. Please try again");
+                            continue;
+                        }
+                            catch(InputMismatchException e){
+                                CommonDisplay.properPage();
+                                continue;
+                            }
+                        }
+                        break;
+                        case 10:
+                        while(true){
+                            try {
+                                DisplayUtility.singleDialog("Enter the College ID");
+                                in = new Scanner(System.in);
+                                collegeAdmin.setCollegeID(in.nextInt());
+                                if(Connect.verifyCollege(collegeAdmin.getCollegeID())){
+                                    break;}
+                                DisplayUtility.singleDialog("College ID doesn't exist. Please try again");
+                                continue;
+                            } catch (InputMismatchException e) {
+                                CommonDisplay.properPage();
+                                continue;
+                            }
+                        }
+                        break;
+                        case 11:
+                        flag=false;
+                        userManage(user);
+                        break;
+                        default:
+                            CommonDisplay.properPage();
+                        continue;
+                    }
+                    Connect.editCollegeAdmin(uID, userVar, collegeAdmin);
+                    uID = userVar.getID();
+                    if(flag && successFlag){
+                    CommonDisplay.processSuccess();
+                }
+                successFlag = true;
             }
             else{
                 DisplayUtility.singleDialog("College Admin data doesn't exist. Please check database");
@@ -1219,9 +1707,189 @@ public static void editUser(User user) throws SQLException{
             }
         }
         else if(userVar!=null && userVar.getRole().equals("SUPER ADMIN")){ 
-            Student student = Connect.returnStudent(uID);
-            if(student!=null){
-                
+            SuperAdmin superAdmin = Connect.returnSuperAdmin(uID);
+            if(superAdmin!=null){
+                DisplayUtility.userPageDialog("Edit Super Admin",userVar.getName(), userVar.getID(), new String[]{
+                    "User ID","Name","Aadhar","Date of Birth","Gender","Address","Role","Password",
+                    "Super Admin ID","Back"});
+                    in = new Scanner(System.in);
+                    int choiceSAdmin = in.nextInt();
+                    switch (choiceSAdmin) {
+                        case 1:
+                            while(true){
+                                try{
+                                DisplayUtility.singleDialog("Enter the unique User ID");
+                                in = new Scanner(System.in);
+                                int c1 = in.nextInt();
+                                if(Connect.returnUser(c1) == null){
+                                    userVar.setID(c1);
+                                    superAdmin.setUserID(c1);
+                                    break;
+                                }
+                                else if(c1 == userVar.getID()){
+                                    DisplayUtility.singleDialog("Same User ID entered. No changes made");
+                                    successFlag = false;
+                                    break;
+                                }
+                                DisplayUtility.singleDialog("User ID exists. Please enter different User ID");
+                                continue;
+                            }
+                                catch(InputMismatchException e){
+                                    CommonDisplay.properPage();
+                                    continue;
+                                }
+                            }
+                        break;
+                        case 2:
+                        in = new Scanner(System.in);
+                        DisplayUtility.singleDialog("Enter the User name");
+                        userVar.setName(in.nextLine());
+                        break;
+                        case 3:
+                        in = new Scanner(System.in);
+                        DisplayUtility.singleDialog("Enter User Aadhar");
+                        userVar.setAadhar(in.nextLine());
+                        break;
+                        case 4:
+                        while (true) {
+                            in = new Scanner(System.in);
+                            DisplayUtility.singleDialog("Enter the Date of Birth");
+                            String date = in.nextLine();
+                            if(CommonLogic.dateFormatInput(date)){
+                                userVar.setDOB(date);
+                                break;
+                            }
+                        }
+                        break;
+                        case 5:
+                        while(true){
+                            String arr[] = {"Male","Female","Other"};
+                            DisplayUtility.optionDialog("Select the Gender", arr);
+                            try{
+                            in = new Scanner(System.in);
+                            Integer g = in.nextInt();
+                            switch (g) {
+                            case 1:
+                            userVar.setGender("M");
+                                break;
+                            case 2:
+                            userVar.setGender("F");
+                                break;
+                            case 3:
+                            userVar.setGender("O");
+                                break;
+                            default:
+                            CommonDisplay.properPage();
+                            continue;
+                            }
+                            break;}
+                            catch(InputMismatchException e){
+                                CommonDisplay.properPage();
+                                continue;
+                            }
+                            
+                        }
+                        break;
+                        case 6:
+                        in = new Scanner(System.in);
+                        DisplayUtility.singleDialog("Enter the Address");
+                        userVar.setAddress(in.nextLine());
+                        break;
+                        case 7:
+                        DisplayUtility.dialogWithHeader("Warning", "Super Admin data will be lost if you proceed");
+                        while(true){
+                            String arr[] = {"Student","Professor","Super Admin"};
+                            DisplayUtility.optionDialog("Select the Role", arr);
+                            try{
+                            in = new Scanner(System.in);
+                            Integer g = in.nextInt();
+                            int i = 1;
+                            switch (g) {
+                            case 1:
+                            i = 1;
+                            while(Connect.verifyStudent(i,1,1,1)){
+                                i++;
+                            }
+                            userVar.setRole("STUDENT");
+                            Connect.deleteUser(uID);
+                            Connect.addStudent(uID, userVar.getName(), userVar.getAadhar(), userVar.getDOB(), userVar.getGender(), userVar.getAddress(), userVar.getRole(), userVar.getPassword(), i, 1, 1, "B. Tech", 0, 1, 1, 1);
+                                break;
+                            case 2:
+                            i = 1;
+                            while(Connect.verifyProfessor(i,1,1)){
+                                i++;
+                            }
+                            userVar.setRole("PROFESSOR");
+                            Connect.deleteUser(uID);
+                            Connect.addProfessor(uID, userVar.getName(), userVar.getAadhar(), userVar.getDOB(), userVar.getGender(), userVar.getAddress(), userVar.getRole(), userVar.getPassword(),i ,1,1);
+                            break;
+                            case 3:
+                            i = 1;
+                            while(Connect.verifyCollegeAdmin(i,1)){
+                                i++;
+                            }
+                            userVar.setRole("COLLEGE ADMIN");
+                            Connect.deleteUser(uID);
+                            Connect.addCollegeAdmin(uID, userVar.getName(), userVar.getAadhar(), userVar.getDOB(), userVar.getGender(), userVar.getAddress(), userVar.getRole(), userVar.getPassword(),i,1);
+                            break;
+                            case 4:
+                            break;
+                            default:
+                            CommonDisplay.properPage();
+                            continue;
+                            }
+                            DisplayUtility.singleDialog("Default values updated to new role");
+                            break;}
+                            catch(InputMismatchException e){
+                                CommonDisplay.properPage();
+                                continue;
+                            }
+                            
+                        }
+                        break;
+                        case 8:
+                        in = new Scanner(System.in);
+                        DisplayUtility.singleDialog("Enter the password");
+                        userVar.setPassword(in.nextLine());
+                        break;
+                        case 9:
+                        while(true){
+                            try{
+                            DisplayUtility.singleDialog("Enter the unique Super Admin ID");
+                            in = new Scanner(System.in);
+                            int c1 = in.nextInt();
+                            if(!Connect.verifySuperAdmin(c1)){
+                                superAdmin.setSaID(c1);
+                                break;
+                            }
+                            else if(c1 == superAdmin.getSaID()){
+                                DisplayUtility.singleDialog("Same College Admin ID entered. No changes made");
+                                successFlag=false;
+                                break;
+                            }
+                            DisplayUtility.singleDialog("Super Admin ID already exists. Please try again");
+                            continue;
+                        }
+                            catch(InputMismatchException e){
+                                CommonDisplay.properPage();
+                                continue;
+                            }
+                        }
+                        break;
+                        case 10:
+                        flag=false;
+                        userManage(user);
+                        break;
+                        default:
+                            CommonDisplay.properPage();
+                        continue;
+                    }
+                    Connect.editSuperAdmin(uID, userVar, superAdmin);
+                    uID = userVar.getID();
+                    if(flag && successFlag){
+                    CommonDisplay.processSuccess();
+                }
+                successFlag = true;
             }
             else{
                 DisplayUtility.singleDialog("Super Admin data doesn't exist. Please check database");
@@ -1247,6 +1915,7 @@ public static void editUser(User user) throws SQLException{
     }
 
 }
+
 }
 
     
