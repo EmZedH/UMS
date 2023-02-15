@@ -1,4 +1,4 @@
-package UI;
+package UI.Utility;
 
 public class DisplayUtility {
     static int lineSize = 60;
@@ -42,12 +42,11 @@ public class DisplayUtility {
                         ki = msg[k];
                     }
                 }
-                msg[i-5] = Integer.toString(i-4) + ". " + msg[i-5]; 
                 for (int j = 0;j+3< lineSize - (p+ki).length() -1 && flag==1; j++) {
                     p = " "+p;
                 }
                 flag=0;
-                System.out.print(p+msg[i-5]);
+                System.out.print(p+Integer.toString(i-4) + ". " + msg[i-5]);
             }
             System.out.println();
         }
@@ -100,12 +99,13 @@ public class DisplayUtility {
                         ki = msg[k];
                     }
                 }
-                msg[i-5] = Integer.toString(i-4) + ". " + msg[i-5]; 
+                // msg[i-5] = Integer.toString(i-4) + ". " + msg[i-5]; 
                 for (int j = 0;j+3< lineSize - (p+ki).length() -1 && flag==1; j++) {
                     p = " "+p;
                 }
                 flag=0;
-                System.out.print(p+msg[i-5]);
+                // System.out.print(p+msg[i-5]);
+                System.out.print(p+Integer.toString(i-4) + ". " + msg[i-5]);
             }
             else if(i==msg.length+7){
                 String uID = "ID: "+Integer.toString(id);

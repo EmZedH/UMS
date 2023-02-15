@@ -1,9 +1,5 @@
 package Database;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import UI.DisplayUtility;
 public class Connect {
 
     static String url = "jdbc:sqlite:/Users/muhamed-pt7045/Desktop/UMS/UMS/db/ums.db"; //"jdbc:sqlite:E:Github/Internship/UMS/db/ums.db"
@@ -16,95 +12,6 @@ public class Connect {
         return conn;
     }
 
-
-    public static void selectEntityAll(int choice) throws SQLException{
-        String sqlUser = "SELECT * FROM USER";
-        String sqlStudent = "SELECT S_ID, U_NAME, SEC_NAME, S_SEM, S_YEAR, DEPT_NAME, S_DEGREE, S_CGPA, C_NAME, U_PASSWORD, USER_ID FROM STUDENT INNER JOIN USER ON USER.U_ID = STUDENT.USER_ID INNER JOIN SECTION ON SECTION.SEC_ID = STUDENT.SEC_ID INNER JOIN DEPARTMENT ON DEPARTMENT.DEPT_ID = STUDENT.DEPT_ID INNER JOIN COLLEGE ON COLLEGE.C_ID = STUDENT.COLLEGE_ID";
-        String sqlProfessor = "SELECT P_ID, U_NAME, DEPT_NAME, C_NAME,U_PASSWORD, USER_ID FROM PROFESSOR INNER JOIN USER ON USER.U_ID = PROFESSOR.USER_ID INNER JOIN DEPARTMENT ON DEPARTMENT.DEPT_ID = PROFESSOR.DEPT_ID INNER JOIN COLLEGE ON COLLEGE.C_ID = PROFESSOR.COLLEGE_ID;";
-        String sqlCollegeAdmin = "SELECT CA_ID,U_NAME,C_NAME,U_PASSWORD,USER_ID FROM COLLEGE_ADMIN INNER JOIN COLLEGE ON COLLEGE.C_ID = COLLEGE_ADMIN.COLLEGE_ID INNER JOIN USER ON USER.U_ID = COLLEGE_ADMIN.USER_ID";
-        String sqlSuperAdmin = "SELECT SA_ID,U_NAME,U_PASSWORD,USER_ID FROM SUPER_ADMIN INNER JOIN USER ON USER.U_ID = SUPER_ADMIN.USER_ID";
-        String sqlDepartment = "SELECT DEPT_ID, DEPT_NAME, C_NAME FROM DEPARTMENT INNER JOIN COLLEGE ON DEPARTMENT.COLLEGE_ID = COLLEGE.C_ID";
-        if(choice==1){
-        try(Connection conn = connect();Statement stmt = conn.createStatement();ResultSet rs = stmt.executeQuery(sqlUser)){
-            ArrayList<String[]> str = new ArrayList<>();
-            while(rs.next()){
-                String[] s = {rs.getString("U_ID"),rs.getString("U_NAME"),rs.getString("U_AADHAR"),rs.getString("U_DOB"),rs.getString("U_GENDER"),rs.getString("U_ADDRESS"),rs.getString("U_ROLE"),rs.getString("U_PASSWORD")};
-                str.add(s);
-            }
-            Object[] objStr = str.toArray();
-            String[][] si = Arrays.copyOf(objStr, objStr.length,String[][].class);
-            String[] headings = {"USER ID","NAME","AADHAR","DATE OF BIRTH","GENDER","ADDRESS","ROLE","PASSWORD"};
-            DisplayUtility.printTable("USER TABLE", headings, si);
-            }
-            }
-        
-        else if(choice == 2){
-            try(Connection conn = connect();Statement stmt = conn.createStatement();ResultSet rs = stmt.executeQuery(sqlStudent)){
-                ArrayList<String[]> str = new ArrayList<>();
-            while(rs.next()){
-                String[] s = {rs.getString("S_ID"),rs.getString("U_NAME"),rs.getString("SEC_NAME"),rs.getString("S_SEM"),rs.getString("S_YEAR"),rs.getString("DEPT_NAME"),rs.getString("S_DEGREE"),String.format("%.2f",rs.getFloat("S_CGPA")),rs.getString("C_NAME"),rs.getString("U_PASSWORD"),rs.getString("USER_ID")};
-                str.add(s);
-            }
-            Object[] objStr = str.toArray();
-            String[][] si = Arrays.copyOf(objStr, objStr.length,String[][].class);
-            String[] headings = {"STUDENT ID","NAME","SECTION","SEMESTER","YEAR","DEPARTMENT","DEGREE","CGPA","COLLEGE","PASSWORD","USER ID"};
-            DisplayUtility.printTable("STUDENT DETAILS", headings, si);
-            }
-        }
-        else if(choice == 3){
-            try(Connection conn = connect();Statement stmt = conn.createStatement();ResultSet rs = stmt.executeQuery(sqlProfessor)){
-                ArrayList<String[]> str = new ArrayList<>();
-            while(rs.next()){
-                String[] s = {rs.getString("P_ID"),rs.getString("U_NAME"),rs.getString("DEPT_NAME"),rs.getString("C_NAME"),rs.getString("U_PASSWORD"),rs.getString("USER_ID")};
-                str.add(s);
-            }
-            Object[] objStr = str.toArray();
-            String[][] si = Arrays.copyOf(objStr, objStr.length,String[][].class);
-            String[] headings = {"PROFESSOR ID","NAME","DEPARTMENT","COLLEGE","PASSWORD","USER ID"};
-            DisplayUtility.printTable("PROFESSOR DETAILS", headings, si);
-            }
-        }
-        else if(choice == 4){
-            try(Connection conn = connect();Statement stmt = conn.createStatement();ResultSet rs = stmt.executeQuery(sqlCollegeAdmin)){
-                ArrayList<String[]> str = new ArrayList<>();
-            while(rs.next()){
-                String[] s = {rs.getString("CA_ID"),rs.getString("U_NAME"),rs.getString("C_NAME"),rs.getString("U_PASSWORD"),rs.getString("USER_ID")};
-                str.add(s);
-            }
-            Object[] objStr = str.toArray();
-            String[][] si = Arrays.copyOf(objStr, objStr.length,String[][].class);
-            String[] headings = {"COLLEGE ADMIN ID","NAME","UCOLLEGE","PASSWORD","USER ID"};
-            DisplayUtility.printTable("COLLEGE ADMIN DETAILS", headings, si);
-            }
-        }
-        else if(choice == 5){
-            try(Connection conn = connect();Statement stmt = conn.createStatement();ResultSet rs = stmt.executeQuery(sqlSuperAdmin)){
-                ArrayList<String[]> str = new ArrayList<>();
-            while(rs.next()){
-                String[] s = {rs.getString("SA_ID"),rs.getString("U_NAME"),rs.getString("U_PASSWORD"),rs.getString("USER_ID")};
-                str.add(s);
-            }
-            Object[] objStr = str.toArray();
-            String[][] si = Arrays.copyOf(objStr, objStr.length,String[][].class);
-            String[] headings = {"SUPER ADMIN ID","NAME","PASSWORD","USER ID"};
-            DisplayUtility.printTable("SUPER ADMIN DETAILS", headings, si);
-            }
-        }
-        else if(choice == 6){
-            try (Connection conn = connect();Statement stmt = conn.createStatement();ResultSet rs = stmt.executeQuery(sqlDepartment)) {
-                ArrayList<String[]> str = new ArrayList<>();
-                while (rs.next()) {
-                    String[] s = {rs.getString("DEPT_ID"),rs.getString("DEPT_NAME"),rs.getString("C_NAME")};
-                    str.add(s);
-                }
-                Object[] objStr = str.toArray();
-                String[][] si = Arrays.copyOf(objStr, objStr.length,String[][].class);
-                String[] headings = {"DEPARTMENT ID","DEPARTMENT NAME","COLLEGE NAME"};
-                DisplayUtility.printTable("DEPARTMENT DETAILS", headings, si);
-            }
-        }
-        return;
-    }
 
     public static boolean verifyUserIDPassword(int userID, String password,String usrRole) throws SQLException{
         String sql = "SELECT U_ID FROM USER WHERE U_ID = ? AND U_PASSWORD = ? AND U_ROLE = "+usrRole;

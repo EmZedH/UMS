@@ -1,4 +1,7 @@
 package UI;
+
+import UI.Utility.DisplayUtility;
+
 public class CommonDisplay {
     public static void loginVerified(){
         // System.out.println();
@@ -84,7 +87,7 @@ public class CommonDisplay {
         // System.out.println();
         DisplayUtility.dialogWithHeader("Login Page", "Enter the user ID");
     }
-    public static void userSelectPage(){
+    public static void loginUserSelectPage(){
         // System.out.println();
         // System.out.println("---------------------------------------");
         // System.out.println("             Login Page");

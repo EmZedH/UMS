@@ -1,40 +1,53 @@
 package Logic;
 
 import java.sql.SQLException;
-import java.util.InputMismatchException;
-import java.util.Scanner;
 
+import Database.CollegeAdminConnect;
 import Database.Connect;
 import Database.User;
+import UI.CollegeAdminUI;
 import UI.CommonDisplay;
-import UI.DisplayUtility;
+import UI.CommonUI;
 
 public class CollegeAdminLogic {
     public static void startup() {
-        int uID = CommonLogic.userID();
-        String password = CommonLogic.password();
+        int uID = CommonUI.userID();
+        String password = CommonUI.password(uID);
         try {
-        if(Connect.verifyUserIDPassword(uID, password,"\"COLLEGE ADMIN\"")){
+        if(CollegeAdminConnect.verifyUserIDPassword(uID, password)){
             CommonDisplay.loginVerified();
             startPage(Connect.returnUser(uID));
         }
         else{
-            CommonLogic.wrongCredentials(3);
+            CommonLogic.wrongCredentials(3,uID);
         }
         } catch (SQLException e) {
             e.printStackTrace();
-            CommonLogic.sqlError(3);
+            CommonLogic.sqlError(3,uID);
+        } 
+    }
+
+    public static void startup(int uID) {
+        // int uID = CommonUI.userID();
+        String password = CommonUI.password(uID);
+        try {
+        if(CollegeAdminConnect.verifyUserIDPassword(uID, password)){
+            CommonDisplay.loginVerified();
+            startPage(Connect.returnUser(uID));
+        }
+        else{
+            CommonLogic.wrongCredentials(3,uID);
+        }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            CommonLogic.sqlError(3,uID);
         } 
     }
 
     public static void startPage(User user) throws SQLException{
-        DisplayUtility.userPageDialog("College Admin Page", user.getName(), user.getID(), new String[]{"User","Course","Department","Record","Registered Student","Section","Tests","Transactions","Log Out"});
-        try {
-            Scanner in = new Scanner(System.in);
-            Integer inp = in.nextInt();
+            int inp = CollegeAdminUI.startPageInput(user.getName(),user.getID());
             switch(inp){
                 case 1:
-                // userManage(user);
                 break;
                 case 3:
                 break;
@@ -45,10 +58,6 @@ public class CollegeAdminLogic {
                 CommonDisplay.properPage();
                 startPage(user);
             }
-        } catch (InputMismatchException e) {
-            CommonDisplay.properPage();
-            startPage(user);
-        }
     }
 
     
