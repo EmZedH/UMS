@@ -1,7 +1,7 @@
 package Database;
 
 public class Student {
-    private int sID;
+    private String sID;
     private int sem;
     private int year;
     private String degree;
@@ -10,7 +10,7 @@ public class Student {
     private int uID;
     private int collegeID;
     private int deptID;
-    Student(int sID, int sem, int year, String degree,  float cgpa, int secID, int uID, int collegeID, int deptID) {
+    Student(String sID, int sem, int year, String degree,  float cgpa, int secID, int uID, int collegeID, int deptID) {
         this.sID = sID;
         this.sem = sem;
         this.year = year;
@@ -21,10 +21,10 @@ public class Student {
         this.collegeID = collegeID;
         this.deptID = deptID;
     }
-    public int getsID() {
+    public String getsID() {
         return sID;
     }
-    public void setsID(int sID) {
+    public void setsID(String sID) {
         this.sID = sID;
     }
     public int getSem() {

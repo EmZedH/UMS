@@ -27,7 +27,7 @@ public class SuperAdminUI{
     }
 
     public static int startPageInput(String name, int id) {
-        return InputUtility.choiceInput("Super Admin Page",new String[]{"User","Course","Department","Record","Registered Student","Section","Tests","Transactions","Colleges","Log Out"}, name, id);
+        return InputUtility.choiceInput("Super Admin Page",new String[]{"User","Course","Department","Record","Registered Student","Section","Test Records","Transactions","Colleges","Log Out"}, name, id);
     }
 
     public static int userManagePageInput() {

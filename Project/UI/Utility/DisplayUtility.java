@@ -2,6 +2,7 @@ package UI.Utility;
 
 public class DisplayUtility {
     static int lineSize = 60;
+
     public static void singleDialog(String msg){
         for (int i = 0; i < 5; i++) {
             if(i==1 || i== 3){
@@ -120,11 +121,55 @@ public class DisplayUtility {
         }
     }
 
+    public static void userPageDialog(String heading,String msg, String[] option) {
+        String p = "";
+        String ki= "";
+        int flag=1;
+        for (int i = 0; i < option.length+10; i++) {
+            if(i==1 || i==3 || i==option.length+6 || i==option.length+8){
+                for (int j = 0; j < lineSize; j++) {
+                    System.out.print("-");
+                }
+            }
+            else if(i==2){
+                for (int j = 0;j< lineSize - heading.length() -1; j++) {
+                    heading = " "  + heading;
+                }
+                    System.out.print(heading);
+            }
+            else if(i>4 && i<option.length+5){
+                for(int k=0;k<option.length && flag==1;k++){
+                    if(ki.length()<option[k].length()){
+                        ki = option[k];
+                    }
+                }
+                // msg[i-5] = Integer.toString(i-4) + ". " + msg[i-5]; 
+                for (int j = 0;j+3< lineSize - (p+ki).length() -1 && flag==1; j++) {
+                    p = " "+p;
+                }
+                flag=0;
+                // System.out.print(p+msg[i-5]);
+                System.out.print(p+Integer.toString(i-4) + ". " + option[i-5]);
+            }
+            else if(i==option.length+7){
+                // String uID = "ID: "+Integer.toString(id);
+                // msg = "Name: " + msg;
+                int len = msg.length();
+                for(int j=len;j<lineSize;j++){
+                    msg=msg+" ";
+                }
+                System.out.print(msg);
+            }
+            System.out.println();
+        }
+    }
+
     public static void printTable(String head,String[] headings,String[][] arr) {
         for (int i = 0; i < headings.length; i++) {
             int lineSize = headings[i].length() +5;
             
             for (int j = 0; j < arr.length; j++) {
+                arr[j][i] = arr[j][i] == null ? "NULL" : arr[j][i];
                 if(lineSize<arr[j][i].length()){
                     lineSize = arr[j][i].length();
                 }

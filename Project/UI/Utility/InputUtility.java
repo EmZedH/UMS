@@ -73,6 +73,23 @@ public class InputUtility {
             return choiceInput(heading, choices);
         }
     }
+    public static int choiceInput(String heading, String[] choices,String msg){
+        try{
+        DisplayUtility.userPageDialog(heading, msg, choices);
+        in = new Scanner(System.in);
+        number = in.nextInt();
+        for (int i = 1; i <= choices.length; i++) {
+            if(number == i){
+                return number;
+            }
+        }
+        CommonUI.properPage();
+        return choiceInput(heading, choices,msg);}
+        catch(InputMismatchException e){
+            CommonUI.properPage();
+            return choiceInput(heading, choices, msg);
+        }
+    }
     public static int choiceInput(String heading, String[] choices,String name, int id){
         try{
         DisplayUtility.userPageDialog(heading, name, id, choices);

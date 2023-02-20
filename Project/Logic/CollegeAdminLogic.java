@@ -2,19 +2,19 @@ package Logic;
 
 import java.sql.SQLException;
 
-import Database.CollegeAdminConnect;
 import Database.Connect;
 import Database.User;
 import UI.CollegeAdminUI;
 import UI.CommonDisplay;
 import UI.CommonUI;
+import UI.Utility.InputUtility;
 
 public class CollegeAdminLogic {
     public static void startup() {
         int uID = CommonUI.userID();
         String password = CommonUI.password(uID);
         try {
-        if(CollegeAdminConnect.verifyUserIDPassword(uID, password)){
+        if(Connect.verifyUIDPassCAdmin(uID, password)){
             CommonDisplay.loginVerified();
             startPage(Connect.returnUser(uID));
         }
@@ -31,7 +31,7 @@ public class CollegeAdminLogic {
         // int uID = CommonUI.userID();
         String password = CommonUI.password(uID);
         try {
-        if(CollegeAdminConnect.verifyUserIDPassword(uID, password)){
+        if(Connect.verifyUIDPassCAdmin(uID, password)){
             CommonDisplay.loginVerified();
             startPage(Connect.returnUser(uID));
         }
@@ -60,5 +60,21 @@ public class CollegeAdminLogic {
             }
     }
 
+    public static void userManage(User user) throws SQLException {
+        int choice;
+        while ((choice = InputUtility.choiceInput("Select Option", new String[]{"Add User","Edit User","Delete User","View User","Back"})) != 5) {
+            switch (choice) {
+                case 1:
+                break;
+                case 2:
+                break;
+                case 3:
+                break;
+                case 4:
+                break;
+            }
+        }
+        startPage(user);
+    }
     
 }
