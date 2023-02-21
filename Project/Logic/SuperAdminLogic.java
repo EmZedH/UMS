@@ -86,58 +86,479 @@ public class SuperAdminLogic {
             }
     }
     public static void userManage(User user) throws SQLException{
-            int inp = SuperAdminUI.userManagePageInput();
-            switch(inp){
-
-                //Adding User
+        int inp = SuperAdminUI.userManagePageInput();
+        int uID;
+        switch(inp){
+            //Adding User
                 case 1:
-                addUser(user);
+                while (Connect.verifyUser(uID = InputUtility.posInput("Enter the unique User ID"))) {
+                    DisplayUtility.singleDialog("User ID already exists. Please enter different user ID");
+                }
+                String uName = InputUtility.inputString("Enter the Name");
+                String uAadhar = InputUtility.inputString("Enter the Aadhar number");
+                String uDOB = CommonUI.dateInput();
+                String uGender = CommonUI.genderInput();
+                String uAddress = InputUtility.inputString("Enter the Address");
+                String uPassword = InputUtility.inputString("Enter the password");
+                String uRole = new String[]{"Student","Professor","College Admin","Super Admin"}[InputUtility.choiceInput("Select the User",new String[]{"Student","Professor","College Admin","Super Admin"}) - 1].toUpperCase();
+                if(!uRole.equals("SUPER ADMIN")){
+                    int collegeID;
+                    while (!Connect.verifyCollege(collegeID = InputUtility.posInput("Enter the College ID"))) {
+                        DisplayUtility.singleDialog("College ID doesn't exist. Please try again");
+                    }
+                    if(!uRole.equals("COLLEGE ADMIN")){
+                        int deptID;
+                        while (!Connect.verifyCollege(deptID = InputUtility.posInput("Enter the Department ID"))) {
+                            DisplayUtility.singleDialog("Department ID doesn't exist. Please try again");
+                        }
+                        if(!uRole.equals("PROFESSOR")){
+                            int secID;
+                            while (!Connect.verifySection(secID = InputUtility.posInput("Enter the Section ID"), deptID, collegeID)) {
+                                DisplayUtility.singleDialog("Section ID doesn't exist. Please try again");
+                            }
+                            String sID;
+                            while (Connect.verifyStudent(sID = InputUtility.inputString("Enter the unique Student ID"), collegeID)) {
+                                DisplayUtility.singleDialog("Student ID already exist. Please try again");
+                            }
+                                int sem = 1;
+                                int year = 1;
+                                float cgpa = 0;
+                                String degree = new String[]{"B. Tech","M. Tech"}[InputUtility.choiceInput("Select the Degree", new String[]{"B. Tech","M. Tech"}) - 1];
+                                int ch =InputUtility.choiceInput("Select the Option",degree == "B. Tech" ? new String[]{"First Year","Lateral Entry","Enter manually"} : new String[]{"First Year","Enter manually"});
+                                if(ch == 2 && degree.equals("B. Tech")){
+                                    year = 2;
+                                    sem = 3;
+                                }
+                                else if((ch == 3 && degree.equals("B. Tech")) ||  (ch == 2 && degree.equals("M. Tech"))){
+                                    year = InputUtility.choiceInput("Enter the year", degree.equals("B. Tech") ? new String[]{"First Year","Second Year","Third Year","Fourth Year"} : new String[]{"First Year","Second Year"});
+                                    sem = InputUtility.choiceInput("Select the semester", new String[]{"Semester "+(year*2 - 1),"Semester "+year*2});
+                                    sem = sem == 1 ? sem*year - 1 : sem*year;
+                                    while((cgpa = InputUtility.floatInput("Enter the CGPA"))>10 && cgpa<0){
+                                        DisplayUtility.singleDialog("Enter the CGPA properly");
+                                    }
+                                }
+                            Connect.addStudent(uID, uName, uAadhar, uDOB, uGender, uAddress, uRole, uPassword, sID, sem, year, degree, cgpa, secID, deptID, collegeID);
+                        }
+                        else{
+                            String pID;
+                            while (Connect.verifyProfessor(pID = InputUtility.inputString("Enter the unique Professor ID"), collegeID)) {
+                                DisplayUtility.singleDialog("Professor ID already exist. Please try again");
+                            }
+                            Connect.addProfessor(uID, uName, uAadhar, uDOB, uGender, uAddress, uRole, uPassword, pID, deptID, collegeID);
+                        }
+                    }
+                    else{
+                        int caID;
+                        while(Connect.verifySuperAdmin(caID = InputUtility.posInput("Enter the unique College Admin ID"))){
+                            DisplayUtility.singleDialog("College Admin ID already exists. Please try again");
+                        }
+                        Connect.addCollegeAdmin(uID, uName, uAadhar, uDOB, uGender, uAddress, uRole, uPassword, caID, collegeID);
+                    }
+                }
+                else{
+                    int saID;
+                    while(Connect.verifySuperAdmin(saID = InputUtility.posInput("Enter the unique Super Admin ID"))){
+                        DisplayUtility.singleDialog("Super Admin ID already exists. Please try again");
+                    }
+                    Connect.addSuperAdmin(uID, uName, uAadhar, uDOB, uGender, uAddress, uRole, uPassword, saID);
+                }
+                CommonUI.processSuccess();
+                userManage(user);
                 break;
 
                 //Editing User
                 case 2:
-                editUser(user);
+                User userVar;
+                boolean toggle = true;
+                while ((userVar = Connect.returnUser(uID = InputUtility.posInput("Enter User ID to edit")))==null) {
+                    DisplayUtility.singleDialog("User ID doesn't exist. Please try again");
+                }
+                while ((userVar = Connect.returnUser(uID))!=null) {
+                    switch(userVar.getRole()){
+                        case "STUDENT":
+                        Student student;
+                        if((student = Connect.returnStudent(userVar.getID()))==null){
+                            DisplayUtility.singleDialog("Student data doesn't exist. Check database");
+                            while ((Connect.returnUser(uID = InputUtility.posInput("Enter User ID to edit")))==null) {
+                                DisplayUtility.singleDialog("User ID doesn't exist. Please try again");
+                            }
+                            continue;
+                        }
+                        switch(InputUtility.choiceInput("Edit Student",toggle ? 
+                        new String[]{"User ID","Name","Aadhar","Date of Birth","Gender",
+                        "Address","Password","Student ID","Degree, Year and Semester",
+                        "CGPA","Section","Department","College","Toggle Details","Back"} : 
+                        new String[]{"User ID - "+userVar.getID(),"Name - "+userVar.getName(),
+                        "Aadhar - "+userVar.getAadhar(),"Date of Birth - "+userVar.getDOB(),
+                        "Gender - "+userVar.getGender(),"Address - "+userVar.getAddress(),
+                        "Password - "+userVar.getPassword(),"Student ID - "+student.getsID(),
+                        "Degree ("+student.getDegree()+"), Year ("+student.getYear()+") and Semester ("+student.getSem()+")",
+                        "CGPA - "+student.getCgpa(),"Section - "+student.getSecID(),
+                        "Department - "+student.getDeptID(),"College - "+student.getCollegeID(),"Toggle Details","Back"},
+                        userVar.getName(), userVar.getID())){
+                                case 1:
+                                userVar.setID(InputUtility.posInput("Enter the unique User ID"));
+                                while (Connect.verifyUser(userVar.getID())) {
+                                    DisplayUtility.singleDialog("User ID already exists. Please try again");
+                                    userVar.setID(InputUtility.posInput("Enter the unique User ID"));
+                                }
+                                student.setuID(userVar.getID());
+                                break;
+                                case 2:
+                                userVar.setName(InputUtility.inputString("Enter the User Name"));
+                                break;
+                                case 3:
+                                userVar.setAadhar(InputUtility.inputString("Enter the User Aadhar"));
+                                break;
+                                case 4:
+                                userVar.setDOB(CommonUI.dateInput());
+                                break;
+                                case 5:
+                                userVar.setGender(CommonUI.genderInput());
+                                break;
+                                case 6:
+                                userVar.setAddress(InputUtility.inputString("Enter the User Address"));
+                                break;
+                                case 7:
+                                userVar.setPassword(InputUtility.inputString("Enter the User Password"));
+                                break;
+                                case 8:
+                                student.setsID(InputUtility.inputString("Enter the unique Student ID"));
+                                while (Connect.verifyStudent(student.getsID(), student.getCollegeID())) {
+                                    DisplayUtility.singleDialog("Student ID already exist. Please try again");
+                                    student.setsID(InputUtility.inputString("Enter the unique Student ID"));
+                                }
+                                break;
+                                case 9:
+                                student.setSem(1);
+                                student.setYear(1);
+                                student.setCgpa(0);
+                                student.setDegree(new String[]{"B. Tech","M. Tech"}[InputUtility.choiceInput("Select the Degree", new String[]{"B. Tech","M. Tech"}) - 1]);
+                                int ch =InputUtility.choiceInput("Select the Option",student.getDegree() == "B. Tech" ? new String[]{"First Year","Lateral Entry","Enter manually"} : new String[]{"First Year","Enter manually"});
+                                if(ch == 2 && student.getDegree().equals("B. Tech")){
+                                    student.setYear(2);
+                                    student.setSem(3);
+                                }
+                                else if((ch == 3 && student.getDegree().equals("B. Tech")) ||  (ch == 2 && student.getDegree().equals("M. Tech"))){
+                                    student.setYear(InputUtility.choiceInput("Enter the year", student.getDegree().equals("B. Tech") ? new String[]{"First Year","Second Year","Third Year","Fourth Year"} : new String[]{"First Year","Second Year"}));
+                                    student.setSem(InputUtility.choiceInput("Select the semester", new String[]{"Semester "+(student.getYear()*2 - 1),"Semester "+student.getYear()*2}));
+                                    student.setSem(student.getSem() == 1 ? student.getYear()*student.getSem() - 1 : student.getYear()*student.getSem());
+                                }
+                                break;
+                                case 10:
+                                student.setCgpa(InputUtility.floatInput("Enter the CGPA"));
+                                while(student.getCgpa()>10 && student.getCgpa()<0){
+                                    DisplayUtility.singleDialog("Enter the CGPA properly");
+                                    student.setCgpa(InputUtility.floatInput("Enter the CGPA"));
+                                }
+                                break;
+                                case 11:
+                                student.setSecID(InputUtility.posInput("Enter the Section ID"));
+                                while(!Connect.verifySection(student.getSecID(), student.getDeptID(), student.getCollegeID())){
+                                    DisplayUtility.singleDialog("Section ID doesn't exist. Please try again");
+                                }
+                                break;
+                                case 12:
+                                student.setDeptID(InputUtility.posInput("Enter the Department ID"));
+                                while(!Connect.verifyDepartment(student.getDeptID(), student.getCollegeID())){
+                                    DisplayUtility.singleDialog("Department ID doesn't exist. Please try again");
+                                }
+                                student.setSecID(InputUtility.posInput("Enter the Section ID"));
+                                while(!Connect.verifySection(student.getSecID(), student.getDeptID(), student.getCollegeID())){
+                                    DisplayUtility.singleDialog("Section ID doesn't exist. Please try again");
+                                }
+                                break;
+                                case 13:
+                                student.setCollegeID(InputUtility.posInput("Enter the College ID"));
+                                while (!Connect.verifyCollege(student.getCollegeID())) {
+                                    DisplayUtility.singleDialog("College ID doesn't exist. Please try again");
+                                }
+                                student.setDeptID(InputUtility.posInput("Enter the Department ID"));
+                                while(!Connect.verifyDepartment(student.getDeptID(), student.getCollegeID())){
+                                    DisplayUtility.singleDialog("Department ID doesn't exist. Please try again");
+                                }
+                                student.setSecID(InputUtility.posInput("Enter the Section ID"));
+                                while(!Connect.verifySection(student.getSecID(), student.getDeptID(), student.getCollegeID())){
+                                    DisplayUtility.singleDialog("Section ID doesn't exist. Please try again");
+                                }
+                                break;
+                                case 14:
+                                toggle ^= true;
+                                break;
+                                case 15:
+                                userManage(user);
+                                return;
+                            }
+                            Connect.editStudent(uID, userVar, student);
+                            uID = userVar.getID();
+                            CommonUI.processSuccess();
+                        break;
+                
+                        case "PROFESSOR":
+                        Professor professor;
+                        if((professor = Connect.returnProfessor(userVar.getID()))==null){
+                            DisplayUtility.singleDialog("Student data doesn't exist. Check database");
+                            while ((Connect.returnUser(uID = InputUtility.posInput("Enter User ID to edit")))==null) {
+                                DisplayUtility.singleDialog("User ID doesn't exist. Please try again");
+                            }
+                            continue;
+                        }
+                        switch(InputUtility.choiceInput("Edit Student",toggle ? 
+                        new String[]{"User ID","Name","Aadhar","Date of Birth","Gender",
+                        "Address","Password","Professor ID","Department","College","Toggle Details","Back"} : 
+                        new String[]{"User ID - "+userVar.getID(),"Name - "+userVar.getName(),
+                        "Aadhar - "+userVar.getAadhar(),"Date of Birth - "+userVar.getDOB(),
+                        "Gender - "+userVar.getGender(),"Address - "+userVar.getAddress(),
+                        "Password - "+userVar.getPassword(),"Professor ID - "+professor.getpID(),
+                        "Department - "+professor.getDeptID(),"College - "+professor.getCollegeID(),"Toggle Details","Back"},
+                        userVar.getName(), userVar.getID())){
+                            case 1:
+                            userVar.setID(InputUtility.posInput("Enter the unique User ID"));
+                            while (Connect.verifyUser(userVar.getID())) {
+                                DisplayUtility.singleDialog("User ID already exists. Please try again");
+                                userVar.setID(InputUtility.posInput("Enter the unique User ID"));
+                            }
+                            professor.setUserID(userVar.getID());
+                            break;
+                            case 2:
+                            userVar.setName(InputUtility.inputString("Enter the User Name"));
+                            break;
+                            case 3:
+                            userVar.setAadhar(InputUtility.inputString("Enter the User Aadhar"));
+                            break;
+                            case 4:
+                            userVar.setDOB(CommonUI.dateInput());
+                            break;
+                            case 5:
+                            userVar.setGender(CommonUI.genderInput());
+                            break;
+                            case 6:
+                            userVar.setAddress(InputUtility.inputString("Enter the User Address"));
+                            break;
+                            case 7:
+                            userVar.setPassword(InputUtility.inputString("Enter the User Password"));
+                            break;
+                            case 8:
+                            professor.setpID(InputUtility.inputString("Enter the unique Professor ID"));
+                            while (Connect.verifyProfessor(professor.getpID(), professor.getCollegeID())) {
+                                DisplayUtility.singleDialog("Professor ID already exist. Please try again");
+                                professor.setpID(InputUtility.inputString("Enter the unique Professor ID"));
+                            }
+                            break;
+                            case 9:
+                            professor.setDeptID(InputUtility.posInput("Enter the Department ID"));
+                            while(!Connect.verifyDepartment(professor.getDeptID(), professor.getCollegeID())){
+                                DisplayUtility.singleDialog("Department ID doesn't exist. Please try again");
+                            }
+                            break;
+                            case 10:
+                            professor.setCollegeID(InputUtility.posInput("Enter the College ID"));
+                            while (!Connect.verifyCollege(professor.getCollegeID())) {
+                                DisplayUtility.singleDialog("College ID doesn't exist. Please try again");
+                            }
+                            professor.setDeptID(InputUtility.posInput("Enter the Department ID"));
+                            while(!Connect.verifyDepartment(professor.getDeptID(), professor.getCollegeID())){
+                                DisplayUtility.singleDialog("Department ID doesn't exist. Please try again");
+                            }
+                            break;
+                            case 11:
+                            toggle ^= true;
+                            break;
+                            case 12:
+                            userManage(user);
+                            return;
+                        }
+                        Connect.editProfessor(uID, userVar, professor);
+                        uID = userVar.getID();
+                        CommonUI.processSuccess();
+                        break;
+                        
+                        case "COLLEGE ADMIN":
+                        CollegeAdmin cAdmin;
+                        if((cAdmin = Connect.returnCollegeAdmin(userVar.getID()))==null){
+                            DisplayUtility.singleDialog("Student data doesn't exist. Check database");
+                            while ((Connect.returnUser(uID = InputUtility.posInput("Enter User ID to edit")))==null) {
+                                DisplayUtility.singleDialog("User ID doesn't exist. Please try again");
+                            }
+                            continue;
+                        }
+                        switch(InputUtility.choiceInput("Edit Student",toggle ? 
+                        new String[]{"User ID","Name","Aadhar","Date of Birth","Gender",
+                        "Address","Password","College Admin ID","College","Toggle Details","Back"} : 
+                        new String[]{"User ID - "+userVar.getID(),"Name - "+userVar.getName(),
+                        "Aadhar - "+userVar.getAadhar(),"Date of Birth - "+userVar.getDOB(),
+                        "Gender - "+userVar.getGender(),"Address - "+userVar.getAddress(),
+                        "Password - "+userVar.getPassword(),"College Admin ID - "+cAdmin.getCaID(),
+                        "College - "+cAdmin.getCollegeID(),"Toggle Details","Back"},
+                        userVar.getName(), userVar.getID())){
+                            case 1:
+                            userVar.setID(InputUtility.posInput("Enter the unique User ID"));
+                            while (Connect.verifyUser(userVar.getID())) {
+                                DisplayUtility.singleDialog("User ID already exists. Please try again");
+                                userVar.setID(InputUtility.posInput("Enter the unique User ID"));
+                            }
+                            cAdmin.setUserID(userVar.getID());
+                            break;
+                            case 2:
+                            userVar.setName(InputUtility.inputString("Enter the User Name"));
+                            break;
+                            case 3:
+                            userVar.setAadhar(InputUtility.inputString("Enter the User Aadhar"));
+                            break;
+                            case 4:
+                            userVar.setDOB(CommonUI.dateInput());
+                            break;
+                            case 5:
+                            userVar.setGender(CommonUI.genderInput());
+                            break;
+                            case 6:
+                            userVar.setAddress(InputUtility.inputString("Enter the User Address"));
+                            break;
+                            case 7:
+                            userVar.setPassword(InputUtility.inputString("Enter the User Password"));
+                            break;
+                            case 8:
+                            cAdmin.setCaID(InputUtility.posInput("Enter the unique College Admin ID"));
+                            while (Connect.verifyCollegeAdmin(cAdmin.getCaID(), cAdmin.getCollegeID())) {
+                                DisplayUtility.singleDialog("Professor ID already exist. Please try again");
+                                cAdmin.setCaID(InputUtility.posInput("Enter the unique Professor ID"));
+                            }
+                            break;
+                            case 9:
+                            cAdmin.setCollegeID(InputUtility.posInput("Enter the College ID"));
+                            while (!Connect.verifyCollege(cAdmin.getCollegeID())) {
+                                DisplayUtility.singleDialog("College ID doesn't exist. Please try again");
+                            }
+                            break;
+                            case 10:
+                            toggle ^= true;
+                            break;
+                            case 11:
+                            userManage(user);
+                            return;
+                        }
+                        Connect.editCollegeAdmin(uID, userVar, cAdmin);
+                        uID = userVar.getID();
+                        CommonUI.processSuccess();
+                        break;
+                        
+                        case "SUPER ADMIN":
+                        SuperAdmin sAdmin;
+                        if((sAdmin = Connect.returnSuperAdmin(userVar.getID()))==null){
+                            DisplayUtility.singleDialog("Student data doesn't exist. Check database");
+                            while ((Connect.returnUser(uID = InputUtility.posInput("Enter User ID to edit")))==null) {
+                                DisplayUtility.singleDialog("User ID doesn't exist. Please try again");
+                            }
+                            continue;
+                        }
+                        switch(InputUtility.choiceInput("Edit Student",toggle ? 
+                        new String[]{"User ID","Name","Aadhar","Date of Birth","Gender",
+                        "Address","Password","Super Admin ID","Toggle Details","Back"} : 
+                        new String[]{"User ID - "+userVar.getID(),"Name - "+userVar.getName(),
+                        "Aadhar - "+userVar.getAadhar(),"Date of Birth - "+userVar.getDOB(),
+                        "Gender - "+userVar.getGender(),"Address - "+userVar.getAddress(),
+                        "Password - "+userVar.getPassword(),"Super Admin ID - "+sAdmin.getSaID(),
+                        "Toggle Details","Back"}, userVar.getName(), userVar.getID())){
+                            case 1:
+                            userVar.setID(InputUtility.posInput("Enter the unique User ID"));
+                            while (Connect.verifyUser(userVar.getID())) {
+                                DisplayUtility.singleDialog("User ID already exists. Please try again");
+                                userVar.setID(InputUtility.posInput("Enter the unique User ID"));
+                            }
+                            sAdmin.setUserID(userVar.getID());
+                            break;
+                            case 2:
+                            userVar.setName(InputUtility.inputString("Enter the User Name"));
+                            break;
+                            case 3:
+                            userVar.setAadhar(InputUtility.inputString("Enter the User Aadhar"));
+                            break;
+                            case 4:
+                            userVar.setDOB(CommonUI.dateInput());
+                            break;
+                            case 5:
+                            userVar.setGender(CommonUI.genderInput());
+                            break;
+                            case 6:
+                            userVar.setAddress(InputUtility.inputString("Enter the User Address"));
+                            break;
+                            case 7:
+                            userVar.setPassword(InputUtility.inputString("Enter the User Password"));
+                            break;
+                            case 8:
+                            sAdmin.setSaID(InputUtility.posInput("Enter the unique Super Admin ID"));
+                            while(Connect.verifySuperAdmin(sAdmin.getSaID())) {
+                                DisplayUtility.singleDialog("Super Admin ID already exist. Please try again");
+                                sAdmin.setSaID(InputUtility.posInput("Enter the unique Super Admin ID"));
+                            }
+                            break;
+                            case 9:
+                            toggle ^= true;
+                            break;
+                            case 10:
+                            userManage(user);
+                            return;
+                        }
+                        Connect.editSuperAdmin(uID, userVar, sAdmin);
+                        uID = userVar.getID();
+                        CommonUI.processSuccess();
+                        break;
+                    }
+                }
                 break;
 
                 //Deleting User
                 case 3:
-                deleteUser(user);
+                // deleteUser(user);
+                inp = InputUtility.posInput("Enter user ID to delete");
+                if(Connect.verifyUser(inp) && user.getID()!=inp){
+                    DisplayUtility.dialogWithHeader("Warning", "Account ID: "+inp+", Name: "+ Connect.returnUser(inp).getName() +" is selected for deletion");
+                    if(InputUtility.choiceInput("Confirm? (All data will be deleted)", new String[]{"Confirm Delete","Back"}) == 1){
+                        Connect.deleteUser(inp);
+                        CommonUI.processSuccess();
+                        userManage(user);
+                    }
+                }
+                else if(user.getID() == inp){
+                    DisplayUtility.dialogWithHeader("Warning", "Account to be deleted is currently logged in");
+                    if(InputUtility.choiceInput("Confirm? (You will be logged out once deleted)",new String[]{"Confirm Delete","Back"}) == 1){
+                        Connect.deleteUser(inp);
+                        CommonUI.processSuccess();
+                        CommonLogic.userSelect();
+                        return;
+                    }
+                }
                 break;
 
                 //View User
                 case 4:
-                viewUser(user);
+                // viewUser(user);
+                while ((inp = SuperAdminUI.viewUserInput())!=6) {
+                    if(inp==1){
+                        DisplayUtility.printTable("USER DETAILS", new String[]{"USER ID","NAME","AADHAR","DATE OF BIRTH","GENDER","ADDRESS","ROLE","PASSWORD"}, Connect.selectUserAll());
+                    }
+                    else if(inp == 2){
+                        DisplayUtility.printTable("STUDENT DETAILS", new String[]{"STUDENT ID","NAME","SECTION","SEMESTER","YEAR","DEPARTMENT","DEGREE","CGPA","COLLEGE","PASSWORD","USER ID"}, Connect.selectStudentAll());
+                    }
+                    else if(inp == 3){
+                        DisplayUtility.printTable("PROFESSOR DETAILS", new String[]{"PROFESSOR ID","NAME","DEPARTMENT","COLLEGE","PASSWORD","USER ID"}, Connect.selectProfessorAll());
+                    }
+                    else if(inp == 4){
+                        DisplayUtility.printTable("COLLEGE ADMIN DETAILS", new String[]{"COLLEGE ADMIN ID","NAME","COLLEGE","PASSWORD","USER ID"}, Connect.selectCollegeAdminAll());
+                    }
+                    else if(inp == 5){
+                        DisplayUtility.printTable("SUPER ADMIN DETAILS", new String[]{"SUPER ADMIN ID","NAME","PASSWORD","USER ID"}, Connect.selectSuperAdminAll());
+                    }
+                }
                 break;
 
                 //Go Back
                 case 5:
                 startPage(user);
-                break;
+                return;
 
             }
-    }
-
-    public static void viewUser(User user) throws SQLException{
-        int choice = SuperAdminUI.viewUserInput();
-            if(choice==1){
-                DisplayUtility.printTable("USER DETAILS", new String[]{"USER ID","NAME","AADHAR","DATE OF BIRTH","GENDER","ADDRESS","ROLE","PASSWORD"}, Connect.selectUserAll());
-            }
-            else if(choice == 2){
-                DisplayUtility.printTable("STUDENT DETAILS", new String[]{"STUDENT ID","NAME","SECTION","SEMESTER","YEAR","DEPARTMENT","DEGREE","CGPA","COLLEGE","PASSWORD","USER ID"}, Connect.selectStudentAll());
-            }
-            else if(choice == 3){
-                DisplayUtility.printTable("PROFESSOR DETAILS", new String[]{"PROFESSOR ID","NAME","DEPARTMENT","COLLEGE","PASSWORD","USER ID"}, Connect.selectProfessorAll());
-            }
-            else if(choice == 4){
-                DisplayUtility.printTable("COLLEGE ADMIN DETAILS", new String[]{"COLLEGE ADMIN ID","NAME","COLLEGE","PASSWORD","USER ID"}, Connect.selectCollegeAdminAll());
-            }
-            else if(choice == 5){
-                DisplayUtility.printTable("SUPER ADMIN DETAILS", new String[]{"SUPER ADMIN ID","NAME","PASSWORD","USER ID"}, Connect.selectSuperAdminAll());
-            }
-            else if(choice == 6){
-                userManage(user);
-            }
-            viewUser(user);
+            userManage(user);
     }
 
     public static void courseManage(User user) throws SQLException {
@@ -152,10 +573,10 @@ public class SuperAdminLogic {
             int cSem;
             int deptID;
             String degree;
-            while (!Connect.verifyCollege(collegeID = InputUtility.intInput("Enter the College ID"))) {
+            while (!Connect.verifyCollege(collegeID = InputUtility.posInput("Enter the College ID"))) {
                 DisplayUtility.singleDialog("College ID doesn't exist. Please try again");
             }
-            while (!Connect.verifyDepartment(deptID = InputUtility.intInput("Enter the Department ID"), collegeID)) {
+            while (!Connect.verifyDepartment(deptID = InputUtility.posInput("Enter the Department ID"), collegeID)) {
                 DisplayUtility.singleDialog("Department ID doesn't exist. Please try again");
             }
             while (Connect.verifyCourse(cID = InputUtility.inputString("Enter the Course ID"), collegeID)) {
@@ -171,7 +592,7 @@ public class SuperAdminLogic {
 
             //EDIT COURSE
             case 2:
-            while (!Connect.verifyCollege(collegeID = InputUtility.intInput("Enter the College ID"))) {
+            while (!Connect.verifyCollege(collegeID = InputUtility.posInput("Enter the College ID"))) {
                 DisplayUtility.singleDialog("College ID doesn't exist. Please try again");
             }
             while (!Connect.verifyCourse(cID = InputUtility.inputString("Enter the Course ID"), collegeID)) {
@@ -206,7 +627,7 @@ public class SuperAdminLogic {
 
             //DELETE COURSE
             case 3:
-            while (!Connect.verifyCollege(collegeID = InputUtility.intInput("Enter the College ID"))) {
+            while (!Connect.verifyCollege(collegeID = InputUtility.posInput("Enter the College ID"))) {
                 DisplayUtility.singleDialog("College ID doesn't exist. Please try again");
             }
             while (!Connect.verifyCourse(cID = InputUtility.inputString("Enter the Course ID"), collegeID)) {
@@ -250,7 +671,7 @@ public class SuperAdminLogic {
             String courseID;
 
             while (true){
-                if(!Connect.verifyUser(inp = InputUtility.intInput("Enter the user ID"))){
+                if(!Connect.verifyUser(inp = InputUtility.posInput("Enter the user ID"))){
                     DisplayUtility.singleDialog("User ID doesn't exist. Please try again");
                     continue;
                 }
@@ -263,7 +684,7 @@ public class SuperAdminLogic {
             while(!Connect.verifyCourse(courseID = InputUtility.inputString("Enter the course ID"), student.getCollegeID())){
                 DisplayUtility.singleDialog("Cpurse ID doesn't exist. Please try again");
             }
-            while (!Connect.verifyTest(inp = InputUtility.intInput("Enter the Test ID"), student.getsID(), courseID, student.getCollegeID())) {
+            while (!Connect.verifyTest(inp = InputUtility.posInput("Enter the Test ID"), student.getsID(), courseID, student.getCollegeID())) {
                 DisplayUtility.singleDialog("Test ID doesn't exist. Please try again");
             }
             DisplayUtility.dialogWithHeader("Warning", "Test ID: "+inp+" Marks: "+Connect.returnTest(inp,student.getsID(),courseID, student.getCollegeID()).getTestMark()+" about to be deleted");
@@ -286,71 +707,74 @@ public class SuperAdminLogic {
 
     public static void transactManage(User user) throws SQLException{
         int inp = InputUtility.choiceInput("Select Option", new String[]{"Add Transaction","Edit Transaction","Delete Transaction","View Transaction","Back"});
-        int collegeID;
         int tID;
-        String sID;
         switch(inp){
 
             //ADD TRANSACTION
             case 1:
-            while (!Connect.verifyCollege(collegeID = InputUtility.intInput("Enter the College ID"))) {
-                DisplayUtility.singleDialog("College ID doesn't exist. Please try again");
-            }
-            while (!Connect.verifyStudent(sID = InputUtility.inputString("Enter the Student ID"), collegeID)) {
-                DisplayUtility.singleDialog("Student ID doesn't exist. Please try again");
-            }
-            while (Connect.verifyTransact(tID = InputUtility.intInput("Enter the unique Transaction ID"), collegeID)) {
+            while (Connect.verifyTransact(tID = InputUtility.posInput("Enter the unique Transaction ID"))) {
                 DisplayUtility.singleDialog("Transaction ID already exists. Please try again");
             }
             String tDate = CommonUI.dateInput();
-            int amount = InputUtility.intInput("Enter the amount");
-            Connect.addTransaction(tID, sID, collegeID, tDate, amount);
+            int amount = InputUtility.posInput("Enter the amount");
+            Connect.addTransaction(tID, tDate, amount);
             CommonUI.processSuccess();
             transactManage(user);
             break;
             
             //EDIT TRANSACTION
             case 2:
-            while (!Connect.verifyCollege(collegeID = InputUtility.intInput("Enter the College ID"))) {
-                DisplayUtility.singleDialog("College ID doesn't exist. Please try again");
-            }
-            while (!Connect.verifyTransact(tID = InputUtility.intInput("Enter the unique Transaction ID"), collegeID)) {
+            while (!Connect.verifyTransact(tID = InputUtility.posInput("Enter the unique Transaction ID"))) {
                 DisplayUtility.singleDialog("Transaction ID adoesn't exist. Please try again");
             }
             boolean toggle = true;
             int choice;
-            Transactions transact = Connect.returnTransact(tID, collegeID);
+            int collegeID;
+            String sID;
+            Transactions transact = Connect.returnTransact(tID);
             while((choice = InputUtility.choiceInput("Select Property to Edit",toggle ? new String[]{"Transaction ID","Student ID","Date","Amount","Toggle Details","Back"} : new String[]{"Transaction ID - "+transact.gettID(),"Student ID - "+transact.getsID(),"Date - "+transact.getDate(),"Amount - "+transact.getDate(),"Toggle Details","Back"})) != 6){
                 switch(choice){
                     case 1:
+                    while (Connect.verifyTransact(tID = InputUtility.posInput("Enter the unique Transaction ID"))) {
+                        DisplayUtility.singleDialog("Transaction ID already exists. Please try again");
+                    }
+                    transact.settID(tID);
                     break;
                     case 2:
+                    while (!Connect.verifyCollege(collegeID = InputUtility.posInput("Enter the Students College ID"))) {
+                        DisplayUtility.singleDialog("College ID doesn't exist. Please try again");
+                    }
+                    while (!Connect.verifyStudent(sID = InputUtility.inputString("Enter the Student ID"), collegeID)) {
+                        DisplayUtility.singleDialog("Student ID doesn't exist. Please try again");
+                    }
+                    transact.setCollegeID(collegeID);
+                    transact.setsID(sID);
                     break;
                     case 3:
                     transact.setDate(CommonUI.dateInput());
                     break;
                     case 4:
+                    transact.setAmount(InputUtility.posInput("Enter the Amount"));
                     break;
                     case 5:
                     toggle^=true;
                     continue;
                 }
-                
+                Connect.editTransact(tID, transact);
+                CommonUI.processSuccess();
+                tID = transact.gettID();
             }
             transactManage(user);
             break;
             
             //DELETE TRANSACTION
             case 3:
-            while(!Connect.verifyCollege(collegeID = InputUtility.intInput("Enter the College ID"))){
-                DisplayUtility.singleDialog("College ID doesn't exist. Please try again");
-            }
-            while (!Connect.verifyTransact(tID = InputUtility.intInput("Enter the Transaction ID"), collegeID)) {
+            while (!Connect.verifyTransact(tID = InputUtility.posInput("Enter the Transaction ID"))) {
                 DisplayUtility.singleDialog("Transaction ID doesn't exist. Please try again");
             }
-            DisplayUtility.dialogWithHeader("Warning", "Transaction ID: "+inp+" Date: "+Connect.returnTransact(tID,collegeID).getDate()+" about to be deleted");
+            DisplayUtility.dialogWithHeader("Warning", "Transaction ID: "+inp+" Date: "+Connect.returnTransact(tID).getDate()+" about to be deleted");
             if(InputUtility.choiceInput("confirm? (All data will be deleted)", new String[]{"Confirm","Back"})==1){
-                Connect.deleteTransact(tID, collegeID);
+                Connect.deleteTransact(tID);
                 CommonUI.processSuccess();
             }
             break;
@@ -377,10 +801,10 @@ public class SuperAdminLogic {
 
             //ADD DEPARTMENT
             case 1:
-            while (!Connect.verifyCollege(collegeID = InputUtility.intInput("Enter the College ID"))) {
+            while (!Connect.verifyCollege(collegeID = InputUtility.posInput("Enter the College ID"))) {
                 DisplayUtility.singleDialog("College ID doesn't exist. Please try again");
             }
-            while(Connect.verifyDepartment(deptID = InputUtility.intInput("Enter the Department ID"), collegeID)){
+            while(Connect.verifyDepartment(deptID = InputUtility.posInput("Enter the Department ID"), collegeID)){
                 DisplayUtility.singleDialog("Department ID already exist. Please try again");
             }
             deptName = InputUtility.inputString("Enter the Department Name");
@@ -391,10 +815,10 @@ public class SuperAdminLogic {
 
             //EDIT DEPARTMENT
             case 2:
-            while (!Connect.verifyCollege(collegeID = InputUtility.intInput("Enter the College ID"))) {
+            while (!Connect.verifyCollege(collegeID = InputUtility.posInput("Enter the College ID"))) {
                 DisplayUtility.singleDialog("College ID doesn't exist. Please try again");
             }
-            while(!Connect.verifyDepartment(deptID = InputUtility.intInput("Enter the Department ID"), collegeID)){
+            while(!Connect.verifyDepartment(deptID = InputUtility.posInput("Enter the Department ID"), collegeID)){
                 DisplayUtility.singleDialog("Department ID doesn't exist. Please try again");
             }
             Department department = Connect.returnDept(deptID, collegeID);            
@@ -404,10 +828,10 @@ public class SuperAdminLogic {
             while ((choice = InputUtility.choiceInput("Select property to Edit", chStr)) != 4) {
                 switch (choice){
                     case 1:
-                    department.setDeptID(InputUtility.intInput("Enter the unique Department ID"));
+                    department.setDeptID(InputUtility.posInput("Enter the unique Department ID"));
                     while (Connect.verifyDepartment(department.getDeptID(), department.getCollegeID())) {
                         DisplayUtility.singleDialog("Department ID already exists. Please enter different ID");
-                        department.setDeptID(InputUtility.intInput("Enter the unique Department ID"));
+                        department.setDeptID(InputUtility.posInput("Enter the unique Department ID"));
                     }
                     break;
                     case 2:
@@ -428,10 +852,10 @@ public class SuperAdminLogic {
 
             //DELETE DEPARTMENT
             case 3:
-            while(!Connect.verifyCollege(collegeID = InputUtility.intInput("Enter the College ID"))){
+            while(!Connect.verifyCollege(collegeID = InputUtility.posInput("Enter the College ID"))){
                 DisplayUtility.singleDialog("College ID doesn't exist. Please try again");
             }
-            while(!Connect.verifyDepartment(deptID = InputUtility.intInput("Enter the Department ID"),collegeID)){
+            while(!Connect.verifyDepartment(deptID = InputUtility.posInput("Enter the Department ID"),collegeID)){
                 DisplayUtility.singleDialog("Department ID doesn't exist. Please try again");
             }
             Connect.deleteDept(deptID,collegeID);
@@ -459,7 +883,7 @@ public class SuperAdminLogic {
 
                 //ADD COLLEGE
                 case 1:
-                while (Connect.verifyCollege(collegeID = InputUtility.intInput("Enter the unique College ID"))) {
+                while (Connect.verifyCollege(collegeID = InputUtility.posInput("Enter the unique College ID"))) {
                     DisplayUtility.singleDialog("College ID already exist. Please try again");
                 }
                 String collegeName = InputUtility.inputString("Enter the College Name");
@@ -470,7 +894,7 @@ public class SuperAdminLogic {
 
                 //EDIT COLLEGE
                 case 2:
-                while (!Connect.verifyCollege(collegeID = InputUtility.intInput("Enter the college ID"))) {
+                while (!Connect.verifyCollege(collegeID = InputUtility.posInput("Enter the college ID"))) {
                     DisplayUtility.singleDialog("College ID doesn't exist. Please try again");
                 }
                 College college = Connect.returnCollege(collegeID);
@@ -499,7 +923,7 @@ public class SuperAdminLogic {
 
                 //DELETE COLLEGE
                 case 3:
-                while (!Connect.verifyCollege(collegeID = InputUtility.intInput("Enter the college ID"))) {
+                while (!Connect.verifyCollege(collegeID = InputUtility.posInput("Enter the college ID"))) {
                     DisplayUtility.singleDialog("College ID doesn't exists. Please try again");
                 }
                 DisplayUtility.dialogWithHeader("Warning", "College ID: "+collegeID+" Name: "+Connect.returnCollege(collegeID).getcName()+"About to undergo deletion");
@@ -509,7 +933,6 @@ public class SuperAdminLogic {
                 break;
                 case 4:
                 DisplayUtility.printTable("COLLEGE DETAILS", new String[]{"COLLEGE ID","NAME","ADDRESS","TELEPHONE"}, Connect.selectCollegeAll());
-
                 break;
             }
             collegeManage(user);
@@ -523,13 +946,13 @@ public class SuperAdminLogic {
         new String[]{"Add Section","Edit Section","Delete Section","View Section","Back"})) != 5){
             switch (choice) {
                 case 1:
-                while (!Connect.verifyCollege(collegeID = InputUtility.intInput("Enter the College ID"))) {
+                while (!Connect.verifyCollege(collegeID = InputUtility.posInput("Enter the College ID"))) {
                     DisplayUtility.singleDialog("College ID doesn't exist. Please try again");
                 }
-                while (!Connect.verifyDepartment(deptID = InputUtility.intInput("Enter the Department ID"),collegeID)) {
+                while (!Connect.verifyDepartment(deptID = InputUtility.posInput("Enter the Department ID"),collegeID)) {
                     DisplayUtility.singleDialog("Department ID doesn't exist. Please try again");
                 }
-                while (Connect.verifySection(secID = InputUtility.intInput("Enter the Section ID"),deptID,collegeID)) {
+                while (Connect.verifySection(secID = InputUtility.posInput("Enter the Section ID"),deptID,collegeID)) {
                     DisplayUtility.singleDialog("Section ID already exists. Please try again");
                 }
                 String secName = InputUtility.inputString("Enter the Section name");
@@ -537,13 +960,13 @@ public class SuperAdminLogic {
                 CommonUI.processSuccess();
                 break;
                 case 2:
-                while (!Connect.verifyCollege(collegeID = InputUtility.intInput("Enter the College ID"))) {
+                while (!Connect.verifyCollege(collegeID = InputUtility.posInput("Enter the College ID"))) {
                     DisplayUtility.singleDialog("College ID doesn't exist. Please try again");
                 }
-                while (!Connect.verifyDepartment(deptID = InputUtility.intInput("Enter the Department ID"),collegeID)) {
+                while (!Connect.verifyDepartment(deptID = InputUtility.posInput("Enter the Department ID"),collegeID)) {
                     DisplayUtility.singleDialog("Department ID doesn't exist. Please try again");
                 }
-                while (!Connect.verifySection(secID = InputUtility.intInput("Enter the Section ID"),deptID,collegeID)) {
+                while (!Connect.verifySection(secID = InputUtility.posInput("Enter the Section ID"),deptID,collegeID)) {
                     DisplayUtility.singleDialog("Section ID doesn't exist. Please try again");
                 }
                 String[] chStr = new String[]{"Section ID","Section Name","Toggle Details","Back"};
@@ -552,10 +975,10 @@ public class SuperAdminLogic {
                 while ((choice = InputUtility.choiceInput("Select Option to Edit", chStr))!=4) {
                     switch (choice) {
                         case 1:
-                        section.setSecID(InputUtility.intInput("Enter the section ID"));
+                        section.setSecID(InputUtility.posInput("Enter the section ID"));
                         while (Connect.verifySection(section.getSecID(), section.getSecID(), section.getCollegeID())) {
                             DisplayUtility.singleDialog("Section ID already exist. Please try again");
-                            section.setSecID(InputUtility.intInput("Enter the section ID"));
+                            section.setSecID(InputUtility.posInput("Enter the section ID"));
                         }
                         break;
                         case 2:
@@ -574,13 +997,13 @@ public class SuperAdminLogic {
                 }
                 break;
                 case 3:
-                while (!Connect.verifyCollege(collegeID = InputUtility.intInput("Enter the College ID"))) {
+                while (!Connect.verifyCollege(collegeID = InputUtility.posInput("Enter the College ID"))) {
                     DisplayUtility.singleDialog("College ID doesn't exist. Please try again");
                 }
-                while (!Connect.verifyDepartment(deptID = InputUtility.intInput("Enter the Department ID"),collegeID)) {
+                while (!Connect.verifyDepartment(deptID = InputUtility.posInput("Enter the Department ID"),collegeID)) {
                     DisplayUtility.singleDialog("Department ID doesn't exist. Please try again");
                 }
-                while (!Connect.verifySection(secID = InputUtility.intInput("Enter the Section ID"),deptID,collegeID)) {
+                while (!Connect.verifySection(secID = InputUtility.posInput("Enter the Section ID"),deptID,collegeID)) {
                     DisplayUtility.singleDialog("Section ID doesn't exist. Please try again");
                 }
                 DisplayUtility.dialogWithHeader("Warning", "Sextion ID: "+secID+" Name: "+Connect.returnSection(collegeID, deptID, secID).getSecName()+" selected for deletion");
@@ -600,768 +1023,4 @@ public class SuperAdminLogic {
         }
         startPage(user);
     }
-
-    public static void addUser(User user) throws SQLException{
-        int uID;
-        while (Connect.verifyUser(uID = InputUtility.intInput("Enter the unique User ID"))) {
-            DisplayUtility.singleDialog("User ID already exists. Please enter different user ID");
-        }
-        String uName = InputUtility.inputString("Enter the Name");
-        String uAadhar = InputUtility.inputString("Enter the Aadhar number");
-        String uDOB = CommonUI.dateInput();
-        String uGender = CommonUI.genderInput();
-        String uAddress = InputUtility.inputString("Enter the Address");
-        String uPassword = InputUtility.inputString("Enter the password");
-        String uRole;
-        int collegeID;
-        int deptID;
-        int secID;
-        int inp = InputUtility.choiceInput("Select Role", new String[]{"Student","Professor","College Admin","Super Admin"});
-        switch(inp){
-
-            case 1:
-            while (!Connect.verifyCollege(collegeID = InputUtility.intInput("Enter the College ID"))) {
-                DisplayUtility.singleDialog("College ID doesn't exist. Please try again");
-            }
-            while (!Connect.verifyDepartment(deptID = InputUtility.intInput("Enter the Department ID"),collegeID)) {
-                DisplayUtility.singleDialog("Department ID doesn't exixt. Please try again");
-            }
-            while (!Connect.verifySection(secID = InputUtility.intInput("Enter the Section ID"),deptID,collegeID)) {
-                DisplayUtility.singleDialog("Section ID doesn't exist. Please try again");
-            }
-            uRole = "STUDENT";
-            String sID;
-            int sem = 1;
-            int year = 1;
-            float cgpa = 0;
-            while (Connect.verifyStudent(sID = InputUtility.inputString("Enter the unique Student ID"),collegeID)) {
-                DisplayUtility.singleDialog("ID already exists. Please enter different student ID");
-            }
-            String degree = InputUtility.choiceInput("Select the Degree", new String[]{"B. Tech","M. Tech"}) == 1 ? "B. Tech" : "M. Tech";
-            boolean manual = true;
-            switch(degree){
-                case "B. Tech":
-                int ch1 = InputUtility.choiceInput("Select the Option", new String[]{"First Year","Lateral Entry","Enter manually"});
-                if(ch1 == 1){
-                    year = 1;
-                    sem = 1;
-                    manual = false;
-                }
-                else if(ch1 == 2){
-                    year = 2;
-                    sem = 3;
-                    manual = false;
-                }
-                else if(ch1==3){
-                }
-                break;
-                case "M. Tech":
-                int ch2 = InputUtility.choiceInput("Select the Option", new String[]{"First Year","Enter manually"});
-                if(ch2 == 1){
-                    year = 1;
-                    sem = 1;
-                    manual = false;
-                }
-                else if(ch2 == 2){
-                }
-                break;
-            }
-
-            if(manual){
-                switch (degree) {
-                    case "B .Tech":
-                    year = InputUtility.choiceInput("Enter the year", new String[]{"First Year","Second Year","Third Year","Fourth Year"});
-                    break;
-                    case "M. Tech":
-                    year = InputUtility.choiceInput("Enter the year", new String[]{"First Year","Second Year"});
-                    break;
-                }
-                switch(year){
-                    case 1:
-                    sem = InputUtility.choiceInput("Select the semester", new String[]{"Semester 1","Semester 2"});
-                    break;
-                    case 2:
-                    sem = InputUtility.choiceInput("Select the semester", new String[]{"Semester 3","Semester 4"}) + 2;
-                    break;
-                    case 3:
-                    sem = InputUtility.choiceInput("Select the semester", new String[]{"Semester 5","Semester 6"}) + 4;
-                    break;
-                    case 4:
-                    sem = InputUtility.choiceInput("Select the semester", new String[]{"Semester 7","Semester 8"}) + 6;
-                    break;
-                }
-                cgpa = InputUtility.floatInput("Enter the CGPA");
-            }
-
-            Connect.addStudent(uID, uName, uAadhar, uDOB, uGender, uAddress, uRole, uPassword, sID, sem, year, degree, cgpa, secID, deptID, collegeID);
-            break;
-
-            case 2:
-            uRole = "PROFESSOR";
-            int pID = 0;
-            while (!Connect.verifyCollege(collegeID = InputUtility.intInput("Enter the College ID"))) {
-                DisplayUtility.singleDialog("College ID doesn't exist. Please try again");
-            }
-            while (!Connect.verifyDepartment(deptID = InputUtility.intInput("Enter the Department ID"),collegeID)) {
-                DisplayUtility.singleDialog("Department ID doesn't exixt. Please try again");
-            }
-            while (Connect.verifyProfessor(pID = InputUtility.intInput("Enter the unique Professor ID"),deptID,collegeID)) {
-                DisplayUtility.singleDialog("ID already exists. Please enter different professor ID");
-            }
-            Connect.addProfessor(uID, uName, uAadhar, uDOB, uGender, uAddress, uRole, uPassword, pID, deptID, collegeID);
-            break;
-
-            case 3:
-            uRole = "COLLEGE ADMIN";
-            int caID;
-            while(!Connect.verifyCollege(collegeID = InputUtility.intInput("Enter the College ID"))) {
-                DisplayUtility.singleDialog("College ID doesn't exist. Please try again");
-            }
-            while(Connect.verifyCollegeAdmin(caID = InputUtility.intInput("Enter the College Admin ID"), collegeID)){
-                DisplayUtility.singleDialog("ID already exists. Please try different admin ID");
-            }
-            Connect.addCollegeAdmin(uID, uName, uAadhar, uDOB, uGender, uAddress, uRole, uPassword, caID, collegeID);
-            break;
-
-            //Add Super Admin
-            case 4:
-            uRole = "SUPER ADMIN";
-            int saID;
-            while(true){
-                    saID = InputUtility.intInput("Enter the unique Super Admin ID");
-                    if(!Connect.verifySuperAdmin(saID)){
-                        break;}
-                    DisplayUtility.singleDialog("ID already exists. Please enter different admin ID");
-            }
-            Connect.addSuperAdmin(uID, uName, uAadhar, uDOB, uGender, uAddress, uRole, uPassword, saID);
-            break;
-
-        }
-        CommonUI.processSuccess();
-        userManage(user);
-    }
-    
-
-    public static void deleteUser(User user) throws SQLException{
-            int inp = InputUtility.intInput("Enter user ID to delete");
-            if(Connect.verifyUser(inp) && user.getID()!=inp){
-                DisplayUtility.dialogWithHeader("Warning", "Account ID: "+inp+", Name: "+ Connect.returnUser(inp).getName() +" is selected for deletion");
-                if(InputUtility.choiceInput("Confirm? (All data will be deleted)", new String[]{"Confirm Delete","Back"}) == 1){
-                    Connect.deleteUser(inp);
-                    CommonUI.processSuccess();
-                    userManage(user);
-                }
-        }
-            else if(user.getID() == inp){
-                DisplayUtility.dialogWithHeader("Warning", "Account to be deleted is currently logged in");
-                if(InputUtility.choiceInput("Confirm? (You will be logged out once deleted)",new String[]{"Confirm Delete","Back"}) == 1){
-                    Connect.deleteUser(inp);
-                    CommonUI.processSuccess();
-                    CommonLogic.userSelect();
-                    return;
-                }
-            }
-            userManage(user);
-    }
-    
-public static void editUser(User user) throws SQLException{
-        int uID = InputUtility.intInput("Enter user ID to edit");
-        User userVar = Connect.returnUser(uID);
-        boolean flag = true;
-        boolean successFlag = true;
-        while(flag){
-        if(userVar!=null && userVar.getRole().equals("STUDENT")){ 
-            Student student = Connect.returnStudent(uID);
-            if(student!=null){
-                int choiceStudent = InputUtility.choiceInput("Edit Student", new String[]{
-                    "User ID","Name","Aadhar","Date of Birth","Gender","Address","Role","Password",
-                    "Student ID","Degree, Year and Semester","CGPA","Section","College","Department","Back"}, userVar.getName(), userVar.getID());
-                switch (choiceStudent) {
-                    case 1:
-                        while(true){
-                            int c1 = InputUtility.intInput("Enter the unique User ID");
-                            if(Connect.returnUser(c1) == null){
-                                userVar.setID(c1);
-                                student.setuID(c1);
-                                break;
-                            }
-                            else if(c1 == userVar.getID()){
-                                DisplayUtility.singleDialog("Same User ID entered. No changes made");
-                                successFlag = false;
-                                break;
-                            }
-                            DisplayUtility.singleDialog("User ID exists. Please enter different User ID");
-                            continue;
-                        }
-                    break;
-                    case 2:
-                    userVar.setName(InputUtility.inputString("Enter the User name"));
-                    break;
-                    case 3:
-                    userVar.setAadhar(InputUtility.inputString("Enter User Aadhar"));
-                    break;
-                    case 4:
-                    userVar.setDOB(CommonUI.dateInput());
-                    break;
-                    case 5:
-                    userVar.setGender(CommonUI.genderInput());
-                    break;
-                    case 6:
-                    userVar.setAddress(InputUtility.inputString("Enter the Address"));
-                    break;
-                    case 7:
-                    DisplayUtility.dialogWithHeader("Warning", "Student data will be lost if you proceed");
-                            int g = InputUtility.choiceInput("Select the Role", new String[]{"Professor","College Admin","Super Admin","Back"});
-                            int i = 1;
-                            switch (g) {
-                                case 1:
-                                i = 1;
-                                while(Connect.verifyProfessor(i,student.getDeptID(),student.getCollegeID())){
-                                    i++;
-                                }
-                                userVar.setRole("PROFESSOR");
-                                Connect.deleteUser(uID);
-                                Connect.addProfessor(uID, userVar.getName(), userVar.getAadhar(), userVar.getDOB(), userVar.getGender(), userVar.getAddress(), userVar.getRole(), userVar.getPassword(),i ,student.getDeptID() ,student.getCollegeID() );
-                                break;
-                                case 2:
-                                i = 1;
-                                while(Connect.verifyCollegeAdmin(i,student.getCollegeID())){
-                                    i++;
-                                }
-                                userVar.setRole("COLLEGE ADMIN");
-                                Connect.deleteUser(uID);
-                                Connect.addCollegeAdmin(uID, userVar.getName(), userVar.getAadhar(), userVar.getDOB(), userVar.getGender(), userVar.getAddress(), userVar.getRole(), userVar.getPassword(),i ,student.getCollegeID() );
-                                break;
-                                case 3:
-                                i = 1;
-                                while(Connect.verifySuperAdmin(i)){
-                                    i++;
-                                }
-                                userVar.setRole("SUPER ADMIN");
-                                Connect.deleteUser(uID);
-                                Connect.addSuperAdmin(uID, userVar.getName(), userVar.getAadhar(), userVar.getDOB(), userVar.getGender(), userVar.getAddress(), userVar.getRole(), userVar.getPassword(),i);
-                                break;
-                                case 4:
-                                break;
-                                default:
-                                CommonUI.properPage();
-                                continue;
-                            }
-                            DisplayUtility.singleDialog("Default values updated to new role");
-                        break;
-                    case 8:
-                    userVar.setPassword(InputUtility.inputString("Enter the password"));
-                    break;
-                    case 9:
-                    while(true){
-                        String c1 = InputUtility.inputString("Enter the unique Student ID");
-                        if(!Connect.verifyStudent(c1,student.getCollegeID())){
-                            student.setsID(c1);
-                            break;
-                        }
-                        else if(c1 == student.getsID()){
-                            DisplayUtility.singleDialog("Same Student ID entered. No changes made");
-                            successFlag=false;
-                            break;
-                        }
-                        DisplayUtility.singleDialog("Student ID already exists. Please try again");
-                        continue;
-                    }
-                    break;
-                    case 10:
-                    student.setDegree(InputUtility.choiceInput("Select the degree", new String[]{"B. Tech","M. Tech"}) == 1 ? "B. Tech":"M. Tech");
-
-                        if(student.getDegree().equals("B. Tech")){
-                            student.setYear(InputUtility.choiceInput("Select the Year",new String[]{"First Year","Second Year","Third Year","Fourth Year"}));
-                        }
-                        else if(student.getDegree().equals("M. Tech")){
-                            student.setYear(InputUtility.choiceInput("Select the Year",new String[]{"First Year","Second Year"}));
-                        }
-                    
-                        if(student.getYear() == 1){
-                            student.setSem(InputUtility.choiceInput("Select the semester", new String[]{"Semester 1","Semester 2"}));
-                        }
-                        else if(student.getYear() == 2){
-                            student.setSem(InputUtility.choiceInput("Select the semester", new String[]{"Semester 3","Semester 4"}) + 2);
-                        }
-                        else if(student.getYear() == 3){
-                            student.setSem(InputUtility.choiceInput("Select the semester", new String[]{"Semester 5","Semester 6"}) + 4);
-                        }
-                        else if(student.getYear() == 4){
-                            student.setSem(InputUtility.choiceInput("Select the semester", new String[]{"Semester 7","Semester 8"}) + 8);
-                        }
-                    break;
-                    case 11:
-                    while (true) {
-                            student.setCgpa(InputUtility.floatInput("Enter the CGPA"));
-                            if(student.getCgpa()<=10f){
-                                break;
-                            }
-                            CommonUI.properPage();
-                    }
-                    break;
-                    case 12:
-                    while (true) {
-                            student.setSecID(InputUtility.intInput("Enter the Section ID"));
-                            if(Connect.verifySection(student.getSecID(),student.getDeptID(),student.getCollegeID())){
-                                break;
-                            }
-                            DisplayUtility.singleDialog("Section ID doesn't exist. Please try again");
-                    }
-                    break;
-                    case 13:
-                    while(true){
-                            student.setCollegeID(InputUtility.intInput("Enter the College ID"));
-                            if(Connect.verifyCollege(student.getCollegeID())){
-                                break;}
-                            DisplayUtility.singleDialog("College ID doesn't exist. Please try again");
-                    }
-                    while (true) {
-                            student.setDeptID(InputUtility.intInput("Enter the Department ID"));
-                            if(Connect.verifyDepartment(student.getDeptID(),student.getCollegeID())){
-                                break;
-                            }
-                            DisplayUtility.singleDialog("Department ID doesn't exixt. Please try again");
-                    } 
-                    while (true) {
-                            student.setSecID(InputUtility.intInput("Enter the Section ID"));
-                            if(Connect.verifySection(student.getSecID(),student.getDeptID(),student.getCollegeID())){
-                                break;
-                            }
-                            DisplayUtility.singleDialog("Section ID doesn't exist. Please try again");
-                    }
-                    break;
-                    case 14:
-                    while (true) {
-                            student.setDeptID(InputUtility.intInput("Enter the Department ID"));
-                            if(Connect.verifyDepartment(student.getDeptID(),student.getCollegeID())){
-                                break;
-                            }
-                            DisplayUtility.singleDialog("Department ID doesn't exixt. Please try again");
-                    }  
-                    while (true) {
-                            student.setSecID(InputUtility.intInput("Enter the Section ID"));
-                            if(Connect.verifySection(student.getSecID(),student.getDeptID(),student.getCollegeID())){
-                                break;
-                            }
-                            DisplayUtility.singleDialog("Section ID doesn't exist. Please try again");
-                    } 
-                    break;
-                    case 15:
-                    flag=false;
-                    userManage(user);
-                    break;
-                    default:
-                        CommonUI.properPage();
-                    continue;
-                }
-                Connect.editStudent(uID, userVar, student);
-                uID = userVar.getID();
-                if(flag && successFlag){
-                CommonUI.processSuccess();
-            }
-            successFlag = true;
-            }
-            else{
-                DisplayUtility.singleDialog("Student data doesn't exist. Please check database");
-                editUser(user);
-                break;
-            }
-        }
-        //Edit Professor
-        else if(userVar!=null && userVar.getRole().equals("PROFESSOR")){ 
-            Professor professor = Connect.returnProfessor(uID);
-            if(professor!=null){
-                int choiceProfessor = InputUtility.choiceInput("Edit Professor", new String[]{
-                    "User ID","Name","Aadhar","Date of Birth","Gender","Address","Role","Password",
-                    "Professor ID","College","Department","Back"}, userVar.getName(), userVar.getID());
-                switch (choiceProfessor) {
-                    case 1:
-                        while(true){
-                            int c1 = InputUtility.intInput("Enter the unique User ID");
-                            if(Connect.returnUser(c1) == null){
-                                userVar.setID(c1);
-                                professor.setUserID(c1);
-                                break;
-                            }
-                            else if(c1 == userVar.getID()){
-                                DisplayUtility.singleDialog("Same User ID entered. No changes made");
-                                successFlag = false;
-                                break;
-                            }
-                            DisplayUtility.singleDialog("User ID exists. Please enter different User ID");
-                        }
-                    break;
-                    case 2:
-                    userVar.setName(InputUtility.inputString("Enter the User name"));
-                    break;
-                    case 3:
-                    userVar.setAadhar(InputUtility.inputString("Enter User Aadhar"));
-                    break;
-                    case 4:
-                    userVar.setDOB(CommonUI.dateInput());
-                    break;
-                    case 5:
-                    userVar.setDOB(CommonUI.dateInput());
-                    break;
-                    case 6:
-                    userVar.setAadhar(InputUtility.inputString("Enter the Address"));
-                    break;
-                    case 7:
-                    DisplayUtility.dialogWithHeader("Warning", "Professor data will be lost if you proceed");
-                    while(true){
-                        String arr[] = {"Student","College Admin","Super Admin"};
-                        DisplayUtility.optionDialog("Select the Role", arr);
-                        int g = InputUtility.choiceInput("Select the Role", new String[]{"Student","College Admin","Super Admin"});
-                        int i = 1;
-                        switch (g) {
-                        case 1:
-                        i = 1;
-                        while(Connect.verifyStudent(Integer.toString(i),professor.getCollegeID())){
-                            i++;
-                        }
-                        userVar.setRole("STUDENT");
-                        Connect.deleteUser(uID);
-                        Connect.addStudent(uID, userVar.getName(), userVar.getAadhar(), userVar.getDOB(), userVar.getGender(), userVar.getAddress(), userVar.getRole(), userVar.getPassword(), Integer.toString(i), 1, 1, "B. Tech", 0, 1, professor.getDeptID(), professor.getCollegeID());
-                        break;
-                        case 2:
-                        i = 1;
-                        while(Connect.verifyCollegeAdmin(i,professor.getCollegeID())){
-                            i++;
-                        }
-                        userVar.setRole("COLLEGE ADMIN");
-                        Connect.deleteUser(uID);
-                        Connect.addCollegeAdmin(uID, userVar.getName(), userVar.getAadhar(), userVar.getDOB(), userVar.getGender(), userVar.getAddress(), userVar.getRole(), userVar.getPassword(),i ,professor.getCollegeID() );
-                        break;
-                        case 3:
-                        i = 1;
-                        while(Connect.verifySuperAdmin(i)){
-                            i++;
-                        }
-                        userVar.setRole("SUPER ADMIN");
-                        Connect.deleteUser(uID);
-                        Connect.addSuperAdmin(uID, userVar.getName(), userVar.getAadhar(), userVar.getDOB(), userVar.getGender(), userVar.getAddress(), userVar.getRole(), userVar.getPassword(),i);
-                        break;
-                        case 4:
-                        break;
-                        default:
-                        CommonUI.properPage();
-                        continue;
-                        }
-                        DisplayUtility.singleDialog("Default values updated to new role");
-                        break;
-                    }
-                    break;
-                    case 8:
-                    userVar.setPassword(InputUtility.inputString("Enter the password"));
-                    break;
-                    case 9:
-                    while(true){
-                        int c1 = InputUtility.intInput("Enter the unique Professor ID");
-                        if(!Connect.verifyProfessor(c1,professor.getDeptID(),professor.getCollegeID())){
-                            professor.setpID(c1);
-                            break;
-                        }
-                        else if(c1 == professor.getpID()){
-                            DisplayUtility.singleDialog("Same Professor ID entered. No changes made");
-                            successFlag=false;
-                            break;
-                        }
-                        DisplayUtility.singleDialog("Professor ID already exists. Please try again");
-                    }
-                    break;
-                    case 10:
-                    while(true){
-                            professor.setCollegeID(InputUtility.intInput("Enter the College ID"));
-                            if(Connect.verifyCollege(professor.getCollegeID())){
-                                break;
-                            }
-                            DisplayUtility.singleDialog("College ID doesn't exist. Please try again");
-                    }
-                    while (true) {
-                            professor.setDeptID(InputUtility.intInput("Enter the Department ID"));
-                            if(Connect.verifyDepartment(professor.getDeptID(),professor.getCollegeID())){
-                                break;
-                            }
-                            DisplayUtility.singleDialog("Department ID doesn't exixt. Please try again");
-                    }  
-                    break;
-                    case 11:
-                    while (true) {
-                            professor.setDeptID(InputUtility.intInput("Enter the Department ID"));
-                            if(Connect.verifyDepartment(professor.getDeptID(),professor.getCollegeID())){
-                                break;
-                            }
-                            DisplayUtility.singleDialog("Department ID doesn't exixt. Please try again");
-                    }   
-                    break;
-                    case 12:
-                    flag=false;
-                    userManage(user);
-                    break;
-                    default:
-                        CommonUI.properPage();
-                    continue;
-                }
-                Connect.editProfessor(uID, userVar, professor);
-                uID = userVar.getID();
-                if(flag && successFlag){
-                CommonUI.processSuccess();
-            }
-            successFlag = true;
-            }
-            else{
-                DisplayUtility.singleDialog("Professor data doesn't exist. Please check database");
-                editUser(user);
-                break;
-            }
-         
-        }
-        else if(userVar!=null && userVar.getRole().equals("COLLEGE ADMIN")){ 
-            CollegeAdmin collegeAdmin = Connect.returnCollegeAdmin(uID);
-            if(collegeAdmin!=null){
-                    int choiceCAdmin = InputUtility.choiceInput("Edit College Admin", new String[]{
-                        "User ID","Name","Aadhar","Date of Birth","Gender","Address","Role","Password",
-                        "College Admin ID","College","Back"}, userVar.getName(), userVar.getID());
-                    switch (choiceCAdmin) {
-                        case 1:
-                            while(true){
-                                int c1 = InputUtility.intInput("Enter the unique User ID");
-                                if(Connect.returnUser(c1) == null){
-                                    userVar.setID(c1);
-                                    collegeAdmin.setUserID(c1);
-                                    break;
-                                }
-                                else if(c1 == userVar.getID()){
-                                    DisplayUtility.singleDialog("Same User ID entered. No changes made");
-                                    successFlag = false;
-                                    break;
-                                }
-                                DisplayUtility.singleDialog("User ID exists. Please enter different User ID");
-                            }
-                        break;
-                        case 2:
-                        userVar.setName(InputUtility.inputString("Enter the User name"));
-                        break;
-                        case 3:
-                        userVar.setAadhar("Enter the Aadhar");
-                        break;
-                        case 4:
-                        userVar.setDOB(CommonUI.dateInput());
-                        break;
-                        case 5:
-                        userVar.setDOB(CommonUI.dateInput());
-                        break;
-                        case 6:
-                        userVar.setAddress(InputUtility.inputString("Enter the Address"));
-                        break;
-                        case 7:
-                        DisplayUtility.dialogWithHeader("Warning", "College Admin data will be lost if you proceed");
-                            int g = InputUtility.choiceInput("Select the Role", new String[]{"Student","Professor","Super Admin"});
-                            int i = 1;
-                            switch (g) {
-                            case 1:
-                            i = 1;
-                            while(Connect.verifyStudent(Integer.toString(i),collegeAdmin.getCollegeID())){
-                                i++;
-                            }
-                            userVar.setRole("STUDENT");
-                            Connect.deleteUser(uID);
-                            Connect.addStudent(uID, userVar.getName(), userVar.getAadhar(), userVar.getDOB(), userVar.getGender(), userVar.getAddress(), userVar.getRole(), userVar.getPassword(), Integer.toString(i), 1, 1, "B. Tech", 0, 1, 1, collegeAdmin.getCollegeID());
-                                break;
-                            case 2:
-                            i = 1;
-                            while(Connect.verifyProfessor(i,1,collegeAdmin.getCollegeID())){
-                                i++;
-                            }
-                            userVar.setRole("PROFESSOR");
-                            Connect.deleteUser(uID);
-                            Connect.addProfessor(uID, userVar.getName(), userVar.getAadhar(), userVar.getDOB(), userVar.getGender(), userVar.getAddress(), userVar.getRole(), userVar.getPassword(),i ,1,collegeAdmin.getCollegeID() );
-                            break;
-                            case 3:
-                            i = 1;
-                            while(Connect.verifySuperAdmin(i)){
-                                i++;
-                            }
-                            userVar.setRole("SUPER ADMIN");
-                            Connect.deleteUser(uID);
-                            Connect.addSuperAdmin(uID, userVar.getName(), userVar.getAadhar(), userVar.getDOB(), userVar.getGender(), userVar.getAddress(), userVar.getRole(), userVar.getPassword(),i);
-                            break;
-                            case 4:
-                            break;
-                            }
-                        DisplayUtility.singleDialog("Default values updated to new role");
-                        break;
-                        case 8:
-                        userVar.setPassword(InputUtility.inputString("Enter the password"));
-                        break;
-                        case 9:
-                        while(true){
-                            int c1 = InputUtility.intInput("Enter the unique College Admin ID");
-                            if(!Connect.verifyCollegeAdmin(c1,collegeAdmin.getCollegeID())){
-                                collegeAdmin.setCaID(c1);
-                                break;
-                            }
-                            else if(c1 == collegeAdmin.getCaID()){
-                                DisplayUtility.singleDialog("Same College Admin ID entered. No changes made");
-                                successFlag=false;
-                                break;
-                            }
-                            DisplayUtility.singleDialog("College Admin ID already exists. Please try again");
-                        }
-                        break;
-                        case 10:
-                        while(true){
-                                collegeAdmin.setCollegeID(InputUtility.intInput("Enter the College ID"));
-                                if(Connect.verifyCollege(collegeAdmin.getCollegeID())){
-                                    break;}
-                                DisplayUtility.singleDialog("College ID doesn't exist. Please try again");
-                        }
-                        break;
-                        case 11:
-                        flag=false;
-                        userManage(user);
-                        break;
-                    }
-                    Connect.editCollegeAdmin(uID, userVar, collegeAdmin);
-                    uID = userVar.getID();
-                    if(flag && successFlag){
-                    CommonUI.processSuccess();}
-                successFlag = true;
-            }
-            else{
-                DisplayUtility.singleDialog("College Admin data doesn't exist. Please check database");
-                editUser(user);
-                break;
-            }
-        }
-        else if(userVar!=null && userVar.getRole().equals("SUPER ADMIN")){ 
-            SuperAdmin superAdmin = Connect.returnSuperAdmin(uID);
-            if(superAdmin!=null){
-                    int choiceSAdmin = InputUtility.choiceInput("Edit Super Admin", new String[]{
-                        "User ID","Name","Aadhar","Date of Birth","Gender","Address","Role","Password",
-                        "Super Admin ID","Back"}, userVar.getName(), userVar.getID());
-                    switch (choiceSAdmin) {
-                        case 1:
-                            while(true){
-                                int c1 = InputUtility.intInput("Enter the unique User ID");
-                                if(Connect.returnUser(c1) == null){
-                                    userVar.setID(c1);
-                                    superAdmin.setUserID(c1);
-                                    break;
-                                }
-                                else if(c1 == userVar.getID()){
-                                    DisplayUtility.singleDialog("Same User ID entered. No changes made");
-                                    successFlag = false;
-                                    break;
-                                }
-                                DisplayUtility.singleDialog("User ID exists. Please enter different User ID");
-                            }
-                        break;
-                        case 2:
-                        userVar.setName(InputUtility.inputString("Enter the User name"));
-                        break;
-                        case 3:
-                        userVar.setAadhar(InputUtility.inputString("Enter the User Aadhar"));
-                        break;
-                        case 4:
-                        userVar.setDOB(CommonUI.dateInput());
-                        break;
-                        case 5:
-                        userVar.setDOB(CommonUI.dateInput());
-                        break;
-                        case 6:
-                        userVar.setAddress(InputUtility.inputString("Enter the Address"));
-                        break;
-                        case 7:
-                        DisplayUtility.dialogWithHeader("Warning", "Super Admin data will be lost if you proceed");
-                            int g = InputUtility.choiceInput("Select the Role", new String[]{"Student","Professor","Super Admin"});
-                            int i = 1;
-                            switch (g) {
-                            case 1:
-                            i = 1;
-                            while(Connect.verifyStudent(Integer.toString(i),1)){
-                                i++;
-                            }
-                            userVar.setRole("STUDENT");
-                            Connect.deleteUser(uID);
-                            Connect.addStudent(uID, userVar.getName(), userVar.getAadhar(), userVar.getDOB(), userVar.getGender(), userVar.getAddress(), userVar.getRole(), userVar.getPassword(), Integer.toString(i), 1, 1, "B. Tech", 0, 1, 1, 1);
-                                break;
-                            case 2:
-                            i = 1;
-                            while(Connect.verifyProfessor(i,1,1)){
-                                i++;
-                            }
-                            userVar.setRole("PROFESSOR");
-                            Connect.deleteUser(uID);
-                            Connect.addProfessor(uID, userVar.getName(), userVar.getAadhar(), userVar.getDOB(), userVar.getGender(), userVar.getAddress(), userVar.getRole(), userVar.getPassword(),i ,1,1);
-                            break;
-                            case 3:
-                            i = 1;
-                            while(Connect.verifyCollegeAdmin(i,1)){
-                                i++;
-                            }
-                            userVar.setRole("COLLEGE ADMIN");
-                            Connect.deleteUser(uID);
-                            Connect.addCollegeAdmin(uID, userVar.getName(), userVar.getAadhar(), userVar.getDOB(), userVar.getGender(), userVar.getAddress(), userVar.getRole(), userVar.getPassword(),i,1);
-                            break;
-                            case 4:
-                            break;
-                            default:
-                            CommonUI.properPage();
-                            continue;
-                            }
-                            DisplayUtility.singleDialog("Default values updated to new role");
-                            break;
-                        case 8:
-                        userVar.setPassword(InputUtility.inputString("Enter the password"));
-                        break;
-                        case 9:
-                        while(true){
-                            int c1 = InputUtility.intInput("Enter the unique Super Admin ID");
-                            if(!Connect.verifySuperAdmin(c1)){
-                                superAdmin.setSaID(c1);
-                                break;
-                            }
-                            else if(c1 == superAdmin.getSaID()){
-                                DisplayUtility.singleDialog("Same College Admin ID entered. No changes made");
-                                successFlag=false;
-                                break;
-                            }
-                            DisplayUtility.singleDialog("Super Admin ID already exists. Please try again");
-                        }
-                        break;
-                        case 10:
-                        flag=false;
-                        userManage(user);
-                        break;
-                        default:
-                        CommonUI.properPage();
-                        continue;
-                    }
-                    Connect.editSuperAdmin(uID, userVar, superAdmin);
-                    uID = userVar.getID();
-                    if(flag && successFlag){
-                    CommonUI.processSuccess();
-                }
-                successFlag = true;
-            }
-            else{
-                DisplayUtility.singleDialog("Super Admin data doesn't exist. Please check database");
-                editUser(user);
-                break;
-            }
-        }
-        else{
-        DisplayUtility.singleDialog("User ID doesn't exist. Please enter different ID.");
-        editUser(user);
-        break;
-    }
-
 }
-
-}
-}
-
-    
-

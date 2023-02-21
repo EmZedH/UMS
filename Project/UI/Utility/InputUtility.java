@@ -21,27 +21,35 @@ public class InputUtility {
         return in.nextLine();
     }
 
-    public static int intInput(String message){
+    public static int posInput(String message){
         try {
             DisplayUtility.singleDialog(message);
             in = new Scanner(System.in);
             number = in.nextInt();
+            if(number<0){
+                CommonUI.properPage();
+                return posInput(message);
+            }
             return number;
         } catch (InputMismatchException e) {
             CommonUI.properPage();
-            return intInput(message);
+            return posInput(message);
         }
     }
 
-    public static int intInput(String heading,String message){
+    public static int posInput(String heading,String message){
         try {
             DisplayUtility.dialogWithHeader(heading, message);
             in = new Scanner(System.in);
             number = in.nextInt();
+            if(number<0){
+                CommonUI.properPage();
+                return posInput(heading, message);
+            }
             return number;
         } catch (InputMismatchException e) {
             CommonUI.properPage();
-            return intInput(message);
+            return posInput(heading,message);
         }
     }
 

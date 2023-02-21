@@ -1,20 +1,20 @@
 package Database;
 
 public class Professor {
-    private int pID;
+    private String pID;
     private int deptID;
     private int userID;
     private int collegeID;
-    public Professor(int pID, int deptID, int userID, int collegeID) {
+    public Professor(String pID, int deptID, int userID, int collegeID) {
         this.pID = pID;
         this.deptID = deptID;
         this.userID = userID;
         this.collegeID = collegeID;
     }
-    public int getpID() {
+    public String getpID() {
         return pID;
     }
-    public void setpID(int pID) {
+    public void setpID(String pID) {
         this.pID = pID;
     }
     public int getDeptID() {

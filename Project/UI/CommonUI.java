@@ -54,7 +54,7 @@ public class CommonUI {
     }
 
     public static int userID(){
-        return InputUtility.intInput("Login Page","Enter the user ID");
+        return InputUtility.posInput("Login Page","Enter the user ID");
     }
 
     public static String password(int uID) {
