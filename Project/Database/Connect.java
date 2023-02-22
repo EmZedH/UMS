@@ -2,6 +2,7 @@ package Database;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import Logic.Table;
 public class Connect {
 
     static String url = "jdbc:sqlite:/Users/muhamed-pt7045/Desktop/UMS/UMS/db/ums.db"; //"jdbc:sqlite:E:Github/Internship/UMS/db/ums.db"
@@ -45,129 +46,161 @@ public class Connect {
         }
     }
 
-    public static String[][] selectUserAll() throws SQLException{
-        String sqlUser = "SELECT * FROM USER";
-        try(Connection conn = Connect.connect();Statement stmt = conn.createStatement();ResultSet rs = stmt.executeQuery(sqlUser)){
-            ArrayList<String[]> str = new ArrayList<>();
-            while(rs.next()){
-                String[] s = {rs.getString("U_ID"),rs.getString("U_NAME"),rs.getString("U_AADHAR"),rs.getString("U_DOB"),rs.getString("U_GENDER"),rs.getString("U_ADDRESS"),rs.getString("U_ROLE"),rs.getString("U_PASSWORD")};
-                str.add(s);
-            }
-            return Arrays.copyOf(str.toArray(), str.toArray().length,String[][].class);
-            }
-    }
-
-    public static String[][] selectStudentAll() throws SQLException{
-        String sqlStudent = "SELECT S_ID,U_NAME,SEC_NAME,S_SEM,S_YEAR, DEPT_NAME,S_DEGREE,S_CGPA, C_NAME,U_PASSWORD, USER_ID FROM STUDENT LEFT JOIN DEPARTMENT ON (STUDENT.DEPT_ID = DEPARTMENT.DEPT_ID AND STUDENT.COLLEGE_ID = DEPARTMENT.COLLEGE_ID) LEFT JOIN SECTION ON (STUDENT.SEC_ID=SECTION.SEC_ID AND STUDENT.DEPT_ID = SECTION.DEPT_ID AND STUDENT.COLLEGE_ID = SECTION.COLLEGE_ID) LEFT JOIN USER ON STUDENT.USER_ID = USER.U_ID LEFT JOIN COLLEGE ON STUDENT.COLLEGE_ID = COLLEGE.C_ID;";
-        try(Connection conn = Connect.connect();Statement stmt = conn.createStatement();ResultSet rs = stmt.executeQuery(sqlStudent)){
-            ArrayList<String[]> str = new ArrayList<>();
-        while(rs.next()){
-            String[] s = {rs.getString("S_ID"),rs.getString("U_NAME"),rs.getString("SEC_NAME"),rs.getString("S_SEM"),rs.getString("S_YEAR"),rs.getString("DEPT_NAME"),rs.getString("S_DEGREE"),String.format("%.2f",rs.getFloat("S_CGPA")),rs.getString("C_NAME"),rs.getString("U_PASSWORD"),rs.getString("USER_ID")};
-            str.add(s);
-        }
-        return Arrays.copyOf(str.toArray(), str.toArray().length,String[][].class);
-        }
-    }
-
-    public static String[][] selectProfessorAll() throws SQLException{
-        String sqlProfessor = "SELECT P_ID, U_NAME, DEPT_NAME, C_NAME,U_PASSWORD, USER_ID FROM PROFESSOR LEFT JOIN USER ON USER.U_ID = PROFESSOR.USER_ID LEFT JOIN DEPARTMENT ON (DEPARTMENT.DEPT_ID = PROFESSOR.DEPT_ID AND DEPARTMENT.COLLEGE_ID = PROFESSOR.COLLEGE_ID) LEFT JOIN COLLEGE ON COLLEGE.C_ID = PROFESSOR.COLLEGE_ID;";
-        try(Connection conn = Connect.connect();Statement stmt = conn.createStatement();ResultSet rs = stmt.executeQuery(sqlProfessor)){
-            ArrayList<String[]> str = new ArrayList<>();
-        while(rs.next()){
-            String[] s = {rs.getString("P_ID"),rs.getString("U_NAME"),rs.getString("DEPT_NAME"),rs.getString("C_NAME"),rs.getString("U_PASSWORD"),rs.getString("USER_ID")};
-            str.add(s);
-        }
-        return Arrays.copyOf(str.toArray(), str.toArray().length,String[][].class);
-        }
-    }
-
-    public static String[][] selectCollegeAdminAll() throws SQLException{
-        String sqlCollegeAdmin = "SELECT CA_ID,U_NAME,C_NAME,U_PASSWORD,USER_ID FROM COLLEGE_ADMIN LEFT JOIN COLLEGE ON COLLEGE.C_ID = COLLEGE_ADMIN.COLLEGE_ID LEFT JOIN USER ON USER.U_ID = COLLEGE_ADMIN.USER_ID";
-        try(Connection conn = Connect.connect();Statement stmt = conn.createStatement();ResultSet rs = stmt.executeQuery(sqlCollegeAdmin)){
-            ArrayList<String[]> str = new ArrayList<>();
-        while(rs.next()){
-            String[] s = {rs.getString("CA_ID"),rs.getString("U_NAME"),rs.getString("C_NAME"),rs.getString("U_PASSWORD"),rs.getString("USER_ID")};
-            str.add(s);
-        }
-        return Arrays.copyOf(str.toArray(), str.toArray().length,String[][].class);
-        }
-    }
-
-    public static String[][] selectSuperAdminAll() throws SQLException{
-        String sqlSuperAdmin = "SELECT SA_ID,U_NAME,U_PASSWORD,USER_ID FROM SUPER_ADMIN LEFT JOIN USER ON USER.U_ID = SUPER_ADMIN.USER_ID";
-        try(Connection conn = Connect.connect();Statement stmt = conn.createStatement();ResultSet rs = stmt.executeQuery(sqlSuperAdmin)){
-            ArrayList<String[]> str = new ArrayList<>();
-        while(rs.next()){
-            String[] s = {rs.getString("SA_ID"),rs.getString("U_NAME"),rs.getString("U_PASSWORD"),rs.getString("USER_ID")};
-            str.add(s);
-        }
-        return Arrays.copyOf(str.toArray(), str.toArray().length,String[][].class);
-        }
-    }
-
-    public static String[][] selectCourseAll() throws SQLException {
-        String sql = "SELECT COURSE_ID, COURSE_NAME, COURSE_SEM, DEPT_NAME, C_NAME, DEGREE FROM COURSE LEFT JOIN DEPARTMENT ON (DEPARTMENT.DEPT_ID = COURSE.COURSE_DEPT AND DEPARTMENT.COLLEGE_ID = COURSE.COLLEGE_ID) LEFT JOIN COLLEGE ON COLLEGE.C_ID = COURSE.COLLEGE_ID";
-        try (Connection conn = connect(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
-            ArrayList<String[]> str = new ArrayList<>();
-            while (rs.next()) {
-                str.add(new String[]{rs.getString("COURSE_ID"),rs.getString("COURSE_NAME"),rs.getString("COURSE_SEM"),rs.getString("DEPT_NAME"),rs.getString("C_NAME"),rs.getString("DEGREE")});
-            }
-            return Arrays.copyOf(str.toArray(), str.toArray().length,String[][].class);
-        }
-    }
-
-    public static String[][] selectCollegeAll() throws SQLException{
-        String sql = "SELECT * FROM COLLEGE";
-        try (Connection conn = Connect.connect();Statement stmt = conn.createStatement();ResultSet rs = stmt.executeQuery(sql)) {
-            ArrayList<String[]> str = new ArrayList<>();
-            while (rs.next()) {
-                str.add(new String[]{rs.getString("C_ID"),rs.getString("C_NAME"),rs.getString("C_ADDRESS"),rs.getString("C_TELEPHONE")});
+    public static String[][] selectTableAll(Table table) throws SQLException{
+        ArrayList<String[]> str = new ArrayList<>();
+        ResultSet rs;
+        try (Connection conn = connect();Statement stmt = conn.createStatement()) {
+            switch(table){
+                case USER:
+                rs = stmt.executeQuery("SELECT * FROM USER");
+                while(rs.next()){
+                    str.add(new String[]{rs.getString("U_ID"),rs.getString("U_NAME"),rs.getString("U_AADHAR"),rs.getString("U_DOB"),rs.getString("U_GENDER"),rs.getString("U_ADDRESS"),rs.getString("U_ROLE"),rs.getString("U_PASSWORD")});
+                }
+                break;
+                case COLLEGE:
+                rs = stmt.executeQuery("SELECT * FROM COLLEGE");
+                while (rs.next()) {
+                    str.add(new String[]{rs.getString("C_ID"),rs.getString("C_NAME"),rs.getString("C_ADDRESS"),rs.getString("C_TELEPHONE")});
+                }
+                break;
+                case COLLEGE_ADMIN:
+                rs = stmt.executeQuery("SELECT CA_ID,U_NAME,C_NAME,U_PASSWORD,USER_ID FROM COLLEGE_ADMIN LEFT JOIN COLLEGE ON COLLEGE.C_ID = COLLEGE_ADMIN.COLLEGE_ID LEFT JOIN USER ON USER.U_ID = COLLEGE_ADMIN.USER_ID");
+                while(rs.next()){
+                    str.add(new String[]{rs.getString("CA_ID"),rs.getString("U_NAME"),rs.getString("C_NAME"),rs.getString("U_PASSWORD"),rs.getString("USER_ID")});
+                }
+                break;
+                case COURSE:
+                rs = stmt.executeQuery("SELECT COURSE_ID, COURSE_NAME, COURSE_SEM, DEPT_NAME, C_NAME, DEGREE, ELECTIVE FROM COURSE LEFT JOIN DEPARTMENT ON (DEPARTMENT.DEPT_ID = COURSE.COURSE_DEPT AND DEPARTMENT.COLLEGE_ID = COURSE.COLLEGE_ID) LEFT JOIN COLLEGE ON COLLEGE.C_ID = COURSE.COLLEGE_ID");
+                while (rs.next()) {
+                    str.add(new String[]{rs.getString("COURSE_ID"),rs.getString("COURSE_NAME"),rs.getString("COURSE_SEM"),rs.getString("DEPT_NAME"),rs.getString("C_NAME"),rs.getString("DEGREE"), rs.getString("ELECTIVE")});
+                }
+                break;
+                case DEPARTMENT:
+                rs = stmt.executeQuery("SELECT DEPT_ID, DEPT_NAME, C_NAME FROM DEPARTMENT LEFT JOIN COLLEGE ON DEPARTMENT.COLLEGE_ID = COLLEGE.C_ID");
+                while (rs.next()) {
+                    str.add(new String[]{rs.getString("DEPT_ID"),rs.getString("DEPT_NAME"),rs.getString("C_NAME")});
+                }
+                break;
+                case PROFESSOR:
+                rs = stmt.executeQuery("SELECT P_ID, U_NAME, DEPT_NAME, C_NAME,U_PASSWORD, USER_ID FROM PROFESSOR LEFT JOIN USER ON USER.U_ID = PROFESSOR.USER_ID LEFT JOIN DEPARTMENT ON (DEPARTMENT.DEPT_ID = PROFESSOR.DEPT_ID AND DEPARTMENT.COLLEGE_ID = PROFESSOR.COLLEGE_ID) LEFT JOIN COLLEGE ON COLLEGE.C_ID = PROFESSOR.COLLEGE_ID");
+                while(rs.next()){
+                    str.add(new String[]{rs.getString("P_ID"),rs.getString("U_NAME"),rs.getString("DEPT_NAME"),rs.getString("C_NAME"),rs.getString("U_PASSWORD"),rs.getString("USER_ID")});
+                }
+                break;
+                case SECTION:
+                rs = stmt.executeQuery("SELECT SEC_ID,SEC_NAME,DEPT_NAME,C_NAME FROM SECTION LEFT JOIN DEPARTMENT ON DEPARTMENT.DEPT_ID = SECTION.DEPT_ID LEFT JOIN COLLEGE ON COLLEGE.C_ID = SECTION.COLLEGE_ID");
+                while (rs.next()) {
+                    str.add(new String[]{rs.getString("SEC_ID"),rs.getString("SEC_NAME"),rs.getString("DEPT_NAME"),rs.getString("C_NAME")});
+                }
+                break;
+                case STUDENT:
+                rs = stmt.executeQuery("SELECT S_ID,U_NAME,SEC_NAME,S_SEM,S_YEAR, DEPT_NAME,S_DEGREE,S_CGPA, C_NAME,U_PASSWORD, USER_ID FROM STUDENT LEFT JOIN DEPARTMENT ON (STUDENT.DEPT_ID = DEPARTMENT.DEPT_ID AND STUDENT.COLLEGE_ID = DEPARTMENT.COLLEGE_ID) LEFT JOIN SECTION ON (STUDENT.SEC_ID=SECTION.SEC_ID AND STUDENT.DEPT_ID = SECTION.DEPT_ID AND STUDENT.COLLEGE_ID = SECTION.COLLEGE_ID) LEFT JOIN USER ON STUDENT.USER_ID = USER.U_ID LEFT JOIN COLLEGE ON STUDENT.COLLEGE_ID = COLLEGE.C_ID");
+                while(rs.next()){
+                    str.add(new String[]{rs.getString("S_ID"),rs.getString("U_NAME"),rs.getString("SEC_NAME"),rs.getString("S_SEM"),rs.getString("S_YEAR"),rs.getString("DEPT_NAME"),rs.getString("S_DEGREE"),String.format("%.2f",rs.getFloat("S_CGPA")),rs.getString("C_NAME"),rs.getString("U_PASSWORD"),rs.getString("USER_ID")});
+                }
+                break;
+                case SUPER_ADMIN:
+                rs = stmt.executeQuery("SELECT SA_ID,U_NAME,U_PASSWORD,USER_ID FROM SUPER_ADMIN LEFT JOIN USER ON USER.U_ID = SUPER_ADMIN.USER_ID");
+                while(rs.next()){
+                    str.add(new String[]{rs.getString("SA_ID"),rs.getString("U_NAME"),rs.getString("U_PASSWORD"),rs.getString("USER_ID")});
+                }
+                break;
+                case TEST:
+                rs = stmt.executeQuery("SELECT TEST_ID, TEST.S_ID, TEST.COURSE_ID, COURSE_NAME, TEST.COLLEGE_ID, C_NAME, TEST_MARKS FROM TEST LEFT JOIN STUDENT ON (STUDENT.S_ID = TEST.S_ID AND STUDENT.COLLEGE_ID = TEST.COLLEGE_ID) LEFT JOIN COURSE ON COURSE.COLLEGE_ID = TEST.COLLEGE_ID LEFT JOIN COLLEGE ON TEST.COLLEGE_ID = COLLEGE.C_ID");
+                while (rs.next()) {
+                    str.add(new String[]{rs.getString("TEST_ID"), rs.getString("TEST.S_ID"),rs.getString("TEST.COURSE_ID"), rs.getString("COURSE_NAME"),rs.getString("TEST.COLLEGE_ID"), rs.getString("C_NAME"),rs.getString("TEST_MARKS")});
+                }
+                break;
+                case TRANSACTIONS:
+                rs = stmt.executeQuery("SELECT T_ID, TRANSACTIONS.S_ID, C_ID, C_NAME, T_DATE, T_AMOUNT FROM TRANSACTIONS LEFT JOIN STUDENT ON STUDENT.S_ID = TRANSACTIONS.S_ID LEFT JOIN COLLEGE ON COLLEGE.C_ID = TRANSACTIONS.COLLEGE_ID");
+                while (rs.next()) {
+                    str.add(new String[]{rs.getString("T_ID"),rs.getString("TRANSACTION.S_ID"),rs.getString("C_ID"),rs.getString("C_NAME"),rs.getString("T_DATE"),rs.getString("T_DATE"),rs.getString("T_AMOUNT")});
+                }
+                break;
             }
             return Arrays.copyOf(str.toArray(), str.toArray().length,String[][].class);
         }
     }
-
-    public static String[][] selectDeptAll() throws SQLException{
-        String sqlDepartment = "SELECT DEPT_ID, DEPT_NAME, C_NAME FROM DEPARTMENT LEFT JOIN COLLEGE ON DEPARTMENT.COLLEGE_ID = COLLEGE.C_ID";
-        try (Connection conn = Connect.connect();Statement stmt = conn.createStatement();ResultSet rs = stmt.executeQuery(sqlDepartment)) {
-            ArrayList<String[]> str = new ArrayList<>();
-            while (rs.next()) {
-                String[] s = {rs.getString("DEPT_ID"),rs.getString("DEPT_NAME"),rs.getString("C_NAME")};
-                str.add(s);
-            }
-            return Arrays.copyOf(str.toArray(), str.toArray().length,String[][].class);
+    
+    public static String[][] searchTable(Table user, String column, String name) throws SQLException{
+        String sql = "";
+        ArrayList<String[]> str = new ArrayList<>();
+        ResultSet rs;
+        try(Connection conn = Connect.connect();Statement stmt = conn.createStatement()){
+            switch(user){
+                case USER:
+                sql = "SELECT U_ID, U_NAME, U_AADHAR, U_DOB, U_GENDER, U_ADDRESS, U_ROLE, U_PASSWORD FROM (SELECT U_ID, U_NAME, U_AADHAR, U_DOB, U_GENDER, U_ADDRESS, U_ROLE, U_PASSWORD, 1 AS TYPE FROM USER WHERE "+column+" LIKE '"+name+"%' UNION SELECT * FROM (SELECT U_ID, U_NAME, U_AADHAR, U_DOB, U_GENDER, U_ADDRESS, U_ROLE, U_PASSWORD, 2 AS TYPE FROM USER WHERE "+column+" LIKE '%"+name+"%' EXCEPT SELECT U_ID, U_NAME, U_AADHAR, U_DOB, U_GENDER, U_ADDRESS, U_ROLE, U_PASSWORD, 2 AS TYPE FROM USER WHERE "+column+" LIKE '"+name+"%')) ORDER BY TYPE";
+                rs = stmt.executeQuery(sql);
+                while(rs.next()){
+                    str.add(new String[]{rs.getString("U_ID"),rs.getString("U_NAME"),rs.getString("U_AADHAR"),rs.getString("U_DOB"),rs.getString("U_GENDER"),rs.getString("U_ADDRESS"),rs.getString("U_ROLE"),rs.getString("U_PASSWORD")});
+                }
+                break;
+                case STUDENT:
+                sql = "SELECT S_ID,U_NAME,SEC_NAME,S_SEM,S_YEAR, DEPT_NAME,S_DEGREE,S_CGPA, C_NAME,U_PASSWORD, USER_ID FROM (select S_ID,U_NAME,SEC_NAME,S_SEM,S_YEAR, DEPT_NAME,S_DEGREE,S_CGPA, C_NAME,U_PASSWORD, USER_ID,1 AS TYPE FROM STUDENT LEFT JOIN DEPARTMENT ON (STUDENT.DEPT_ID = DEPARTMENT.DEPT_ID AND STUDENT.COLLEGE_ID = DEPARTMENT.COLLEGE_ID) LEFT JOIN SECTION ON (STUDENT.SEC_ID=SECTION.SEC_ID AND STUDENT.DEPT_ID = SECTION.DEPT_ID AND STUDENT.COLLEGE_ID = SECTION.COLLEGE_ID) LEFT JOIN USER ON STUDENT.USER_ID = USER.U_ID LEFT JOIN COLLEGE ON STUDENT.COLLEGE_ID = COLLEGE.C_ID WHERE "+column+" LIKE '"+name+"%' UNION SELECT * FROM (SELECT S_ID,U_NAME,SEC_NAME,S_SEM,S_YEAR, DEPT_NAME,S_DEGREE,S_CGPA, C_NAME,U_PASSWORD, USER_ID,2 AS TYPE FROM STUDENT LEFT JOIN DEPARTMENT ON (STUDENT.DEPT_ID = DEPARTMENT.DEPT_ID AND STUDENT.COLLEGE_ID = DEPARTMENT.COLLEGE_ID) LEFT JOIN SECTION ON (STUDENT.SEC_ID=SECTION.SEC_ID AND STUDENT.DEPT_ID = SECTION.DEPT_ID AND STUDENT.COLLEGE_ID = SECTION.COLLEGE_ID) LEFT JOIN USER ON STUDENT.USER_ID = USER.U_ID LEFT JOIN COLLEGE ON STUDENT.COLLEGE_ID = COLLEGE.C_ID WHERE "+column+" LIKE '%"+name+"%' EXCEPT SELECT S_ID,U_NAME,SEC_NAME,S_SEM,S_YEAR, DEPT_NAME,S_DEGREE,S_CGPA, C_NAME,U_PASSWORD, USER_ID,2 AS TYPE FROM STUDENT LEFT JOIN DEPARTMENT ON (STUDENT.DEPT_ID = DEPARTMENT.DEPT_ID AND STUDENT.COLLEGE_ID = DEPARTMENT.COLLEGE_ID) LEFT JOIN SECTION ON (STUDENT.SEC_ID=SECTION.SEC_ID AND STUDENT.DEPT_ID = SECTION.DEPT_ID AND STUDENT.COLLEGE_ID = SECTION.COLLEGE_ID) LEFT JOIN USER ON STUDENT.USER_ID = USER.U_ID LEFT JOIN COLLEGE ON STUDENT.COLLEGE_ID = COLLEGE.C_ID WHERE "+column+" LIKE '"+name+"%')) ORDER BY TYPE";
+                rs = stmt.executeQuery(sql);
+                while(rs.next()){
+                    str.add(new String[]{rs.getString("S_ID"),rs.getString("U_NAME"),rs.getString("SEC_NAME"),rs.getString("S_SEM"),rs.getString("S_YEAR"),rs.getString("DEPT_NAME"),rs.getString("S_DEGREE"),String.format("%.2f",rs.getFloat("S_CGPA")),rs.getString("C_NAME"),rs.getString("U_PASSWORD"),rs.getString("USER_ID")});
+                }
+                break;
+                case PROFESSOR:
+                sql = "SELECT P_ID, U_NAME, DEPT_NAME, C_NAME,U_PASSWORD, USER_ID FROM (select P_ID, U_NAME, DEPT_NAME, C_NAME,U_PASSWORD, USER_ID,1 as type FROM PROFESSOR LEFT JOIN USER ON USER.U_ID = PROFESSOR.USER_ID LEFT JOIN DEPARTMENT ON (DEPARTMENT.DEPT_ID = PROFESSOR.DEPT_ID AND DEPARTMENT.COLLEGE_ID = PROFESSOR.COLLEGE_ID) LEFT JOIN COLLEGE ON COLLEGE.C_ID = PROFESSOR.COLLEGE_ID WHERE "+column+" like '"+name+"%' union select * from (select P_ID, U_NAME, DEPT_NAME, C_NAME,U_PASSWORD, USER_ID,2 AS TYPE FROM PROFESSOR LEFT JOIN USER ON USER.U_ID = PROFESSOR.USER_ID LEFT JOIN DEPARTMENT ON (DEPARTMENT.DEPT_ID = PROFESSOR.DEPT_ID AND DEPARTMENT.COLLEGE_ID = PROFESSOR.COLLEGE_ID) LEFT JOIN COLLEGE ON COLLEGE.C_ID = PROFESSOR.COLLEGE_ID where "+column+" like '%"+name+"%' except select P_ID, U_NAME, DEPT_NAME, C_NAME,U_PASSWORD, USER_ID,2 as type FROM PROFESSOR LEFT JOIN USER ON USER.U_ID = PROFESSOR.USER_ID LEFT JOIN DEPARTMENT ON (DEPARTMENT.DEPT_ID = PROFESSOR.DEPT_ID AND DEPARTMENT.COLLEGE_ID = PROFESSOR.COLLEGE_ID) LEFT JOIN COLLEGE ON COLLEGE.C_ID = PROFESSOR.COLLEGE_ID where "+column+" like '"+name+"%')) order by type";
+                rs = stmt.executeQuery(sql);
+                while(rs.next()){
+                    str.add(new String[]{rs.getString("P_ID"),rs.getString("U_NAME"),rs.getString("DEPT_NAME"),rs.getString("C_NAME"),rs.getString("U_PASSWORD"),rs.getString("USER_ID")});
+                }
+                break;
+                case COLLEGE_ADMIN:
+                sql = "SELECT CA_ID,U_NAME,C_NAME,U_PASSWORD,USER_ID FROM (select CA_ID,U_NAME,C_NAME,U_PASSWORD,USER_ID,1 AS TYPE FROM COLLEGE_ADMIN LEFT JOIN COLLEGE ON COLLEGE.C_ID = COLLEGE_ADMIN.COLLEGE_ID LEFT JOIN USER ON USER.U_ID = COLLEGE_ADMIN.USER_ID WHERE "+column+" LIKE '"+name+"%' UNION SELECT * FROM (SELECT CA_ID,U_NAME,C_NAME,U_PASSWORD,USER_ID,2 AS TYPE FROM COLLEGE_ADMIN LEFT JOIN COLLEGE ON COLLEGE.C_ID = COLLEGE_ADMIN.COLLEGE_ID LEFT JOIN USER ON USER.U_ID = COLLEGE_ADMIN.USER_ID WHERE "+column+" LIKE '%"+name+"%' EXCEPT SELECT CA_ID,U_NAME,C_NAME,U_PASSWORD,USER_ID,2 AS TYPE FROM COLLEGE_ADMIN LEFT JOIN COLLEGE ON COLLEGE.C_ID = COLLEGE_ADMIN.COLLEGE_ID LEFT JOIN USER ON USER.U_ID = COLLEGE_ADMIN.USER_ID WHERE "+column+" LIKE '"+name+"%')) ORDER BY TYPESELECT;";
+                rs = stmt.executeQuery(sql);
+                while(rs.next()){
+                    String[] s = {rs.getString("CA_ID"),rs.getString("U_NAME"),rs.getString("C_NAME"),rs.getString("U_PASSWORD"),rs.getString("USER_ID")};
+                    str.add(s);
+                }
+                break;
+                case SUPER_ADMIN:
+                sql = "SELECT SA_ID,U_NAME,U_PASSWORD,USER_ID FROM (SELECT SA_ID,U_NAME,U_PASSWORD,USER_ID,1 as type FROM SUPER_ADMIN LEFT JOIN USER ON USER.U_ID = SUPER_ADMIN.USER_ID WHERE "+column+" LIKE '"+name+"%' UNION SELECT * FROM (SELECT SA_ID,U_NAME,U_PASSWORD,USER_ID,2 AS TYPE FROM SUPER_ADMIN LEFT JOIN USER ON USER.U_ID = SUPER_ADMIN.USER_ID WHERE "+column+" LIKE '%"+name+"%' EXCEPT SELECT SA_ID,U_NAME,U_PASSWORD,USER_ID,2 AS TYPE FROM SUPER_ADMIN LEFT JOIN USER ON USER.U_ID = SUPER_ADMIN.USER_ID WHERE "+column+" LIKE '"+name+"%')) ORDER BY TYPE;";
+                rs = stmt.executeQuery(sql);
+                while(rs.next()){
+                    str.add(new String[]{rs.getString("SA_ID"),rs.getString("U_NAME"),rs.getString("U_PASSWORD"),rs.getString("USER_ID")});
+                }
+                break;
+                case COLLEGE:
+                rs = stmt.executeQuery("SELECT C_ID, C_NAME, C_ADDRESS, C_TELEPHONE FROM (SELECT C_ID, C_NAME, C_ADDRESS, C_TELEPHONE,1 AS TYPE FROM COLLEGE WHERE "+column+" LIKE '"+name+"%' UNION SELECT * FROM (SELECT C_ID, C_NAME, C_ADDRESS, C_TELEPHONE,2 AS TYPE FROM COLLEGE WHERE "+column+" LIKE '%"+name+"%' EXCEPT SELECT C_ID, C_NAME, C_ADDRESS, C_TELEPHONE,2 AS TYPE FROM COLLEGE WHERE"+column+" LIKE '"+name+"%')) ORDER BY TYPE;");
+                while (rs.next()) {
+                    str.add(new String[]{rs.getString("C_ID"),rs.getString("C_NAME"),rs.getString("C_ADDRESS"),rs.getString("C_TELEPHONE")});
+                }
+                break;
+                case COURSE:
+                rs = stmt.executeQuery("SELECT COURSE_ID, COURSE_NAME, COURSE_SEM, DEPT_NAME, C_NAME, DEGREE, ELECTIVE FROM (SELECT COURSE_ID, COURSE_NAME, COURSE_SEM, DEPT_NAME, C_NAME, DEGREE, ELECTIVE,1 AS TYPE FROM COURSE LEFT JOIN DEPARTMENT ON (DEPARTMENT.DEPT_ID = COURSE.COURSE_DEPT AND DEPARTMENT.COLLEGE_ID = COURSE.COLLEGE_ID) LEFT JOIN COLLEGE ON COLLEGE.C_ID = COURSE.COLLEGE_ID WHERE "+column+" LIKE '"+name+"%' UNION SELECT * FROM (SELECT COURSE_ID, COURSE_NAME, COURSE_SEM, DEPT_NAME, C_NAME, DEGREE, ELECTIVE,2 AS TYPE FROM COURSE LEFT JOIN DEPARTMENT ON (DEPARTMENT.DEPT_ID = COURSE.COURSE_DEPT AND DEPARTMENT.COLLEGE_ID = COURSE.COLLEGE_ID) LEFT JOIN COLLEGE ON COLLEGE.C_ID = COURSE.COLLEGE_ID WHERE "+column+" LIKE '%"+name+"%' EXCEPT SELECT COURSE_ID, COURSE_NAME, COURSE_SEM, DEPT_NAME, C_NAME, DEGREE, ELECTIVE,2 AS TYPE FROM COURSE LEFT JOIN DEPARTMENT ON (DEPARTMENT.DEPT_ID = COURSE.COURSE_DEPT AND DEPARTMENT.COLLEGE_ID = COURSE.COLLEGE_ID) LEFT JOIN COLLEGE ON COLLEGE.C_ID = COURSE.COLLEGE_ID WHERE "+column+" LIKE '"+name+"%')) ORDER BY TYPE");
+                while (rs.next()) {
+                    str.add(new String[]{rs.getString("COURSE_ID"),rs.getString("COURSE_NAME"),rs.getString("COURSE_SEM"),rs.getString("DEPT_NAME"),rs.getString("C_NAME"),rs.getString("DEGREE"), rs.getString("ELECTIVE")});
+                }
+                break;
+                case DEPARTMENT:
+                rs = stmt.executeQuery("SELECT DEPT_ID, DEPT_NAME, C_NAME FROM (SELECT DEPT_ID, DEPT_NAME, C_NAME,1 AS TYPE FROM DEPARTMENT LEFT JOIN COLLEGE ON DEPARTMENT.COLLEGE_ID = COLLEGE.C_ID WHERE "+column+" LIKE '"+name+"%' UNION SELECT * FROM (SELECT DEPT_ID, DEPT_NAME, C_NAME,2 AS TYPE FROM DEPARTMENT LEFT JOIN COLLEGE ON DEPARTMENT.COLLEGE_ID = COLLEGE.C_ID WHERE "+column+" LIKE '%"+name+"%' EXCEPT SELECT DEPT_ID, DEPT_NAME, C_NAME,2 AS TYPE FROM DEPARTMENT LEFT JOIN COLLEGE ON DEPARTMENT.COLLEGE_ID = COLLEGE.C_ID WHERE "+column+" LIKE '"+name+"%')) ORDER BY TYPE");
+                while (rs.next()) {
+                    str.add(new String[]{rs.getString("DEPT_ID"),rs.getString("DEPT_NAME"),rs.getString("C_NAME")});
+                }
+                break;
+                case SECTION:
+                rs = stmt.executeQuery("SELECT SEC_ID,SEC_NAME,DEPT_NAME,C_NAME FROM (SELECT SEC_ID,SEC_NAME,DEPT_NAME,C_NAME,1 AS TYPE FROM SECTION LEFT JOIN DEPARTMENT ON DEPARTMENT.DEPT_ID = SECTION.DEPT_ID LEFT JOIN COLLEGE ON COLLEGE.C_ID = SECTION.COLLEGE_ID WHERE "+column+" LIKE '"+name+"%' UNION SELECT * FROM (SELECT SEC_ID,SEC_NAME,DEPT_NAME,C_NAME,2 AS TYPE FROM SECTION LEFT JOIN DEPARTMENT ON DEPARTMENT.DEPT_ID = SECTION.DEPT_ID LEFT JOIN COLLEGE ON COLLEGE.C_ID = SECTION.COLLEGE_ID WHERE "+column+" LIKE '%"+name+"%' EXCEPT SELECT SEC_ID,SEC_NAME,DEPT_NAME,C_NAME,2 AS TYPE FROM SECTION LEFT JOIN DEPARTMENT ON DEPARTMENT.DEPT_ID = SECTION.DEPT_ID LEFT JOIN COLLEGE ON COLLEGE.C_ID = SECTION.COLLEGE_ID WHERE "+column+" LIKE '"+name+"%')) ORDER BY TYPE");
+                while (rs.next()) {
+                    str.add(new String[]{rs.getString("SEC_ID"),rs.getString("SEC_NAME"),rs.getString("DEPT_NAME"),rs.getString("C_NAME")});
+                }
+                break;
+                case TEST:
+                rs = stmt.executeQuery("SELECT TEST_ID, S_ID, COURSE_ID, COURSE_NAME, COLLEGE_ID, C_NAME, TEST_MARKS FROM (SELECT TEST_ID, TEST.S_ID, TEST.COURSE_ID, COURSE_NAME, TEST.COLLEGE_ID, C_NAME, TEST_MARKS,1 AS TYPE FROM TEST LEFT JOIN STUDENT ON (STUDENT.S_ID = TEST.S_ID AND STUDENT.COLLEGE_ID = TEST.COLLEGE_ID) LEFT JOIN COURSE ON COURSE.COLLEGE_ID = TEST.COLLEGE_ID LEFT JOIN COLLEGE ON TEST.COLLEGE_ID = COLLEGE.C_ID WHERE "+column+" LIKE '"+name+"%' UNION SELECT * FROM (SELECT TEST_ID, TEST.S_ID, TEST.COURSE_ID, COURSE_NAME, TEST.COLLEGE_ID, C_NAME, TEST_MARKS,2 AS TYPE FROM TEST LEFT JOIN STUDENT ON (STUDENT.S_ID = TEST.S_ID AND STUDENT.COLLEGE_ID = TEST.COLLEGE_ID) LEFT JOIN COURSE ON COURSE.COLLEGE_ID = TEST.COLLEGE_ID LEFT JOIN COLLEGE ON TEST.COLLEGE_ID = COLLEGE.C_ID WHERE "+column+" LIKE '%"+name+"%' EXCEPT SELECT TEST_ID, TEST.S_ID, TEST.COURSE_ID, COURSE_NAME, TEST.COLLEGE_ID, C_NAME, TEST_MARKS,2 AS TYPE FROM TEST LEFT JOIN STUDENT ON (STUDENT.S_ID = TEST.S_ID AND STUDENT.COLLEGE_ID = TEST.COLLEGE_ID) LEFT JOIN COURSE ON COURSE.COLLEGE_ID = TEST.COLLEGE_ID LEFT JOIN COLLEGE ON TEST.COLLEGE_ID = COLLEGE.C_ID WHERE "+column+" LIKE '"+name+"%')) ORDER BY TYPE");
+                while (rs.next()) {
+                    str.add(new String[]{rs.getString("TEST_ID"), rs.getString("TEST.S_ID"),rs.getString("TEST.COURSE_ID"), rs.getString("COURSE_NAME"),rs.getString("TEST.COLLEGE_ID"), rs.getString("C_NAME"),rs.getString("TEST_MARKS")});
+                }
+                break;
+                case TRANSACTIONS:
+                rs = stmt.executeQuery("SELECT T_ID, S_ID, C_ID, C_NAME, T_DATE, T_AMOUNT FROM (SELECT T_ID, TRANSACTIONS.S_ID, C_ID, C_NAME, T_DATE, T_AMOUNT,1 AS TYPE FROM TRANSACTIONS LEFT JOIN STUDENT ON STUDENT.S_ID = TRANSACTIONS.S_ID LEFT JOIN COLLEGE ON COLLEGE.C_ID = TRANSACTIONS.COLLEGE_ID WHERE "+column+" LIKE '"+name+"%' UNION SELECT * FROM (SELECT T_ID, TRANSACTIONS.S_ID, C_ID, C_NAME, T_DATE, T_AMOUNT,2 AS TYPE FROM TRANSACTIONS LEFT JOIN STUDENT ON STUDENT.S_ID = TRANSACTIONS.S_ID LEFT JOIN COLLEGE ON COLLEGE.C_ID = TRANSACTIONS.COLLEGE_ID WHERE "+column+" LIKE '%"+name+"%' EXCEPT SELECT T_ID, TRANSACTIONS.S_ID, C_ID, C_NAME, T_DATE, T_AMOUNT,2 AS TYPE FROM TRANSACTIONS LEFT JOIN STUDENT ON STUDENT.S_ID = TRANSACTIONS.S_ID LEFT JOIN COLLEGE ON COLLEGE.C_ID = TRANSACTIONS.COLLEGE_ID WHERE "+column+" LIKE '"+name+"%')) ORDER BY TYPE");
+                while (rs.next()) {
+                    str.add(new String[]{rs.getString("T_ID"),rs.getString("TRANSACTION.S_ID"),rs.getString("C_ID"),rs.getString("C_NAME"),rs.getString("T_DATE"),rs.getString("T_DATE"),rs.getString("T_AMOUNT")});
+                }
+                break;
         }
-    }
-
-    public static String[][] selectSecAll() throws SQLException{
-        String sql = "SELECT SEC_ID,SEC_NAME,DEPT_NAME,C_NAME FROM SECTION LEFT JOIN DEPARTMENT ON DEPARTMENT.DEPT_ID = SECTION.DEPT_ID LEFT JOIN COLLEGE ON COLLEGE.C_ID = SECTION.COLLEGE_ID";
-        try (Connection conn = Connect.connect();Statement stmt = conn.createStatement();ResultSet rs = stmt.executeQuery(sql)) {
-            ArrayList<String[]> str = new ArrayList<>();
-            while (rs.next()) {
-                str.add(new String[]{rs.getString("SEC_ID"),rs.getString("SEC_NAME"),rs.getString("DEPT_NAME"),rs.getString("C_NAME")});
-            }
-            return Arrays.copyOf(str.toArray(), str.toArray().length,String[][].class);
-        }
-    }
-
-    public static String[][] selectTestAll() throws SQLException{
-        String sql = "SELECT TEST_ID, TEST.S_ID, TEST.COURSE_ID, COURSE_NAME, TEST.COLLEGE_ID, C_NAME, TEST_MARKS FROM TEST LEFT JOIN STUDENT ON (STUDENT.S_ID = TEST.S_ID AND STUDENT.COLLEGE_ID = TEST.COLLEGE_ID) LEFT JOIN COURSE ON COURSE.COLLEGE_ID = TEST.COLLEGE_ID LEFT JOIN COLLEGE ON TEST.COLLEGE_ID = COLLEGE.C_ID";
-        try (Connection conn = connect(); Statement stmt = conn.createStatement();ResultSet rs = stmt.executeQuery(sql)) {
-            ArrayList<String[]> str = new ArrayList<>();
-            while (rs.next()) {
-                str.add(new String[]{rs.getString("TEST_ID"), rs.getString("TEST.S_ID"),rs.getString("TEST.COURSE_ID"), rs.getString("COURSE_NAME"),rs.getString("TEST.COLLEGE_ID"), rs.getString("C_NAME"),rs.getString("TEST_MARKS")});
-            }
-            return Arrays.copyOf(str.toArray(), str.toArray().length,String[][].class);
-        }
-    }
-
-    public static String[][] selectTransactAll() throws SQLException {
-        String sql = "SELECT T_ID, TRANSACTIONS.S_ID, C_ID, C_NAME, T_DATE, T_AMOUNT FROM TRANSACTIONS LEFT JOIN STUDENT ON STUDENT.S_ID = TRANSACTIONS.S_ID LEFT JOIN COLLEGE ON COLLEGE.C_ID = TRANSACTIONS.COLLEGE_ID";
-        try (Connection conn = connect(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
-            ArrayList<String[]> str = new ArrayList<>();
-            while (rs.next()) {
-                str.add(new String[]{rs.getString("T_ID"),rs.getString("TRANSACTION.S_ID"),rs.getString("C_ID"),rs.getString("C_NAME"),rs.getString("T_DATE"),rs.getString("T_DATE"),rs.getString("T_AMOUNT")});
-            }
             return Arrays.copyOf(str.toArray(), str.toArray().length,String[][].class);
         }
     }
@@ -291,8 +324,8 @@ public class Connect {
         }
     }
 
-    public static void addCourse(String cID, String cName, int cSem, int deptID, int collegeID, String degree) throws SQLException {
-        String sql = "INSERT INTO COURSE VALUES (?,?,?,?,?,?)";
+    public static void addCourse(String cID, String cName, int cSem, int deptID, int collegeID, String degree, String elective) throws SQLException {
+        String sql = "INSERT INTO COURSE VALUES (?,?,?,?,?,?,?)";
         try (Connection conn = connect();PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, cID);
             pstmt.setString(2, cName);
@@ -300,6 +333,7 @@ public class Connect {
             pstmt.setInt(4, deptID);
             pstmt.setInt(5, collegeID);
             pstmt.setString(6, degree);
+            pstmt.setString(7, elective);
             pstmt.executeUpdate();
         } 
     }
@@ -509,7 +543,6 @@ public class Connect {
             try{
                 conn.setAutoCommit(false);
                 pstmt.setInt(1, tID);
-                // pstmt.setInt(2, collegeID);
                 pstmt.execute();
                 conn.commit();
             } catch (SQLException e) {
@@ -526,6 +559,7 @@ public class Connect {
                 conn.setAutoCommit(false);
                 pstmtCourse.setString(1, cID);
                 pstmtCourse.setInt(2, collegeID);
+                pstmtCourse.execute();
                 conn.commit();
             } catch (SQLException e) {
                 conn.rollback();

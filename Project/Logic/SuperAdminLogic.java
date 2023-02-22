@@ -89,6 +89,7 @@ public class SuperAdminLogic {
         int inp = SuperAdminUI.userManagePageInput();
         int uID;
         switch(inp){
+            
             //Adding User
                 case 1:
                 while (Connect.verifyUser(uID = InputUtility.posInput("Enter the unique User ID"))) {
@@ -507,9 +508,8 @@ public class SuperAdminLogic {
                 }
                 break;
 
-                //Deleting User
+                //DELETE USER
                 case 3:
-                // deleteUser(user);
                 inp = InputUtility.posInput("Enter user ID to delete");
                 if(Connect.verifyUser(inp) && user.getID()!=inp){
                     DisplayUtility.dialogWithHeader("Warning", "Account ID: "+inp+", Name: "+ Connect.returnUser(inp).getName() +" is selected for deletion");
@@ -529,25 +529,108 @@ public class SuperAdminLogic {
                     }
                 }
                 break;
-
-                //View User
+                
+                //VIEW USER
                 case 4:
-                // viewUser(user);
                 while ((inp = SuperAdminUI.viewUserInput())!=6) {
-                    if(inp==1){
-                        DisplayUtility.printTable("USER DETAILS", new String[]{"USER ID","NAME","AADHAR","DATE OF BIRTH","GENDER","ADDRESS","ROLE","PASSWORD"}, Connect.selectUserAll());
-                    }
-                    else if(inp == 2){
-                        DisplayUtility.printTable("STUDENT DETAILS", new String[]{"STUDENT ID","NAME","SECTION","SEMESTER","YEAR","DEPARTMENT","DEGREE","CGPA","COLLEGE","PASSWORD","USER ID"}, Connect.selectStudentAll());
-                    }
-                    else if(inp == 3){
-                        DisplayUtility.printTable("PROFESSOR DETAILS", new String[]{"PROFESSOR ID","NAME","DEPARTMENT","COLLEGE","PASSWORD","USER ID"}, Connect.selectProfessorAll());
-                    }
-                    else if(inp == 4){
-                        DisplayUtility.printTable("COLLEGE ADMIN DETAILS", new String[]{"COLLEGE ADMIN ID","NAME","COLLEGE","PASSWORD","USER ID"}, Connect.selectCollegeAdminAll());
-                    }
-                    else if(inp == 5){
-                        DisplayUtility.printTable("SUPER ADMIN DETAILS", new String[]{"SUPER ADMIN ID","NAME","PASSWORD","USER ID"}, Connect.selectSuperAdminAll());
+                    switch(inp){
+                        case 1:
+                        while ((inp = InputUtility.choiceInput("View User", new String[]{"View All User","Search by name","Search by Aadhar","Search by Address","Back"}))!=5) {
+                            switch(inp){
+                                case 1:
+                                DisplayUtility.printTable("USER DETAILS", new String[]{"USER ID","NAME","AADHAR","DATE OF BIRTH","GENDER","ADDRESS","ROLE","PASSWORD"}, Connect.selectTableAll(Table.USER));
+                                break;
+                                case 2:
+                                DisplayUtility.printTable("USER DETAILS", new String[]{"USER ID","NAME","AADHAR","DATE OF BIRTH","GENDER","ADDRESS","ROLE","PASSWORD"}, Connect.searchTable(Table.USER,"U_NAME",InputUtility.inputString("Enter the name")));
+                                break;
+                                case 3:
+                                DisplayUtility.printTable("USER DETAILS", new String[]{"USER ID","NAME","AADHAR","DATE OF BIRTH","GENDER","ADDRESS","ROLE","PASSWORD"}, Connect.searchTable(Table.USER,"U_AADHAR",InputUtility.inputString("Enter the user aadhar")));
+                                break;
+                                case 4:
+                                DisplayUtility.printTable("USER DETAILS", new String[]{"USER ID","NAME","AADHAR","DATE OF BIRTH","GENDER","ADDRESS","ROLE","PASSWORD"}, Connect.searchTable(Table.USER,"U_ADDRESS",InputUtility.inputString("Enter the user aadhar")));
+                                break;
+    
+                            }
+                        }
+                        break;
+                        case 2:
+                        while ((inp = InputUtility.choiceInput("View Student", new String[]{"View All Student","Search by name","Search by Section","Search by Semester","Search by Year","Search by Department","Search by Degree","Search by CGPA","Search by College","Back"}))!=10) {
+                            switch(inp){
+                                case 1:
+                                DisplayUtility.printTable("STUDENT DETAILS", new String[]{"STUDENT ID","NAME","SECTION","SEMESTER","YEAR","DEPARTMENT","DEGREE","CGPA","COLLEGE","PASSWORD","USER ID"}, Connect.selectTableAll(Table.STUDENT));
+                                break;
+                                case 2:
+                                DisplayUtility.printTable("STUDENT DETAILS", new String[]{"STUDENT ID","NAME","SECTION","SEMESTER","YEAR","DEPARTMENT","DEGREE","CGPA","COLLEGE","PASSWORD","USER ID"}, Connect.searchTable(Table.STUDENT,"U_NAME",InputUtility.inputString("Enter the name")));
+                                break;
+                                case 3:
+                                DisplayUtility.printTable("STUDENT DETAILS", new String[]{"STUDENT ID","NAME","SECTION","SEMESTER","YEAR","DEPARTMENT","DEGREE","CGPA","COLLEGE","PASSWORD","USER ID"}, Connect.searchTable(Table.STUDENT,"SEC_NAME",InputUtility.inputString("Enter the section")));
+                                break;
+                                case 4:
+                                DisplayUtility.printTable("STUDENT DETAILS", new String[]{"STUDENT ID","NAME","SECTION","SEMESTER","YEAR","DEPARTMENT","DEGREE","CGPA","COLLEGE","PASSWORD","USER ID"}, Connect.searchTable(Table.STUDENT,"S_SEM",InputUtility.inputString("Enter the semester")));
+                                break;
+                                case 5:
+                                DisplayUtility.printTable("STUDENT DETAILS", new String[]{"STUDENT ID","NAME","SECTION","SEMESTER","YEAR","DEPARTMENT","DEGREE","CGPA","COLLEGE","PASSWORD","USER ID"}, Connect.searchTable(Table.STUDENT,"S_YEAR",InputUtility.inputString("Enter the year")));
+                                break;
+                                case 6:
+                                DisplayUtility.printTable("STUDENT DETAILS", new String[]{"STUDENT ID","NAME","SECTION","SEMESTER","YEAR","DEPARTMENT","DEGREE","CGPA","COLLEGE","PASSWORD","USER ID"}, Connect.searchTable(Table.STUDENT,"DEPT_NAME",InputUtility.inputString("Enter the department")));
+                                break;
+                                case 7:
+                                DisplayUtility.printTable("STUDENT DETAILS", new String[]{"STUDENT ID","NAME","SECTION","SEMESTER","YEAR","DEPARTMENT","DEGREE","CGPA","COLLEGE","PASSWORD","USER ID"}, Connect.searchTable(Table.STUDENT,"S_DEGREE",InputUtility.inputString("Enter the degree")));
+                                break;
+                                case 8:
+                                DisplayUtility.printTable("STUDENT DETAILS", new String[]{"STUDENT ID","NAME","SECTION","SEMESTER","YEAR","DEPARTMENT","DEGREE","CGPA","COLLEGE","PASSWORD","USER ID"}, Connect.searchTable(Table.STUDENT,"S_CGPA",InputUtility.inputString("Enter the CGPA")));
+                                break;
+                                case 9:
+                                DisplayUtility.printTable("STUDENT DETAILS", new String[]{"STUDENT ID","NAME","SECTION","SEMESTER","YEAR","DEPARTMENT","DEGREE","CGPA","COLLEGE","PASSWORD","USER ID"}, Connect.searchTable(Table.STUDENT,"C_NAME",InputUtility.inputString("Enter the College")));
+                                break;
+                            }
+                        }
+                        break;
+                        case 3:
+                        while((inp = InputUtility.choiceInput("View Professor", new String[]{"View All Professor","Search by name","Search by Department","Search by College","Back"}))!=5){
+                            switch(inp){
+                                case 1:
+                                DisplayUtility.printTable("PROFESSOR DETAILS", new String[]{"PROFESSOR ID","NAME","DEPARTMENT","COLLEGE","PASSWORD","USER ID"}, Connect.selectTableAll(Table.PROFESSOR));
+                                break;
+                                case 2:
+                                DisplayUtility.printTable("PROFESSOR DETAILS", new String[]{"PROFESSOR ID","NAME","DEPARTMENT","COLLEGE","PASSWORD","USER ID"}, Connect.searchTable(Table.PROFESSOR, "U_NAME", InputUtility.inputString("Enter the name")));
+                                break;
+                                case 3:
+                                DisplayUtility.printTable("PROFESSOR DETAILS", new String[]{"PROFESSOR ID","NAME","DEPARTMENT","COLLEGE","PASSWORD","USER ID"}, Connect.searchTable(Table.PROFESSOR, "DEPT_NAME", InputUtility.inputString("Enter the department")));
+                                break;
+                                case 4:
+                                DisplayUtility.printTable("PROFESSOR DETAILS", new String[]{"PROFESSOR ID","NAME","DEPARTMENT","COLLEGE","PASSWORD","USER ID"}, Connect.searchTable(Table.PROFESSOR, "C_NAME", InputUtility.inputString("Enter the college")));
+                                break;
+                            }
+                        }
+                        break;
+                        case 4:
+                        while ((inp = InputUtility.choiceInput("View College Admin", new String[]{"View All College Admin","Search by name","Search by college","Back"}))!=4) {
+                            switch(inp){
+                                case 1:
+                                DisplayUtility.printTable("COLLEGE ADMIN DETAILS", new String[]{"COLLEGE ADMIN ID","NAME","COLLEGE","PASSWORD","USER ID"}, Connect.selectTableAll(Table.COLLEGE_ADMIN));
+                                break;
+                                case 2:
+                                DisplayUtility.printTable("COLLEGE ADMIN DETAILS", new String[]{"COLLEGE ADMIN ID","NAME","COLLEGE","PASSWORD","USER ID"}, Connect.searchTable(Table.COLLEGE_ADMIN, "U_NAME", InputUtility.inputString("Enter the name")));
+                                break;
+                                case 3:
+                                DisplayUtility.printTable("COLLEGE ADMIN DETAILS", new String[]{"COLLEGE ADMIN ID","NAME","COLLEGE","PASSWORD","USER ID"}, Connect.searchTable(Table.COLLEGE_ADMIN, "C_NAME", InputUtility.inputString("Enter the college")));
+                                break;
+                            }
+                        }
+                        break;
+                        case 5:
+                        while ((inp = InputUtility.choiceInput("View Super Admin", new String[]{"View Super Admin","Search by name","Back"}))!=3) {
+                            switch(inp){
+                                case 1:
+                                DisplayUtility.printTable("SUPER ADMIN DETAILS", new String[]{"SUPER ADMIN ID","NAME","PASSWORD","USER ID"}, Connect.selectTableAll(Table.SUPER_ADMIN));
+                                break;
+                                case 2:
+                                DisplayUtility.printTable("SUPER ADMIN DETAILS", new String[]{"SUPER ADMIN ID","NAME","PASSWORD","USER ID"}, Connect.searchTable(Table.SUPER_ADMIN, "U_NAME", InputUtility.inputString("Enter the name")));
+                                break;
+                            }
+                        }
+                        break;
                     }
                 }
                 break;
@@ -573,6 +656,7 @@ public class SuperAdminLogic {
             int cSem;
             int deptID;
             String degree;
+            String elective;
             while (!Connect.verifyCollege(collegeID = InputUtility.posInput("Enter the College ID"))) {
                 DisplayUtility.singleDialog("College ID doesn't exist. Please try again");
             }
@@ -585,7 +669,8 @@ public class SuperAdminLogic {
             cName = InputUtility.inputString("Enter the Course Name");
             degree = InputUtility.choiceInput("Select the degree", new String[]{"B. Tech","M. Tech"}) == 1 ? "B. Tech" : "M. Tech";
             cSem = InputUtility.choiceInput("Select the Semester", degree=="B. Tech" ? new String[]{"First Year","Second Year","Third Year","Fourth Year"} : new String[]{"First Year","Second Year"});
-            Connect.addCourse(cID, cName, cSem, deptID, collegeID, degree);
+            elective = InputUtility.choiceInput("Select the Elective", new String[]{"Professional Elective","Open Elective"}) == 1 ? "P" : "O";
+            Connect.addCourse(cID, cName, cSem, deptID, collegeID, degree, elective);
             CommonUI.processSuccess();
             courseManage(user);
             break;
@@ -634,7 +719,7 @@ public class SuperAdminLogic {
                 DisplayUtility.singleDialog("Course ID doesn't exist. Please try again");
             }
             DisplayUtility.dialogWithHeader("Warning", "Course ID: "+cID+" Name: "+Connect.returnCourse(cID, collegeID).getcName()+" about to be deleted");
-            if(InputUtility.choiceInput("confirm? (All data will be deleted)", new String[]{"Confirm","Back"})==1){
+            if(InputUtility.choiceInput("Confirm? (All data will be deleted)", new String[]{"Confirm","Back"})==1){
                 Connect.deleteCourse(cID, collegeID);
                 CommonUI.processSuccess();
             }
@@ -643,7 +728,31 @@ public class SuperAdminLogic {
 
             //VIEW COURSE
             case 4:
-            DisplayUtility.printTable("COURSE DETAILS", new String[]{"COURSE ID","NAME","SEMESTER","DEPARTMENT","COLLEGE NAME","DEGREE"}, Connect.selectCourseAll());
+            while ((inp = InputUtility.choiceInput("View Course", new String[]{"View All Courses","Search by name","Search by semester","Search by department","Search by College","Search by Degree","Search by elective","Back"}))!=8) {
+                switch(inp){
+                    case 1:
+                    DisplayUtility.printTable("COURSE DETAILS", new String[]{"COURSE ID","NAME","SEMESTER","DEPARTMENT","COLLEGE NAME","DEGREE","ELECTIVE"}, Connect.selectTableAll(Table.COURSE));
+                    break;
+                    case 2:
+                    DisplayUtility.printTable("COURSE DETAILS", new String[]{"COURSE ID","NAME","SEMESTER","DEPARTMENT","COLLEGE NAME","DEGREE","ELECTIVE"}, Connect.searchTable(Table.COURSE,"COURSE_NAME",InputUtility.inputString("Enter the name")));
+                    break;
+                    case 3:
+                    DisplayUtility.printTable("COURSE DETAILS", new String[]{"COURSE ID","NAME","SEMESTER","DEPARTMENT","COLLEGE NAME","DEGREE","ELECTIVE"}, Connect.searchTable(Table.COURSE,"COURSE_SEM",InputUtility.inputString("Enter the semester")));
+                    break;
+                    case 4:
+                    DisplayUtility.printTable("COURSE DETAILS", new String[]{"COURSE ID","NAME","SEMESTER","DEPARTMENT","COLLEGE NAME","DEGREE","ELECTIVE"}, Connect.searchTable(Table.COURSE,"DEPT_NAME",InputUtility.inputString("Enter the department")));
+                    break;
+                    case 5:
+                    DisplayUtility.printTable("COURSE DETAILS", new String[]{"COURSE ID","NAME","SEMESTER","DEPARTMENT","COLLEGE NAME","DEGREE","ELECTIVE"}, Connect.searchTable(Table.COURSE,"C_NAME",InputUtility.inputString("Enter the college")));
+                    break;
+                    case 6:
+                    DisplayUtility.printTable("COURSE DETAILS", new String[]{"COURSE ID","NAME","SEMESTER","DEPARTMENT","COLLEGE NAME","DEGREE","ELECTIVE"}, Connect.searchTable(Table.COURSE,"DEGREE",InputUtility.inputString("Enter the degree")));
+                    break;
+                    case 7:
+                    DisplayUtility.printTable("COURSE DETAILS", new String[]{"COURSE ID","NAME","SEMESTER","DEPARTMENT","COLLEGE NAME","DEGREE","ELECTIVE"}, Connect.searchTable(Table.COURSE,"ELECTIVE",InputUtility.inputString("Enter the elective")));
+                    break;
+                }
+            }
             courseManage(user);
             break;
 
@@ -688,7 +797,7 @@ public class SuperAdminLogic {
                 DisplayUtility.singleDialog("Test ID doesn't exist. Please try again");
             }
             DisplayUtility.dialogWithHeader("Warning", "Test ID: "+inp+" Marks: "+Connect.returnTest(inp,student.getsID(),courseID, student.getCollegeID()).getTestMark()+" about to be deleted");
-            if(InputUtility.choiceInput("confirm? (All data will be deleted)", new String[]{"Confirm","Back"})==1){
+            if(InputUtility.choiceInput("Confirm? (All data will be deleted)", new String[]{"Confirm","Back"})==1){
                 Connect.deleteTest(inp, student.getsID(), courseID, student.getCollegeID());
                 CommonUI.processSuccess();
             }
@@ -696,7 +805,25 @@ public class SuperAdminLogic {
 
             //VIEW TEST
             case 4:
-            DisplayUtility.printTable("TEST RECORDS", new String[]{"TEST ID","STUDENT ID","COURSE ID","COURSE NAME","COLLEGE ID","COLLEGE NAME","TEST MARKS"}, Connect.selectTestAll());
+            while((inp = InputUtility.choiceInput("View Test", new String[]{"View All Test","Search by student ID","Search by course","Search by college","Search by marks","Back"}))!=6){
+                switch(inp){
+                    case 1:
+                    DisplayUtility.printTable("TEST RECORDS", new String[]{"TEST ID","STUDENT ID","COURSE ID","COURSE NAME","COLLEGE ID","COLLEGE NAME","TEST MARKS"}, Connect.selectTableAll(Table.TEST));
+                    break;
+                    case 2:
+                    DisplayUtility.printTable("TEST RECORDS", new String[]{"TEST ID","STUDENT ID","COURSE ID","COURSE NAME","COLLEGE ID","COLLEGE NAME","TEST MARKS"}, Connect.searchTable(Table.TEST,"TEST.S_ID",InputUtility.inputString("Enter the Student ID")));
+                    break;
+                    case 3:
+                    DisplayUtility.printTable("TEST RECORDS", new String[]{"TEST ID","STUDENT ID","COURSE ID","COURSE NAME","COLLEGE ID","COLLEGE NAME","TEST MARKS"}, Connect.searchTable(Table.TEST,"COURSE_NAME",InputUtility.inputString("Enter the course")));
+                    break;
+                    case 4:
+                    DisplayUtility.printTable("TEST RECORDS", new String[]{"TEST ID","STUDENT ID","COURSE ID","COURSE NAME","COLLEGE ID","COLLEGE NAME","TEST MARKS"}, Connect.searchTable(Table.TEST,"C_NAME",InputUtility.inputString("Enter the college")));
+                    break;
+                    case 5:
+                    DisplayUtility.printTable("TEST RECORDS", new String[]{"TEST ID","STUDENT ID","COURSE ID","COURSE NAME","COLLEGE ID","COLLEGE NAME","TEST MARKS"}, Connect.searchTable(Table.TEST,"TEST_MARKS",InputUtility.inputString("Enter the test mark")));
+                    break;
+                }
+            }
             testManage(user);
             break;
             case 5:
@@ -732,7 +859,10 @@ public class SuperAdminLogic {
             int collegeID;
             String sID;
             Transactions transact = Connect.returnTransact(tID);
-            while((choice = InputUtility.choiceInput("Select Property to Edit",toggle ? new String[]{"Transaction ID","Student ID","Date","Amount","Toggle Details","Back"} : new String[]{"Transaction ID - "+transact.gettID(),"Student ID - "+transact.getsID(),"Date - "+transact.getDate(),"Amount - "+transact.getDate(),"Toggle Details","Back"})) != 6){
+            while((choice = InputUtility.choiceInput("Select Property to Edit",
+            toggle ? new String[]{"Transaction ID","Student ID","Date","Amount","Toggle Details","Back"} : 
+            new String[]{"Transaction ID - "+transact.gettID(),"Student ID - "+transact.getsID(),
+            "Date - "+transact.getDate(),"Amount - "+transact.getDate(),"Toggle Details","Back"})) != 6){
                 switch(choice){
                     case 1:
                     while (Connect.verifyTransact(tID = InputUtility.posInput("Enter the unique Transaction ID"))) {
@@ -773,7 +903,7 @@ public class SuperAdminLogic {
                 DisplayUtility.singleDialog("Transaction ID doesn't exist. Please try again");
             }
             DisplayUtility.dialogWithHeader("Warning", "Transaction ID: "+inp+" Date: "+Connect.returnTransact(tID).getDate()+" about to be deleted");
-            if(InputUtility.choiceInput("confirm? (All data will be deleted)", new String[]{"Confirm","Back"})==1){
+            if(InputUtility.choiceInput("Confirm? (All data will be deleted)", new String[]{"Confirm","Back"})==1){
                 Connect.deleteTransact(tID);
                 CommonUI.processSuccess();
             }
@@ -781,7 +911,25 @@ public class SuperAdminLogic {
             
             //VIEW TRANSACTION
             case 4:
-            DisplayUtility.printTable("TRANSACTION DETAILS", new String[]{"TRANSACTION ID","STUDENT ID","COLLEGE ID","COLLEGE NAME","DATE","AMOUNT"}, Connect.selectTransactAll());
+            while((inp = InputUtility.choiceInput("View Transactions", new String[]{"View Transaction All","Search by student ID","Search by college","Search by date","Search by amount","Back"}))!=6){
+                switch(inp){
+                    case 1:
+                    DisplayUtility.printTable("TRANSACTION DETAILS", new String[]{"TRANSACTION ID","STUDENT ID","COLLEGE ID","COLLEGE NAME","DATE","AMOUNT"}, Connect.selectTableAll(Table.TRANSACTIONS));
+                    break;
+                    case 2:
+                    DisplayUtility.printTable("TRANSACTION DETAILS", new String[]{"TRANSACTION ID","STUDENT ID","COLLEGE ID","COLLEGE NAME","DATE","AMOUNT"}, Connect.searchTable(Table.TRANSACTIONS,"TRANSACTIONS.S_ID",InputUtility.inputString("Enter the student ID")));
+                    break;
+                    case 3:
+                    DisplayUtility.printTable("TRANSACTION DETAILS", new String[]{"TRANSACTION ID","STUDENT ID","COLLEGE ID","COLLEGE NAME","DATE","AMOUNT"}, Connect.searchTable(Table.TRANSACTIONS,"C_NAME",InputUtility.inputString("Enter the college")));
+                    break;
+                    case 4:
+                    DisplayUtility.printTable("TRANSACTION DETAILS", new String[]{"TRANSACTION ID","STUDENT ID","COLLEGE ID","COLLEGE NAME","DATE","AMOUNT"}, Connect.searchTable(Table.TRANSACTIONS,"T_DATE",InputUtility.inputString("Enter the date")));
+                    break;
+                    case 5:
+                    DisplayUtility.printTable("TRANSACTION DETAILS", new String[]{"TRANSACTION ID","STUDENT ID","COLLEGE ID","COLLEGE NAME","DATE","AMOUNT"}, Connect.searchTable(Table.TRANSACTIONS,"T_AMOUNT",InputUtility.inputString("Enter the amount")));
+                    break;
+                }
+            }
             transactManage(user);
             break;
 
@@ -865,7 +1013,19 @@ public class SuperAdminLogic {
 
             //VIEW DEPARTMENT
             case 4:
-            DisplayUtility.printTable("DEPARTMENT DETAILS", new String[]{"DEPARTMENT ID","NAME","COLLEGE NAME"}, Connect.selectDeptAll());
+            while((inp = InputUtility.choiceInput("View Department", new String[]{"View All Department","Search by name","Search by college","Back"}))!=4){
+                switch(inp){
+                    case 1:
+                    DisplayUtility.printTable("DEPARTMENT DETAILS", new String[]{"DEPARTMENT ID","NAME","COLLEGE NAME"}, Connect.selectTableAll(Table.DEPARTMENT));
+                    break;
+                    case 2:
+                    DisplayUtility.printTable("DEPARTMENT DETAILS", new String[]{"DEPARTMENT ID","NAME","COLLEGE NAME"}, Connect.searchTable(Table.DEPARTMENT,"DEPT_NAME",InputUtility.inputString("Enter the name")));
+                    break;
+                    case 3:
+                    DisplayUtility.printTable("DEPARTMENT DETAILS", new String[]{"DEPARTMENT ID","NAME","COLLEGE NAME"}, Connect.searchTable(Table.DEPARTMENT,"C_NAME",InputUtility.inputString("Enter the college")));
+                    break;
+                }
+            }
             deptManage(user);
             break;
 
@@ -932,7 +1092,7 @@ public class SuperAdminLogic {
                 }
                 break;
                 case 4:
-                DisplayUtility.printTable("COLLEGE DETAILS", new String[]{"COLLEGE ID","NAME","ADDRESS","TELEPHONE"}, Connect.selectCollegeAll());
+                DisplayUtility.printTable("COLLEGE DETAILS", new String[]{"COLLEGE ID","NAME","ADDRESS","TELEPHONE"}, Connect.selectTableAll(Table.COLLEGE));
                 break;
             }
             collegeManage(user);
@@ -1014,9 +1174,22 @@ public class SuperAdminLogic {
                 CommonUI.processSuccess();
                 break;
                 case 4:
-                DisplayUtility.printTable("SECTION DETAILS", 
-                new String[]{"SECTION ID","NAME","DEPARTMENT NAME","COLLEGE NAME"},
-                Connect.selectSecAll());
+                while((choice = InputUtility.choiceInput("View Section", new String[]{"View all Section","Search by name","Search by department","Search by college","Back"}))!=5){
+                    switch(choice){
+                        case 1:
+                        DisplayUtility.printTable("SECTION DETAILS", new String[]{"SECTION ID","NAME","DEPARTMENT NAME","COLLEGE NAME"}, Connect.selectTableAll(Table.SECTION));
+                        break;
+                        case 2:
+                        DisplayUtility.printTable("SECTION DETAILS", new String[]{"SECTION ID","NAME","DEPARTMENT NAME","COLLEGE NAME"}, Connect.searchTable(Table.SECTION,"SEC_NAME",InputUtility.inputString("Enter the name")));
+                        break;
+                        case 3:
+                        DisplayUtility.printTable("SECTION DETAILS", new String[]{"SECTION ID","NAME","DEPARTMENT NAME","COLLEGE NAME"}, Connect.searchTable(Table.SECTION,"DEPT_NAME",InputUtility.inputString("Enter the department")));
+                        break;
+                        case 4:
+                        DisplayUtility.printTable("SECTION DETAILS", new String[]{"SECTION ID","NAME","DEPARTMENT NAME","COLLEGE NAME"}, Connect.searchTable(Table.SECTION,"C_NAME",InputUtility.inputString("Enter the college")));
+                        break;
+                    }
+                }
                 break;
             }
             secManage(user);
