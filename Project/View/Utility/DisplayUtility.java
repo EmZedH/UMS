@@ -1,4 +1,4 @@
-package UI.Utility;
+package View.Utility;
 
 public class DisplayUtility {
     static int lineSize = 60;

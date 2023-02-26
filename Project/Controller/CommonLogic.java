@@ -1,6 +1,6 @@
-package Logic;
-import UI.CommonDisplay;
-import UI.CommonUI;
+package Controller;
+import View.CommonDisplay;
+import View.CommonUI;
 
 public class CommonLogic {
     static int inputChoice;

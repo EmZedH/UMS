@@ -1,10 +1,10 @@
-package UI;
+package View;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-import UI.Utility.DisplayUtility;
-import UI.Utility.InputUtility;
+import View.Utility.DisplayUtility;
+import View.Utility.InputUtility;
 
 public class CommonUI {
     static Scanner in;

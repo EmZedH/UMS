@@ -1,24 +1,25 @@
-package Logic;
+package Controller;
 
 import java.sql.SQLException;
 import java.util.Scanner;
-import Database.College;
-import Database.CollegeAdmin;
-import Database.Connect;
-import Database.Course;
-import Database.Department;
-import Database.Professor;
-import Database.Records;
-import Database.Section;
-import Database.Student;
-import Database.SuperAdmin;
-import Database.Test;
-import Database.Transactions;
-import Database.User;
-import UI.CommonUI;
-import UI.SuperAdminUI;
-import UI.Utility.DisplayUtility;
-import UI.Utility.InputUtility;
+
+import Model.College;
+import Model.CollegeAdmin;
+import Model.Connect;
+import Model.Course;
+import Model.Department;
+import Model.Professor;
+import Model.Records;
+import Model.Section;
+import Model.Student;
+import Model.SuperAdmin;
+import Model.Test;
+import Model.Transactions;
+import Model.User;
+import View.CommonUI;
+import View.SuperAdminUI;
+import View.Utility.DisplayUtility;
+import View.Utility.InputUtility;
 
 public class SuperAdminLogic {
     static Scanner in;

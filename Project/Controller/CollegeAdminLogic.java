@@ -1,13 +1,13 @@
-package Logic;
+package Controller;
 
 import java.sql.SQLException;
 
-import Database.Connect;
-import Database.User;
-import UI.CollegeAdminUI;
-import UI.CommonDisplay;
-import UI.CommonUI;
-import UI.Utility.InputUtility;
+import Model.Connect;
+import Model.User;
+import View.CollegeAdminUI;
+import View.CommonDisplay;
+import View.CommonUI;
+import View.Utility.InputUtility;
 
 public class CollegeAdminLogic {
     public static void startup() {

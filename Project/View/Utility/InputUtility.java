@@ -1,9 +1,9 @@
-package UI.Utility;
+package View.Utility;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-import UI.CommonUI;
+import View.CommonUI;
 
 public class InputUtility {
     static Scanner in;

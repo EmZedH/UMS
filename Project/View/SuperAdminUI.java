@@ -1,7 +1,8 @@
-package UI;
+package View;
 
 import java.util.Scanner;
-import UI.Utility.InputUtility;
+
+import View.Utility.InputUtility;
 
 public class SuperAdminUI{
     static Scanner in;

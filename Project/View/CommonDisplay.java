@@ -1,6 +1,6 @@
-package UI;
+package View;
 
-import UI.Utility.DisplayUtility;
+import View.Utility.DisplayUtility;
 
 public class CommonDisplay {
     public static void loginVerified(){

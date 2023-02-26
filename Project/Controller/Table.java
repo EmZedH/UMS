@@ -1,4 +1,4 @@
-package Logic;
+package Controller;
 
 public enum Table {
     COLLEGE,

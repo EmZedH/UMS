@@ -1,4 +1,4 @@
-package Database;
+package Model;
 
 public class SuperAdmin {
     private int superAdminID;

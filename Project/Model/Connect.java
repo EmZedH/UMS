@@ -1,10 +1,9 @@
-package Database;
+package Model;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-
-import Logic.Table;
+import Controller.Table;
 public class Connect {
 
     static String url = "jdbc:sqlite:/Users/muhamed-pt7045/Desktop/UMS/UMS/db/ums.db"; //"jdbc:sqlite:E:Github/Internship/UMS/db/ums.db"
