@@ -9,13 +9,13 @@ import UI.Utility.InputUtility;
 public class CommonUI {
     static Scanner in;
 
-    public static void processSuccess(){
+    public static void processSuccessDisplay(){
         // System.out.println();
         // System.out.println("---------------------------------------");
         // System.out.println("            Process Success!");
         // System.out.println("---------------------------------------");
         // System.out.println();
-        DisplayUtility.singleDialog("Process Success");
+        DisplayUtility.singleDialogDisplay("Process Success");
     }
 
     public static void properPage(){
@@ -24,7 +24,7 @@ public class CommonUI {
         // System.out.println("     Please enter a proper input");
         // System.out.println("---------------------------------------");
         // System.out.println();
-        DisplayUtility.singleDialog("Please Enter a Proper Input");
+        DisplayUtility.singleDialogDisplay("Please Enter a Proper Input");
     }
 
     public static void thankYou(){
@@ -33,7 +33,7 @@ public class CommonUI {
         // System.out.println("              Thank You");
         // System.out.println("---------------------------------------");
         // System.out.println();
-        DisplayUtility.singleDialog("Thank You");
+        DisplayUtility.singleDialogDisplay("Thank You");
     }
     
     public static void loginVerified(){
@@ -42,15 +42,15 @@ public class CommonUI {
         // System.out.println("              Login Success");
         // System.out.println("---------------------------------------");
         // System.out.println();
-        DisplayUtility.singleDialog("Login Success");
+        DisplayUtility.singleDialogDisplay("Login Success");
     }
 
     public static void someErrorOccured() {
-        DisplayUtility.singleDialog("Some Error Occured. Try Again");
+        DisplayUtility.singleDialogDisplay("Some Error Occured. Try Again");
     }
     
     public static int startupPageInput() {
-        return InputUtility.choiceInput("Welcome to University Management System", new String[]{"Login","Exit"});
+        return InputUtility.inputChoice("Welcome to University Management System", new String[]{"Login","Exit"});
     }
 
     public static int userID(){
@@ -62,7 +62,7 @@ public class CommonUI {
     }
 
     public static int loginUserSelectInput() {
-        return InputUtility.choiceInput("Login Page", new String[]{"Student","Professor","College Admin","Super Admin","Exit"});
+        return InputUtility.inputChoice("Login Page", new String[]{"Student","Professor","College Admin","Super Admin","Exit"});
     }
 
     public static int sqlErrorPageInput() {
@@ -96,8 +96,8 @@ public class CommonUI {
             return wrongCredentialsInput();
     }
 }
-    public static String dateInput() {
-        DisplayUtility.singleDialog("Enter the Date of Birth (Format YYYY-MM-DD)");
+    public static String dateInput(String heading) {
+        DisplayUtility.dialogWithHeaderDisplay(heading,"(Format YYYY-MM-DD)");
         in = new Scanner(System.in);
         String date = in.nextLine();
         if(date.length()==10 && date.charAt(4) == '-' && date.charAt(7)=='-'){
@@ -110,16 +110,16 @@ public class CommonUI {
                     return date;
                 }
             } catch (NumberFormatException e) {
-                DisplayUtility.singleDialog("Please ensure correct date is input or check the format");
-                return dateInput();
+                DisplayUtility.singleDialogDisplay("Please ensure correct date is input or check the format");
+                return dateInput(heading);
             }
         }
-        DisplayUtility.singleDialog("Please ensure correct date is input or check the format");
-        return dateInput();
+        DisplayUtility.singleDialogDisplay("Please ensure correct date is input or check the format");
+        return dateInput(heading);
     }
 
     public static String genderInput() {
-        int choice = InputUtility.choiceInput("Select the Gender", new String[]{"Male","Female","Other"});
+        int choice = InputUtility.inputChoice("Select the Gender", new String[]{"Male","Female","Other"});
         if(choice==1){
             return "M";
         }

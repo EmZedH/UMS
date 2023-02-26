@@ -1,23 +1,23 @@
 package Database;
 
 public class Transactions {
-    private int tID;
-    private String sID;
+    private int transactionID;
+    private String studentID;
     private int collegeID;
     private String date;
     private int amount;
-    public Transactions(int tID, String sID, int collegeID, String date, int amount) {
-        this.tID = tID;
-        this.sID = sID;
+    public Transactions(int transactionID, String studentID, int collegeID, String date, int amount) {
+        this.transactionID = transactionID;
+        this.studentID = studentID;
         this.collegeID = collegeID;
         this.date = date;
         this.amount = amount;
     }
-    public int gettID() {
-        return tID;
+    public int getTransactionID() {
+        return transactionID;
     }
-    public String getsID() {
-        return sID;
+    public String getStudentID() {
+        return studentID;
     }
     public int getCollegeID() {
         return collegeID;
@@ -28,11 +28,11 @@ public class Transactions {
     public int getAmount() {
         return amount;
     }
-    public void settID(int tID) {
-        this.tID = tID;
+    public void setTransactionID(int transactionID) {
+        this.transactionID = transactionID;
     }
-    public void setsID(String sID) {
-        this.sID = sID;
+    public void setStudentID(String studentID) {
+        this.studentID = studentID;
     }
     public void setCollegeID(int collegeID) {
         this.collegeID = collegeID;

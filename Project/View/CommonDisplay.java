@@ -9,7 +9,7 @@ public class CommonDisplay {
         // System.out.println("              Login Success");
         // System.out.println("---------------------------------------");
         // System.out.println();
-        DisplayUtility.singleDialog("Login Success");
+        DisplayUtility.singleDialogDisplay("Login Success");
     }
     public static void passwordPage(){
         // System.out.println();
@@ -21,7 +21,7 @@ public class CommonDisplay {
         // System.out.println();
         // System.out.println("---------------------------------------");
         // System.out.println();
-        DisplayUtility.dialogWithHeader("Login Page", "Enter the password");
+        DisplayUtility.dialogWithHeaderDisplay("Login Page", "Enter the password");
     }
     public static void processSuccess(){
         // System.out.println();
@@ -29,7 +29,7 @@ public class CommonDisplay {
         // System.out.println("            Process Success!");
         // System.out.println("---------------------------------------");
         // System.out.println();
-        DisplayUtility.singleDialog("Process Success");
+        DisplayUtility.singleDialogDisplay("Process Success");
     }
     public static void properPage(){
         // System.out.println();
@@ -37,7 +37,7 @@ public class CommonDisplay {
         // System.out.println("     Please enter a proper input");
         // System.out.println("---------------------------------------");
         // System.out.println();
-        DisplayUtility.singleDialog("Please Enter a Proper Input");
+        DisplayUtility.singleDialogDisplay("Please Enter a Proper Input");
     }
     public static void sqlError(){
         // System.out.println();
@@ -73,7 +73,7 @@ public class CommonDisplay {
         // System.out.println("              Thank You");
         // System.out.println("---------------------------------------");
         // System.out.println();
-        DisplayUtility.singleDialog("Thank You");
+        DisplayUtility.singleDialogDisplay("Thank You");
     }
     public static void userID(){
         // System.out.println();
@@ -85,7 +85,7 @@ public class CommonDisplay {
         // System.out.println();
         // System.out.println("---------------------------------------");
         // System.out.println();
-        DisplayUtility.dialogWithHeader("Login Page", "Enter the user ID");
+        DisplayUtility.dialogWithHeaderDisplay("Login Page", "Enter the user ID");
     }
     public static void loginUserSelectPage(){
         // System.out.println();

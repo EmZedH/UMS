@@ -2,6 +2,8 @@ package Database;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+
+
 import Logic.Table;
 public class Connect {
 
@@ -15,29 +17,24 @@ public class Connect {
         return conn;
     }
 
-    public static boolean verifyUIDPassSAdmin(int userID, String password) throws SQLException{
-        String sql = "SELECT U_ID FROM USER WHERE U_ID = ? AND U_PASSWORD = ? AND U_ROLE = \"SUPER ADMIN\"";
-        try(Connection conn = Connect.connect();PreparedStatement pstmt = conn.prepareStatement(sql)){
-            pstmt.setInt(1, userID);
-            pstmt.setString(2, password);
-            ResultSet rs = pstmt.executeQuery();
-            return rs.next() ? true:false;
+    public static boolean verifyUIDPassword(int userID, String password, Table user) throws SQLException{
+        String sql="";
+        switch(user){
+            case SUPER_ADMIN:
+            sql = "SELECT U_ID FROM USER WHERE U_ID = ? AND U_PASSWORD = ? AND U_ROLE = \"SUPER ADMIN\"";
+            break;
+            case COLLEGE_ADMIN:
+            sql = "SELECT U_ID FROM USER WHERE U_ID = ? AND U_PASSWORD = ? AND U_ROLE = \"COLLEGE ADMIN\"";
+            break;
+            case PROFESSOR:
+            sql = "SELECT U_ID FROM USER WHERE U_ID = ? AND U_PASSWORD = ? AND U_ROLE = \"PROFESSOR\"";
+            break;
+            case STUDENT:
+            sql = "SELECT U_ID FROM USER WHERE U_ID = ? AND U_PASSWORD = ? AND U_ROLE = \"STUDENT\"";
+            break;
+            default:
+            break;
         }
-    }
-
-    public static boolean verifyUIDPassCAdmin(int userID, String password) throws SQLException{
-        String sql = "SELECT U_ID FROM USER WHERE U_ID = ? AND U_PASSWORD = ? AND U_ROLE = \"COLLEGE ADMIN\"";
-        try(Connection conn = Connect.connect();PreparedStatement pstmt = conn.prepareStatement(sql)){
-            pstmt.setInt(1, userID);
-            pstmt.setString(2, password);
-            ResultSet rs = pstmt.executeQuery();
-            return rs.next() ? true:false;
-        }
-    }
-
-
-    public static boolean verifyUserIDPassword(int userID, String password) throws SQLException{
-        String sql = "SELECT U_ID FROM USER WHERE U_ID = ? AND U_PASSWORD = ? AND U_ROLE = \"SUPER ADMIN\"";
         try(Connection conn = Connect.connect();PreparedStatement pstmt = conn.prepareStatement(sql)){
             pstmt.setInt(1, userID);
             pstmt.setString(2, password);
@@ -88,7 +85,7 @@ public class Connect {
                 }
                 break;
                 case SECTION:
-                rs = stmt.executeQuery("SELECT SEC_ID,SEC_NAME,DEPT_NAME,C_NAME FROM SECTION LEFT JOIN DEPARTMENT ON DEPARTMENT.DEPT_ID = SECTION.DEPT_ID LEFT JOIN COLLEGE ON COLLEGE.C_ID = SECTION.COLLEGE_ID");
+                rs = stmt.executeQuery("SELECT SEC_ID,SEC_NAME,DEPT_NAME,C_NAME FROM SECTION LEFT JOIN DEPARTMENT ON (DEPARTMENT.DEPT_ID = SECTION.DEPT_ID AND SECTION.COLLEGE_ID = DEPARTMENT.COLLEGE_ID) LEFT JOIN COLLEGE ON COLLEGE.C_ID = SECTION.COLLEGE_ID");
                 while (rs.next()) {
                     str.add(new String[]{rs.getString("SEC_ID"),rs.getString("SEC_NAME"),rs.getString("DEPT_NAME"),rs.getString("C_NAME")});
                 }
@@ -106,15 +103,27 @@ public class Connect {
                 }
                 break;
                 case TEST:
-                rs = stmt.executeQuery("SELECT TEST_ID, TEST.S_ID, TEST.COURSE_ID, COURSE_NAME, TEST.COLLEGE_ID, C_NAME, TEST_MARKS FROM TEST LEFT JOIN STUDENT ON (STUDENT.S_ID = TEST.S_ID AND STUDENT.COLLEGE_ID = TEST.COLLEGE_ID) LEFT JOIN COURSE ON COURSE.COLLEGE_ID = TEST.COLLEGE_ID LEFT JOIN COLLEGE ON TEST.COLLEGE_ID = COLLEGE.C_ID");
+                rs = stmt.executeQuery("SELECT TEST_ID, TEST.S_ID, TEST.COURSE_ID, COURSE_NAME, TEST.COLLEGE_ID, C_NAME, TEST_MARKS FROM TEST LEFT JOIN STUDENT ON (STUDENT.S_ID = TEST.S_ID AND STUDENT.COLLEGE_ID = TEST.COLLEGE_ID) LEFT JOIN COURSE ON (COURSE.COLLEGE_ID = TEST.COLLEGE_ID AND COURSE.COURSE_ID = TEST.COURSE_ID) LEFT JOIN COLLEGE ON TEST.COLLEGE_ID = COLLEGE.C_ID");
                 while (rs.next()) {
-                    str.add(new String[]{rs.getString("TEST_ID"), rs.getString("TEST.S_ID"),rs.getString("TEST.COURSE_ID"), rs.getString("COURSE_NAME"),rs.getString("TEST.COLLEGE_ID"), rs.getString("C_NAME"),rs.getString("TEST_MARKS")});
+                    str.add(new String[]{rs.getString("TEST_ID"), rs.getString("S_ID"),rs.getString("COURSE_ID"), rs.getString("COURSE_NAME"),rs.getString("COLLEGE_ID"), rs.getString("C_NAME"),rs.getString("TEST_MARKS")});
                 }
                 break;
                 case TRANSACTIONS:
-                rs = stmt.executeQuery("SELECT T_ID, TRANSACTIONS.S_ID, C_ID, C_NAME, T_DATE, T_AMOUNT FROM TRANSACTIONS LEFT JOIN STUDENT ON STUDENT.S_ID = TRANSACTIONS.S_ID LEFT JOIN COLLEGE ON COLLEGE.C_ID = TRANSACTIONS.COLLEGE_ID");
+                rs = stmt.executeQuery("SELECT T_ID, TRANSACTIONS.S_ID, C_ID, C_NAME, T_DATE, T_AMOUNT FROM TRANSACTIONS LEFT JOIN STUDENT ON (STUDENT.S_ID = TRANSACTIONS.S_ID AND TRANSACTIONS.COLLEGE_ID = STUDENT.COLLEGE_ID) LEFT JOIN COLLEGE ON COLLEGE.C_ID = TRANSACTIONS.COLLEGE_ID");
                 while (rs.next()) {
-                    str.add(new String[]{rs.getString("T_ID"),rs.getString("TRANSACTION.S_ID"),rs.getString("C_ID"),rs.getString("C_NAME"),rs.getString("T_DATE"),rs.getString("T_DATE"),rs.getString("T_AMOUNT")});
+                    str.add(new String[]{rs.getString("T_ID"),rs.getString("S_ID"),rs.getString("C_ID"),rs.getString("C_NAME"),rs.getString("T_DATE"),rs.getString("T_DATE"),rs.getString("T_AMOUNT")});
+                }
+                break;
+                case COURSE_PROF_TABLE:
+                rs = stmt.executeQuery("SELECT PROFESSOR_ID, COURSE_ID, DEPT_ID, COLLEGE_ID FROM COURSE_PROF_TABLE");
+                while (rs.next()) {
+                    str.add(new String[]{rs.getString("PROFESSOR_ID"),rs.getString("COURSE_ID"),rs.getString("DEPT_ID"),rs.getString("COLLEGE_ID")});
+                }
+                break;
+                case RECORDS:
+                rs = stmt.executeQuery("SELECT * FROM RECORDS");
+                while (rs.next()) {
+                    str.add(new String[]{rs.getString("STUDENT_ID"),rs.getString("COURSE_ID"),rs.getString("SEC_ID"),rs.getString("DEPT_ID"),rs.getString("PROF_ID"),rs.getString("COLLEGE_ID"),rs.getString("TRANSACT_ID"),rs.getString("INT_MARK"),rs.getString("EXT_MARK"),rs.getString("ATTENDANCE"),rs.getString("CGPA"),rs.getString("STATUS"),rs.getString("SEM_COMPLETED")});
                 }
                 break;
             }
@@ -191,14 +200,18 @@ public class Connect {
                 case TEST:
                 rs = stmt.executeQuery("SELECT TEST_ID, S_ID, COURSE_ID, COURSE_NAME, COLLEGE_ID, C_NAME, TEST_MARKS FROM (SELECT TEST_ID, TEST.S_ID, TEST.COURSE_ID, COURSE_NAME, TEST.COLLEGE_ID, C_NAME, TEST_MARKS,1 AS TYPE FROM TEST LEFT JOIN STUDENT ON (STUDENT.S_ID = TEST.S_ID AND STUDENT.COLLEGE_ID = TEST.COLLEGE_ID) LEFT JOIN COURSE ON COURSE.COLLEGE_ID = TEST.COLLEGE_ID LEFT JOIN COLLEGE ON TEST.COLLEGE_ID = COLLEGE.C_ID WHERE "+column+" LIKE '"+name+"%' UNION SELECT * FROM (SELECT TEST_ID, TEST.S_ID, TEST.COURSE_ID, COURSE_NAME, TEST.COLLEGE_ID, C_NAME, TEST_MARKS,2 AS TYPE FROM TEST LEFT JOIN STUDENT ON (STUDENT.S_ID = TEST.S_ID AND STUDENT.COLLEGE_ID = TEST.COLLEGE_ID) LEFT JOIN COURSE ON COURSE.COLLEGE_ID = TEST.COLLEGE_ID LEFT JOIN COLLEGE ON TEST.COLLEGE_ID = COLLEGE.C_ID WHERE "+column+" LIKE '%"+name+"%' EXCEPT SELECT TEST_ID, TEST.S_ID, TEST.COURSE_ID, COURSE_NAME, TEST.COLLEGE_ID, C_NAME, TEST_MARKS,2 AS TYPE FROM TEST LEFT JOIN STUDENT ON (STUDENT.S_ID = TEST.S_ID AND STUDENT.COLLEGE_ID = TEST.COLLEGE_ID) LEFT JOIN COURSE ON COURSE.COLLEGE_ID = TEST.COLLEGE_ID LEFT JOIN COLLEGE ON TEST.COLLEGE_ID = COLLEGE.C_ID WHERE "+column+" LIKE '"+name+"%')) ORDER BY TYPE");
                 while (rs.next()) {
-                    str.add(new String[]{rs.getString("TEST_ID"), rs.getString("TEST.S_ID"),rs.getString("TEST.COURSE_ID"), rs.getString("COURSE_NAME"),rs.getString("TEST.COLLEGE_ID"), rs.getString("C_NAME"),rs.getString("TEST_MARKS")});
+                    str.add(new String[]{rs.getString("TEST_ID"), rs.getString("S_ID"),rs.getString("COURSE_ID"), rs.getString("COURSE_NAME"),rs.getString("COLLEGE_ID"), rs.getString("C_NAME"),rs.getString("TEST_MARKS")});
                 }
                 break;
                 case TRANSACTIONS:
                 rs = stmt.executeQuery("SELECT T_ID, S_ID, C_ID, C_NAME, T_DATE, T_AMOUNT FROM (SELECT T_ID, TRANSACTIONS.S_ID, C_ID, C_NAME, T_DATE, T_AMOUNT,1 AS TYPE FROM TRANSACTIONS LEFT JOIN STUDENT ON STUDENT.S_ID = TRANSACTIONS.S_ID LEFT JOIN COLLEGE ON COLLEGE.C_ID = TRANSACTIONS.COLLEGE_ID WHERE "+column+" LIKE '"+name+"%' UNION SELECT * FROM (SELECT T_ID, TRANSACTIONS.S_ID, C_ID, C_NAME, T_DATE, T_AMOUNT,2 AS TYPE FROM TRANSACTIONS LEFT JOIN STUDENT ON STUDENT.S_ID = TRANSACTIONS.S_ID LEFT JOIN COLLEGE ON COLLEGE.C_ID = TRANSACTIONS.COLLEGE_ID WHERE "+column+" LIKE '%"+name+"%' EXCEPT SELECT T_ID, TRANSACTIONS.S_ID, C_ID, C_NAME, T_DATE, T_AMOUNT,2 AS TYPE FROM TRANSACTIONS LEFT JOIN STUDENT ON STUDENT.S_ID = TRANSACTIONS.S_ID LEFT JOIN COLLEGE ON COLLEGE.C_ID = TRANSACTIONS.COLLEGE_ID WHERE "+column+" LIKE '"+name+"%')) ORDER BY TYPE");
                 while (rs.next()) {
-                    str.add(new String[]{rs.getString("T_ID"),rs.getString("TRANSACTION.S_ID"),rs.getString("C_ID"),rs.getString("C_NAME"),rs.getString("T_DATE"),rs.getString("T_DATE"),rs.getString("T_AMOUNT")});
+                    str.add(new String[]{rs.getString("T_ID"),rs.getString("S_ID"),rs.getString("C_ID"),rs.getString("C_NAME"),rs.getString("T_DATE"),rs.getString("T_DATE"),rs.getString("T_AMOUNT")});
                 }
+                break;
+                case COURSE_PROF_TABLE:
+                break;
+                case RECORDS:
                 break;
         }
             return Arrays.copyOf(str.toArray(), str.toArray().length,String[][].class);
@@ -218,6 +231,16 @@ public class Connect {
         String sql = "SELECT * FROM STUDENT WHERE USER_ID = ?";
         try (Connection conn = connect();PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, uID);
+            ResultSet rs = pstmt.executeQuery();
+            return rs.next() ? new Student(rs.getString("S_ID"),rs.getInt("S_SEM"),rs.getInt("S_YEAR"),rs.getString("S_DEGREE"),rs.getFloat("S_CGPA"),rs.getInt("SEC_ID"),rs.getInt("USER_ID"),rs.getInt("COLLEGE_ID"),rs.getInt("DEPT_ID")) : null;
+        }
+    }
+    
+    public static Student returnStudent(String sID, int collegeID) throws SQLException{
+        String sql = "SELECT * FROM STUDENT WHERE S_ID = ? AND COLLEGE_ID = ?";
+        try (Connection conn = connect();PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, sID);
+            pstmt.setInt(2,collegeID);
             ResultSet rs = pstmt.executeQuery();
             return rs.next() ? new Student(rs.getString("S_ID"),rs.getInt("S_SEM"),rs.getInt("S_YEAR"),rs.getString("S_DEGREE"),rs.getFloat("S_CGPA"),rs.getInt("SEC_ID"),rs.getInt("USER_ID"),rs.getInt("COLLEGE_ID"),rs.getInt("DEPT_ID")) : null;
         }
@@ -267,11 +290,11 @@ public class Connect {
             pstmt.setString(3, courseID);
             pstmt.setInt(4, collegeID);
             ResultSet rs = pstmt.executeQuery();
-            return rs.next() ? new Test(rs.getInt("TEST_ID"),rs.getString("S_ID"),rs.getString("COURSE_ID"),rs.getInt("COLLEGE_ID"),rs.getInt("TEST_MARK")) : null;
+            return rs.next() ? new Test(rs.getInt("TEST_ID"),rs.getString("S_ID"),rs.getString("COURSE_ID"),rs.getInt("COLLEGE_ID"),rs.getInt("TEST_MARKS")) : null;
         }
     }
 
-    public static Transactions returnTransact(int tID) throws SQLException {
+    public static Transactions returnTransaction(int tID) throws SQLException {
         String sql = "SELECT * FROM TRANSACTIONS WHERE T_ID = ?";
         try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1,tID);
@@ -281,7 +304,7 @@ public class Connect {
         }
     }
 
-    public static Department returnDept(int deptID, int collegeID) throws SQLException {
+    public static Department returnDepartment(int deptID, int collegeID) throws SQLException {
         String sql = "SELECT * FROM DEPARTMENT WHERE DEPT_ID = ? AND COLLEGE_ID = ?";
         try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1,deptID);
@@ -311,13 +334,62 @@ public class Connect {
             return rs.next() ? new Course(rs.getString("COURSE_ID"),rs.getString("COURSE_NAME"),rs.getInt("COURSE_SEM"),rs.getInt("COURSE_DEPT"),rs.getInt("COLLEGE_ID"),rs.getString("DEGREE")) : null;
         }
     }
+    
+    public static Records returnRecords(int tID, String courseID) throws SQLException {
+        String sql = "SELECT * FROM RECORDS WHERE TRANSACT_ID = ? AND COURSE_ID = ?";
+        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, tID);
+            pstmt.setString(2, courseID);
+            ResultSet rs = pstmt.executeQuery();
+            return rs.next() ? new Records(rs.getString("STUDENT_ID"), rs.getString("COURSE_ID"), rs.getInt("SEC_ID"), rs.getInt("DEPT_ID"), rs.getString("PROF_ID"), rs.getInt("COLLEGE_ID"), rs.getInt("TRANSACT_ID"), rs.getInt("INT_MARK"), rs.getInt("EXT_MARK"), rs.getInt("ATTENDANCE"), rs.getFloat("CGPA"), rs.getString("STATUS"), rs.getInt("SEM_COMPLETED")) : null;
+        } 
+    }
 
-    public static void addTransaction(int tID, String date, int amount) throws SQLException {
+    public static void addTest(int testID, String studentID, String courseID, int collegeID, int testMarks) throws SQLException {
+        String sql = "INSERT INTO TEST VALUES(?,?,?,?,?)";
+        String sqlGetInternalMark = "SELECT INT_MARK FROM RECORDS WHERE STUDENT_ID = ? AND COURSE_ID = ? AND COLLEGE_ID = ?";
+        String sqlSetInternalMark = "UPDATE RECORDS SET INT_MARK = ? WHERE STUDENT_ID = ? AND COURSE_ID = ? AND COLLEGE_ID = ?";
+        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql);
+        PreparedStatement pstmtGetInternalMarks = conn.prepareStatement(sqlGetInternalMark);
+        PreparedStatement pstmtSetInternalMarks = conn.prepareStatement(sqlSetInternalMark)
+        ) {
+            try {
+                conn.setAutoCommit(false);
+                pstmtGetInternalMarks.setString(1, studentID);
+                pstmtGetInternalMarks.setString(2, courseID);
+                pstmtGetInternalMarks.setInt(3, collegeID);
+                ResultSet rs = pstmtGetInternalMarks.executeQuery();
+                int x = rs.getInt("INT_MARK");
+
+                // System.out.println(x);
+                // System.out.println(testMarks);
+
+                pstmt.setInt(1, testID);
+                pstmt.setString(2, studentID);
+                pstmt.setString(3, courseID);
+                pstmt.setInt(4, collegeID);
+                pstmt.setInt(5, testMarks);
+                pstmt.executeUpdate();
+
+                pstmtSetInternalMarks.setInt(1, x+testMarks);
+                pstmtSetInternalMarks.setString(2, studentID);
+                pstmtSetInternalMarks.setString(3, courseID);
+                pstmtSetInternalMarks.setInt(4, collegeID);
+                pstmtSetInternalMarks.executeUpdate();
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw new SQLException();
+            }
+        }
+    }
+
+    public static void addTransaction(int tID, String sID, int collegeID, String date, int amount) throws SQLException {
         String sql = "INSERT INTO TRANSACTIONS VALUES (?,?,?,date(?),?)";
         try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, tID);
-            // pstmt.setString(2, sID);
-            // pstmt.setInt(3, collegeID);
+            pstmt.setString(2, sID);
+            pstmt.setInt(3, collegeID);
             pstmt.setString(4, date);
             pstmt.setInt(5, amount);
             pstmt.executeUpdate();
@@ -336,6 +408,37 @@ public class Connect {
             pstmt.setString(7, elective);
             pstmt.executeUpdate();
         } 
+    }
+
+    public static void addCourseProfessor(String courseID, String pID, int deptID, int collegeID) throws SQLException{
+        String sql = "INSERT INTO COURSE_PROF_TABLE VALUES (?,?,?,?)";
+        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, pID);
+            pstmt.setString(2, courseID);
+            pstmt.setInt(3, deptID);
+            pstmt.setInt(4, collegeID);
+            pstmt.executeUpdate();
+        }
+    }
+
+    public static void addRecord(String sID, String courseID, int secID, int deptID, String profID, int collegeID, int tID, int intMark, int extMark, int attendance, float cgpa, String status, int semCompleted) throws SQLException {
+        String sql = "INSERT INTO RECORDS VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, sID);
+            pstmt.setString(2, courseID);
+            pstmt.setInt(3, secID);
+            pstmt.setInt(4, deptID);
+            pstmt.setString(5, profID);
+            pstmt.setInt(6, collegeID);
+            pstmt.setInt(7, tID);
+            pstmt.setInt(8, intMark);
+            pstmt.setInt(9, extMark);
+            pstmt.setInt(10, attendance);
+            pstmt.setFloat(11, cgpa);
+            pstmt.setString(12, status);
+            pstmt.setInt(13, semCompleted);
+            pstmt.executeUpdate();
+        }
     }
 
     public static void addSection(int secID, String secName, int deptID, int collegeID) throws SQLException {
@@ -488,10 +591,14 @@ public class Connect {
 
     public static void deleteUser(int uID) throws SQLException{
         String sqlUser = "DELETE FROM USER WHERE U_ID = ?";
-        String sqlStudent = "DELETE FROM STUDENT WHERE USER_ID = ?";
-        String sqlProfessor = "DELETE FROM PROFESSOR WHERE USER_ID = ?";
-        String sqlCAdmin = "DELETE FROM COLLEGE_ADMIN WHERE USER_ID = ?";
-        String sqlSAdmin = "DELETE FROM SUPER_ADMIN WHERE USER_ID = ?";
+        // String sqlStudent = "DELETE FROM STUDENT WHERE USER_ID = ?";
+        String sqlStudent = "UPDATE STUDENT SET USER_ID = 0 WHERE USER_ID = ?";
+        // String sqlProfessor = "DELETE FROM PROFESSOR WHERE USER_ID = ?";
+        String sqlProfessor = "UPDATE PROFESSOR SET USER_ID = 0 WHERE USER_ID = ?";
+        // String sqlCAdmin = "DELETE FROM COLLEGE_ADMIN WHERE USER_ID = ?";
+        String sqlCAdmin = "UPDATE COLLEGE_ADMIN SET USER_ID = 0 WHERE USER_ID = ?";
+        // String sqlSAdmin = "DELETE FROM SUPER_ADMIN WHERE USER_ID = ?";
+        String sqlSAdmin = "UPDATE SUPER_ADMIN SET USER_ID = 0 WHERE USER_ID = ?";
         try(Connection conn = connect();
         PreparedStatement pstmtUser = conn.prepareStatement(sqlUser);
         PreparedStatement pstmtStudent = conn.prepareStatement(sqlStudent);
@@ -511,7 +618,8 @@ public class Connect {
             pstmtCAdmin.execute();
             pstmtSAdmin.setInt(1, uID);
             pstmtSAdmin.execute();
-            conn.commit();}
+            conn.commit();
+        }
             catch(SQLException e){
                 conn.rollback();
                 throw new SQLException();
@@ -520,15 +628,48 @@ public class Connect {
     }
 
     public static void deleteTest(int testID, String sID, String courseID, int collegeID) throws SQLException {
-        String sql = "DELETE FROM TEST WHERE TEST_ID = ? AND S_ID = ? AND COURSE_ID = ? AND COLLEGE_ID = ?";
-        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        String sqlDeleteTest = "DELETE FROM TEST WHERE TEST_ID = ? AND S_ID = ? AND COURSE_ID = ? AND COLLEGE_ID = ?";
+        String sqlGetInternalMarkTest = "SELECT TEST_MARKS FROM TEST WHERE S_ID = ? AND COURSE_ID = ? AND COLLEGE_ID = ?";
+        String sqlGetInternalMarkRecord = "SELECT INT_MARK FROM RECORDS WHERE STUDENT_ID = ? AND COURSE_ID = ? AND COLLEGE_ID = ?";
+        String sqlSetRecord = "UPDATE RECORDS SET INT_MARK = ? WHERE STUDENT_ID = ? AND COURSE_ID = ? AND COLLEGE_ID = ?";
+        try (Connection conn = connect(); 
+        PreparedStatement pstmtDeleteTest = conn.prepareStatement(sqlDeleteTest);
+        PreparedStatement pstmtGetInternalMarkTest = conn.prepareStatement(sqlGetInternalMarkTest);
+        PreparedStatement pstmtGetInternalMarkRecord = conn.prepareStatement(sqlGetInternalMarkRecord);
+        PreparedStatement pstmtSetRecord = conn.prepareStatement(sqlSetRecord);
+        ) {
+            // Test test = returnTest(testID, sID, courseID, collegeID);
             try {
                 conn.setAutoCommit(false);
-                pstmt.setInt(1, testID);
-                pstmt.setString(2, sID);
-                pstmt.setString(3, courseID);
-                pstmt.setInt(4, collegeID);
-                pstmt.execute();
+
+                pstmtGetInternalMarkTest.setString(1, sID);
+                pstmtGetInternalMarkTest.setString(2, courseID);
+                pstmtGetInternalMarkTest.setInt(3, collegeID);
+                ResultSet rsTest = pstmtGetInternalMarkTest.executeQuery();
+                int x = rsTest.getInt("TEST_MARKS");
+                System.out.println(x);
+                
+                pstmtGetInternalMarkRecord.setString(1, sID);
+                pstmtGetInternalMarkRecord.setString(2, courseID);
+                pstmtGetInternalMarkRecord.setInt(3, collegeID);
+                ResultSet rsRecord = pstmtGetInternalMarkRecord.executeQuery();
+                int y = rsRecord.getInt("INT_MARK");
+
+                pstmtDeleteTest.setInt(1, testID);
+                pstmtDeleteTest.setString(2, sID);
+                pstmtDeleteTest.setString(3, courseID);
+                pstmtDeleteTest.setInt(4, collegeID);
+                pstmtDeleteTest.execute();
+                System.out.println(y);
+
+                System.out.println(y-x);
+
+                pstmtSetRecord.setInt(1, y-x);
+                pstmtSetRecord.setString(2, sID);
+                pstmtSetRecord.setString(3, courseID);
+                pstmtSetRecord.setInt(4, collegeID);
+                pstmtSetRecord.executeUpdate();
+
                 conn.commit();
             } catch (SQLException e) {
                 conn.rollback();
@@ -539,11 +680,15 @@ public class Connect {
 
     public static void deleteTransact(int tID) throws SQLException {
         String sql = "DELETE FROM TRANSACTIONS WHERE T_ID = ?";
-        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        String sqlRecord = "UPDATE RECORDS SET TRANSACT_ID = 0 WHERE TRANSACT_ID = ?";
+        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql); 
+        PreparedStatement pstmtRecord = conn.prepareStatement(sqlRecord)) {
             try{
                 conn.setAutoCommit(false);
                 pstmt.setInt(1, tID);
                 pstmt.execute();
+                pstmtRecord.setInt(1, tID);
+                pstmtRecord.executeUpdate();
                 conn.commit();
             } catch (SQLException e) {
                 conn.rollback();
@@ -554,12 +699,27 @@ public class Connect {
 
     public static void deleteCourse(String cID, int collegeID) throws SQLException {
         String sqlCourse = "DELETE FROM COURSE WHERE COURSE_ID = ? AND COLLEGE_ID = ?";
-        try (Connection conn = connect(); PreparedStatement pstmtCourse = conn.prepareStatement(sqlCourse)) {
+        String sqlCourseProfessor = "UPDATE COURSE_PROF_TABLE SET COURSE_ID = NULL WHERE COURSE_ID = ? AND COLLEGE_ID = ?";
+        String sqlRecords = "UPDATE RECORDS SET COURSE_ID = NULL WHERE COURSE_ID = ? AND COLLEGE_ID = ?";
+        String sqlTest = "UPDATE TEST SET COURSE_ID = NULL WHERE COURSE_ID = ? AND COLLEGE_ID = ?";
+        try (Connection conn = connect(); PreparedStatement pstmtCourse = conn.prepareStatement(sqlCourse);
+        PreparedStatement pstmtCourseProfessor = conn.prepareStatement(sqlCourseProfessor);
+        PreparedStatement pstmtRecords = conn.prepareStatement(sqlRecords);
+        PreparedStatement pstmtTest = conn.prepareStatement(sqlTest)) {
             try {
                 conn.setAutoCommit(false);
                 pstmtCourse.setString(1, cID);
                 pstmtCourse.setInt(2, collegeID);
                 pstmtCourse.execute();
+                pstmtCourseProfessor.setString(1, cID);
+                pstmtCourseProfessor.setInt(2, collegeID);
+                pstmtCourseProfessor.executeUpdate();
+                pstmtRecords.setString(1, cID);
+                pstmtRecords.setInt(2, collegeID);
+                pstmtRecords.executeUpdate();
+                pstmtTest.setString(1, cID);
+                pstmtTest.setInt(2, collegeID);
+                pstmtTest.executeUpdate();
                 conn.commit();
             } catch (SQLException e) {
                 conn.rollback();
@@ -568,9 +728,10 @@ public class Connect {
         }
     }
 
-    public static void deleteSec(int secID,int deptID, int collegeID) throws SQLException {
+    public static void deleteSection(int secID,int deptID, int collegeID) throws SQLException {
         String sqlSec = "DELETE FROM SECTION WHERE SEC_ID = ? AND DEPT_ID = ? AND COLLEGE_ID = ?";
         String sqlStudent = "UPDATE STUDENT SET SEC_ID = 0 WHERE SEC_ID = ? AND DEPT_ID = ? AND COLLEGE_ID = ?";
+
         try (Connection conn = connect();
         PreparedStatement pstmtSec = conn.prepareStatement(sqlSec);
         PreparedStatement pstmtStudent = conn.prepareStatement(sqlStudent)) {
@@ -592,16 +753,23 @@ public class Connect {
         }
     }
 
-    public static void deleteDept(int deptID, int collegeID) throws SQLException{
+    public static void deleteDepartment(int deptID, int collegeID) throws SQLException{
         String sqlDept = "DELETE FROM DEPARTMENT WHERE DEPT_ID = ? AND COLLEGE_ID = ?";
         String sqlSec = "UPDATE SECTION SET DEPT_ID = 0 WHERE DEPT_ID = ? AND COLLEGE_ID = ?";
         String sqlStudent = "UPDATE STUDENT SET DEPT_ID = 0 WHERE DEPT ID = ? AND COLLEGE_ID = ?";
         String sqlProfessor = "UPDATE PROFESSOR SET DEPT_ID = 0 WHERE DEPT_ID = ? AND COLLEGE_ID = ?";
+
+        String sqlCourse = "UPDATE COURSE SET COURSE_DEPT = 0 WHERE COURSE_DEPT = ? AND COLLEGE_ID = ?";
+        String sqlCourseProfessor = "UPDATE COURSE_PROF_TABLE SET DEPT_ID = 0 WHERE DEPT_ID = ? AND COLLEGE_ID = ?";
+        String sqlRecords = "UPDATE RECORDS SET DEPT_ID = 0 WHERE DEPT_ID = ? AND COLLEGE_ID = ?";
         try(Connection conn = connect();
         PreparedStatement pstmtDept = conn.prepareStatement(sqlDept);
         PreparedStatement pstmtSec = conn.prepareStatement(sqlSec);
         PreparedStatement pstmtStudent = conn.prepareStatement(sqlStudent);
-        PreparedStatement pstmtProfessor = conn.prepareStatement(sqlProfessor)){
+        PreparedStatement pstmtProfessor = conn.prepareStatement(sqlProfessor);
+        PreparedStatement pstmtCourse = conn.prepareStatement(sqlCourse);
+        PreparedStatement pstmtCourseProfessor = conn.prepareStatement(sqlCourseProfessor);
+        PreparedStatement pstmtRecords = conn.prepareStatement(sqlRecords)){
             try{
                 conn.setAutoCommit(false);
                 pstmtDept.setInt(1,deptID);
@@ -616,6 +784,16 @@ public class Connect {
                 pstmtProfessor.setInt(1,deptID);
                 pstmtProfessor.setInt(2,collegeID);
                 pstmtProfessor.executeUpdate();
+                
+                pstmtCourse.setInt(1,deptID);
+                pstmtCourse.setInt(2,collegeID);
+                pstmtCourse.executeUpdate();
+                pstmtCourseProfessor.setInt(1,deptID);
+                pstmtCourseProfessor.setInt(2,collegeID);
+                pstmtCourseProfessor.executeUpdate();
+                pstmtRecords.setInt(1,deptID);
+                pstmtRecords.setInt(2,collegeID);
+                pstmtRecords.executeUpdate();
                 conn.commit();
             }catch(SQLException e){
                 conn.rollback();
@@ -630,12 +808,21 @@ public class Connect {
         String sqlSection = "UPDATE SECTION SET COLLEGE_ID = 0 WHERE COLLEGE_ID = ?";
         String sqlProfessor = "UPDATE PROFESSOR SET COLLEGE_ID = 0 WHERE COLLEGE_ID = ?";
         String sqlStudent = "UPDATE STUDENT SET COLLEGE_ID = 0 WHERE COLLEGE_ID = 0";
+
+        String sqlCollegeAdmin = "UPDATE COLLEGE_ADMIN SET COLLEGE_ID = 0 WHERE COLLEGE_ID = ?";
+        String sqlCourse = "UPDATE COURSE SET COLLEGE_ID = 0 WHERE COLLEGE_ID = ?";
+        String sqlCourseProfessor = "UPDATE COURSE_PROFESSOR_TABLE SET COLLEGE_ID = 0 WHERE COLLEGE_ID = ?";
+        String sqlRecords = "UPDATE RECORDS SET COLLEGE_ID = 0 WHERE COLLEGE_ID = ?";
         try (Connection conn = connect();
         PreparedStatement pstmtCollege = conn.prepareStatement(sqlCollege);
         PreparedStatement pstmtDept = conn.prepareStatement(sqlDepartment);
         PreparedStatement pstmtSec = conn.prepareStatement(sqlSection);
         PreparedStatement pstmtProf = conn.prepareStatement(sqlProfessor);
-        PreparedStatement pstmtStudent = conn.prepareStatement(sqlStudent)) {
+        PreparedStatement pstmtStudent = conn.prepareStatement(sqlStudent);
+        PreparedStatement pstmtCollegeAdmin = conn.prepareStatement(sqlCollegeAdmin);
+        PreparedStatement pstmtCourse = conn.prepareStatement(sqlCourse);
+        PreparedStatement pstmtCourseProfessor = conn.prepareStatement(sqlCourseProfessor);
+        PreparedStatement pstmtRecords = conn.prepareStatement(sqlRecords)) {
             try {
                 conn.setAutoCommit(false);
                 pstmtCollege.setInt(1, collegeID);
@@ -648,6 +835,15 @@ public class Connect {
                 pstmtProf.executeUpdate();
                 pstmtStudent.setInt(1, collegeID);
                 pstmtStudent.executeUpdate();
+                
+                pstmtCollegeAdmin.setInt(1, collegeID);
+                pstmtCollegeAdmin.executeUpdate();
+                pstmtCourse.setInt(1, collegeID);
+                pstmtCourse.executeUpdate();
+                pstmtCourseProfessor.setInt(1, collegeID);
+                pstmtCourseProfessor.executeUpdate();
+                pstmtRecords.setInt(1, collegeID);
+                pstmtRecords.executeUpdate();
                 conn.commit();
             } catch (SQLException e) {
                 conn.rollback();
@@ -656,9 +852,23 @@ public class Connect {
         }
     }
 
+    public static void deleteRecord(int tID, String courseID) throws SQLException {
+        String sqlRecord = "DELETE FROM RECORDS WHERE COURSE_ID = ? AND TRANSACT_ID = ?";
+        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sqlRecord)) {
+            // pstmt.setString(1, sID);
+            pstmt.setString(1, courseID);
+            // pstmt.setInt(2,collegeID);
+            pstmt.setInt(2, tID);
+            // pstmt.setString(5, pID);
+            pstmt.execute();
+        } 
+    }
+
     public static void editStudent(int uID, User user, Student student) throws SQLException{
         String sqlUser = "UPDATE USER SET U_ID = ?, U_NAME = ?, U_AADHAR = ?, U_DOB = ?, U_GENDER = ?, U_ADDRESS = ?, U_ROLE = ?, U_PASSWORD = ? WHERE U_ID = ?";
         String sqlStudent = "UPDATE STUDENT SET S_ID = ?, S_SEM = ?, S_YEAR = ?, S_DEGREE = ?, S_CGPA = ?, SEC_ID = ?, USER_ID = ?, COLLEGE_ID = ?, DEPT_ID = ? WHERE USER_ID = ?";
+
+        // String sqlRecords = "UPDATE RECORDS SET S_ID = ?, SEC_ID = ?, DEPT_ID = ?, COLLEGE_ID = ? WHERE "
         try (Connection conn = connect();PreparedStatement pstmtUser = conn.prepareStatement(sqlUser);PreparedStatement pstmtStudent = conn.prepareStatement(sqlStudent)) {
             try{
             conn.setAutoCommit(false);
@@ -672,15 +882,15 @@ public class Connect {
             pstmtUser.setString(8, user.getPassword());
             pstmtUser.setInt(9, uID);
             pstmtUser.executeUpdate();
-            pstmtStudent.setString(1, student.getsID());
-            pstmtStudent.setInt(2, student.getSem());
+            pstmtStudent.setString(1, student.getStudentID());
+            pstmtStudent.setInt(2, student.getSemester());
             pstmtStudent.setInt(3, student.getYear());
             pstmtStudent.setString(4, student.getDegree());
             pstmtStudent.setFloat(5, student.getCgpa());
-            pstmtStudent.setInt(6, student.getSecID());
-            pstmtStudent.setInt(7, student.getuID());
+            pstmtStudent.setInt(6, student.getSectionID());
+            pstmtStudent.setInt(7, student.getUserID());
             pstmtStudent.setInt(8, student.getCollegeID());
-            pstmtStudent.setInt(9, student.getDeptID());
+            pstmtStudent.setInt(9, student.getDepartmentID());
             pstmtStudent.setInt(10, uID);
             pstmtStudent.executeUpdate();
             conn.commit();
@@ -708,8 +918,8 @@ public class Connect {
                 pstmtUser.setString(8, user.getPassword());
                 pstmtUser.setInt(9, uID);
                 pstmtUser.executeUpdate();
-                pstmtProfessor.setString(1,professor.getpID());
-                pstmtProfessor.setInt(2, professor.getDeptID());
+                pstmtProfessor.setString(1,professor.getProfessorID());
+                pstmtProfessor.setInt(2, professor.getDepartmentID());
                 pstmtProfessor.setInt(3,professor.getUserID());
                 pstmtProfessor.setInt(4,professor.getCollegeID());
                 pstmtProfessor.setInt(5,uID);
@@ -738,7 +948,7 @@ public class Connect {
                 pstmtUser.setString(8, user.getPassword());
                 pstmtUser.setInt(9, uID);
                 pstmtUser.executeUpdate();
-                pstmtCollegeAdmin.setInt(1, collegeAdmin.getCaID());
+                pstmtCollegeAdmin.setInt(1, collegeAdmin.getCollegeAdminID());
                 pstmtCollegeAdmin.setInt(2, collegeAdmin.getUserID());
                 pstmtCollegeAdmin.setInt(3, collegeAdmin.getCollegeID());
                 pstmtCollegeAdmin.setInt(4, uID);
@@ -768,7 +978,7 @@ public class Connect {
                 pstmtUser.setString(8, user.getPassword());
                 pstmtUser.setInt(9, uID);
                 pstmtUser.executeUpdate();
-                pstmtSuperAdmin.setInt(1, superAdmin.getSaID());
+                pstmtSuperAdmin.setInt(1, superAdmin.getSuperAdminID());
                 pstmtSuperAdmin.setInt(2, superAdmin.getUserID());
                 pstmtSuperAdmin.setInt(3, uID);
                 pstmtSuperAdmin.executeUpdate();
@@ -785,8 +995,8 @@ public class Connect {
         try (Connection conn = connect();PreparedStatement pstmtCourse = conn.prepareStatement(sqlCourse)) {
             try {
                 conn.setAutoCommit(false);
-                pstmtCourse.setString(1,course.getcID());
-                pstmtCourse.setString(2,course.getcName());
+                pstmtCourse.setString(1,course.getCourseID());
+                pstmtCourse.setString(2,course.getCourseName());
                 pstmtCourse.setString(3,cID);
                 pstmtCourse.setInt(4,collegeID);
                 pstmtCourse.executeUpdate();
@@ -798,24 +1008,73 @@ public class Connect {
         }
     }
 
-    public static void editTransact(int tID, Transactions transact) throws SQLException {
+    public static void editTransaction(int tID, Transactions transact) throws SQLException {
         String sql = "UPDATE SECTION SET T_ID = ?, S_ID = ?, COLLEGE_ID = ?, T_DATE = date(?), T_AMOUNT = ? WHERE T_ID = ?";
         try (Connection conn = connect(); 
         PreparedStatement pstmt = conn.prepareStatement(sql)) {
             try {
                 conn.setAutoCommit(false);
-                pstmt.setInt(1, transact.gettID());
-                pstmt.setString(2, transact.getsID());
+                pstmt.setInt(1, transact.getTransactionID());
+                pstmt.setString(2, transact.getStudentID());
                 pstmt.setInt(3, transact.getCollegeID());
                 pstmt.setString(4, transact.getDate());
                 pstmt.setInt(5, transact.getAmount());
                 pstmt.setInt(6, tID);
+                pstmt.executeUpdate();
                 conn.commit();
             } catch (SQLException e) {
                 conn.rollback();
                 throw new SQLException();
             }
         }
+    }
+    
+    public static void editTest(int testID, String studentID, String courseID, int collegeID, Test test) throws SQLException {
+        String sqlGetInternalMarksTest = "SELECT TEST_MARKS FROM TEST WHERE TEST_ID = ? AND S_ID = ? AND COURSE_ID = ? AND COLLEGE_ID = ?";
+        String sql = "UPDATE TEST SET TEST_ID = ?, TEST_MARKS = ? WHERE TEST_ID = ? AND S_ID = ? AND COURSE_ID = ? AND COLLEGE_ID = ?";
+        String sqlGetInternalMarksRecords = "SELECT INT_MARK FROM RECORDS WHERE STUDENT_ID = ? AND COURSE_ID = ? AND COLLEGE_ID = ?";
+        String sqlSetInternalMarks = "UPDATE RECORDS SET INT_MARK = ? WHERE STUDENT_ID = ? AND COURSE_ID = ? AND COLLEGE_ID = ?";
+        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql);
+        PreparedStatement pstmtGetInternalMarksTest = conn.prepareStatement(sqlGetInternalMarksTest);
+        PreparedStatement pstmtGetInternalMarksRecords = conn.prepareStatement(sqlGetInternalMarksRecords);
+        PreparedStatement pstmtSetInternalMarks = conn.prepareStatement(sqlSetInternalMarks)) {
+            try {
+                conn.setAutoCommit(false);
+                pstmtGetInternalMarksTest.setInt(1, testID);
+                pstmtGetInternalMarksTest.setString(2, studentID);
+                pstmtGetInternalMarksTest.setString(3, courseID);
+                pstmtGetInternalMarksTest.setInt(4, collegeID);
+                ResultSet rsTest = pstmtGetInternalMarksTest.executeQuery();
+                int x = rsTest.getInt("TEST_MARKS");
+                // System.out.println(x);
+
+                pstmt.setInt(1, test.getTestID());
+                pstmt.setInt(2, test.getTestMark());
+                pstmt.setInt(3, testID);
+                pstmt.setString(4, studentID);
+                pstmt.setString(5, courseID);
+                pstmt.setInt(6, collegeID);
+                pstmt.executeUpdate();
+    
+                
+                pstmtGetInternalMarksRecords.setString(1, studentID);
+                pstmtGetInternalMarksRecords.setString(2, courseID);
+                pstmtGetInternalMarksRecords.setInt(3, collegeID);
+                ResultSet rsRecords = pstmtGetInternalMarksRecords.executeQuery();
+                int y = rsRecords.getInt("INT_MARK");
+                // System.out.println(y);
+    
+                pstmtSetInternalMarks.setInt(1, test.getTestMark() - x + y);
+                pstmtSetInternalMarks.setString(2, studentID);
+                pstmtSetInternalMarks.setString(3, courseID);
+                pstmtSetInternalMarks.setInt(4, collegeID);
+                pstmtSetInternalMarks.executeUpdate();
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw new SQLException();
+            }
+        } 
     }
 
     public static void editSection(int secID, int deptID, int collegeID, Section section) throws SQLException {
@@ -826,13 +1085,13 @@ public class Connect {
         PreparedStatement pstmtStudent = conn.prepareStatement(sqlStudent)) {
             try {
                 conn.setAutoCommit(false);
-                pstmtSec.setInt(1, section.getSecID());
-                pstmtSec.setString(2, section.getSecName());
+                pstmtSec.setInt(1, section.getSectionID());
+                pstmtSec.setString(2, section.getSectionName());
                 pstmtSec.setInt(3, secID);
                 pstmtSec.setInt(4, deptID);
                 pstmtSec.setInt(5, collegeID);
                 pstmtSec.executeUpdate();
-                pstmtStudent.setInt(1, section.getSecID());
+                pstmtStudent.setInt(1, section.getSectionID());
                 pstmtStudent.setInt(2, secID);
                 pstmtStudent.setInt(3, deptID);
                 pstmtStudent.setInt(4, collegeID);
@@ -850,34 +1109,57 @@ public class Connect {
         String sqlSec = "UPDATE SECTION SET DEPT_ID = ?, COLLEGE_ID = ? WHERE DEPT_ID = ? AND COLLEGE_ID = ?";
         String sqlStudent = "UPDATE STUDENT SET DEPT_ID = ?,COLLEGE_ID = ? WHERE DEPT_ID = ? AND COLLEGE_ID = ?";
         String sqlProfessor = "UPDATE PROFESSOR SET DEPT_ID = ?,COLLEGE_ID = ? WHERE DEPT_ID = ? AND COLLEGE_ID = ?";
+
+        String sqlCourseProfessor = "UPDATE COURSE_PROFESSOR_TABLE SET DEPT_ID = ?, COLLEGE_ID = ? WHERE DEPT_ID = ? AND COLLEGE_ID = ?";
+        String sqlCourse = "UPDATE COURSE SET COURSE_DEPT = ?, COLLEGE_ID = ? WHERE COURSE_DEPT = ? AND COLLEGE_ID = ?";
+        String sqlRecords = "UPDATE RECORDS SET DEPT_ID = ?, COLLEGE_ID = ? WHERE DEPT_ID = ? AND COLLEGE_ID = ?";
         try (Connection conn = connect();
         PreparedStatement pstmtDept = conn.prepareStatement(sqlDept);
         PreparedStatement pstmtSec = conn.prepareStatement(sqlSec);
         PreparedStatement pstmtStudent = conn.prepareStatement(sqlStudent);
-        PreparedStatement pstmtProfessor = conn.prepareStatement(sqlProfessor)) {
+        PreparedStatement pstmtProfessor = conn.prepareStatement(sqlProfessor);
+        PreparedStatement pstmtCourseProfessor = conn.prepareStatement(sqlCourseProfessor);
+        PreparedStatement pstmtCourse = conn.prepareStatement(sqlCourse);
+        PreparedStatement pstmtRecords = conn.prepareStatement(sqlRecords)) {
             try {
                 conn.setAutoCommit(false);
-                pstmtDept.setInt(1, dept.getDeptID());
+                pstmtDept.setInt(1, dept.getDepartmentID());
                 pstmtDept.setString(2, dept.getDeptName());
                 pstmtDept.setInt(3, dept.getCollegeID());
                 pstmtDept.setInt(4, deptID);
                 pstmtDept.setInt(5, collegeID);
                 pstmtDept.executeUpdate();
-                pstmtSec.setInt(1, dept.getDeptID());
+                pstmtSec.setInt(1, dept.getDepartmentID());
                 pstmtSec.setInt(2, dept.getCollegeID());
                 pstmtSec.setInt(3, deptID);
                 pstmtSec.setInt(4, collegeID);
                 pstmtSec.executeUpdate();
-                pstmtStudent.setInt(1, dept.getDeptID());
+                pstmtStudent.setInt(1, dept.getDepartmentID());
                 pstmtStudent.setInt(2, dept.getCollegeID());
                 pstmtStudent.setInt(3, deptID);
                 pstmtStudent.setInt(4, collegeID);
                 pstmtStudent.executeUpdate();
-                pstmtProfessor.setInt(1, dept.getDeptID());
+                pstmtProfessor.setInt(1, dept.getDepartmentID());
                 pstmtProfessor.setInt(2, dept.getCollegeID());
                 pstmtProfessor.setInt(3, deptID);
                 pstmtProfessor.setInt(4, collegeID);
                 pstmtProfessor.executeUpdate();
+                
+                pstmtCourseProfessor.setInt(1, dept.getDepartmentID());
+                pstmtCourseProfessor.setInt(2, dept.getCollegeID());
+                pstmtCourseProfessor.setInt(3, deptID);
+                pstmtCourseProfessor.setInt(4, collegeID);
+                pstmtCourseProfessor.executeUpdate();
+                pstmtCourse.setInt(1, dept.getDepartmentID());
+                pstmtCourse.setInt(2, dept.getCollegeID());
+                pstmtCourse.setInt(3, deptID);
+                pstmtCourse.setInt(4, collegeID);
+                pstmtCourse.executeUpdate();
+                pstmtRecords.setInt(1, dept.getDepartmentID());
+                pstmtRecords.setInt(2, dept.getCollegeID());
+                pstmtRecords.setInt(3, deptID);
+                pstmtRecords.setInt(4, collegeID);
+                pstmtRecords.executeUpdate();
                 conn.commit();
             } catch (SQLException e) {
                 conn.rollback();
@@ -889,12 +1171,55 @@ public class Connect {
     public static void editCollege(College college) throws SQLException {
         String sqlCollege = "UPDATE COLLEGE SET C_NAME = ?, C_ADDRESS = ?, C_TELEPHONE = ? WHERE C_ID = ?";
         try (Connection conn = connect();PreparedStatement pstmt = conn.prepareStatement(sqlCollege)) {
-            pstmt.setString(1,college.getcName());
-            pstmt.setString(2, college.getcAddress());
-            pstmt.setString(3, college.getcTelephone());
-            pstmt.setInt(4,college.getcID());
+            pstmt.setString(1,college.getCollegeName());
+            pstmt.setString(2, college.getCollegeAddress());
+            pstmt.setString(3, college.getCollegeTelephone());
+            pstmt.setInt(4,college.getCollegeID());
             pstmt.executeUpdate();
         }
+    }
+
+    public static void editCourseProfessor(String pID, String courseID, int deptID, int collegeID, String newProfessorID) throws SQLException {
+        String sql = "UPDATE COURSE_PROF_TABLE SET PROFESSOR_ID = ? WHERE PROFESSOR_ID = ? AND COURSE_ID = ? AND DEPT_ID = ? AND COLLEGE_ID = ?";
+        String sqlRecords = "UPDATE RECORDS SET PROF_ID = ? WHERE PROF_ID = ? AND COURSE_ID = ? AND DEPT_ID = ? AND COLLEGE_ID = ?";
+        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql);
+        PreparedStatement pstmtRecords = conn.prepareStatement(sqlRecords)) {
+            try {
+                conn.setAutoCommit(false);
+                pstmt.setString(1, newProfessorID);
+                pstmt.setString(2, pID);
+                pstmt.setString(3, courseID);
+                pstmt.setInt(4, deptID);
+                pstmt.setInt(5, collegeID);
+                pstmt.executeUpdate();
+                pstmtRecords.setString(1, newProfessorID);
+                pstmtRecords.setString(2, pID);
+                pstmtRecords.setString(3, courseID);
+                pstmtRecords.setInt(4, deptID);
+                pstmtRecords.setInt(5, collegeID);
+                pstmtRecords.executeUpdate();
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw new SQLException();
+            }
+        } 
+    }
+    
+    public static void editRecord(int tID, String courseID, Records record) throws SQLException {
+        String sqlRecord = "UPDATE RECORDS SET PROF_ID = ? , INT_MARK = ? , EXT_MARK = ? , ATTENDANCE = ? , CGPA = ? , STATUS = ? , SEM_COMPLETED = ? WHERE TRANSACT_ID = ? AND COURSE_ID = ?";
+        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sqlRecord)) {
+            pstmt.setString(1, record.getProfessorID());
+            pstmt.setInt(2, record.getInternalMarks());
+            pstmt.setInt(3, record.getExternalMarks());
+            pstmt.setInt(4, record.getAttendance());
+            pstmt.setFloat(5, record.getCgpa());
+            pstmt.setString(6, record.getStatus());
+            pstmt.setInt(7, record.getSemCompleted());
+            pstmt.setInt(8, tID);
+            pstmt.setString(9, courseID);
+            pstmt.executeUpdate();
+        } 
     }
 
     public static boolean verifyCollege(int cID) throws SQLException{
@@ -932,6 +1257,27 @@ public class Connect {
         try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1,cID);
             pstmt.setInt(2, collegeID);
+            return pstmt.executeQuery().next() ? true : false;
+        }
+    }
+    
+    public static boolean verifyCourse(String cID, int deptID, int collegeID) throws SQLException {
+        String sql = "SELECT * FROM COURSE WHERE COURSE_ID = ? AND COURSE_DEPT = ? AND COLLEGE_ID = ?";
+        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1,cID);
+            pstmt.setInt(2, deptID);
+            pstmt.setInt(3, collegeID);
+            return pstmt.executeQuery().next() ? true : false;
+        }
+    }
+    
+    public static boolean verifyCourseProfessor(String pID, String courseID, int deptID, int collegeID) throws SQLException{
+        String sql = "SELECT * FROM COURSE_PROF_TABLE WHERE PROFESSOR_ID = ? AND COURSE_ID = ? AND DEPT_ID = ? AND COLLEGE_ID = ?";
+        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, pID);
+            pstmt.setString(2, courseID);
+            pstmt.setInt(3,deptID);
+            pstmt.setInt(4,collegeID);
             return pstmt.executeQuery().next() ? true : false;
         }
     }
@@ -975,11 +1321,22 @@ public class Connect {
         }
     }
 
-    public static boolean verifyProfessor(String pID, int collegeID) throws SQLException{
-        String sql = "SELECT * FROM PROFESSOR WHERE P_ID = ? AND COLLEGE_ID = ?";
+    // public static boolean verifyProfessor(String pID, int collegeID) throws SQLException{
+    //     String sql = "SELECT * FROM PROFESSOR WHERE P_ID = ? AND COLLEGE_ID = ?";
+    //     try(Connection conn = connect();PreparedStatement pstmt = conn.prepareStatement(sql)){
+    //         pstmt.setString(1,pID);
+    //         pstmt.setInt(2, collegeID);
+    //         ResultSet rs = pstmt.executeQuery();
+    //         return rs.next() ? true:false;
+    //     }
+    // }
+
+    public static boolean verifyProfessor(String pID, int deptID, int collegeID) throws SQLException{
+        String sql = "SELECT * FROM PROFESSOR WHERE P_ID = ? AND DEPT_ID = ? AND COLLEGE_ID = ?";
         try(Connection conn = connect();PreparedStatement pstmt = conn.prepareStatement(sql)){
             pstmt.setString(1,pID);
-            pstmt.setInt(2, collegeID);
+            pstmt.setInt(2, deptID);
+            pstmt.setInt(3, collegeID);
             ResultSet rs = pstmt.executeQuery();
             return rs.next() ? true:false;
         }
@@ -994,6 +1351,17 @@ public class Connect {
             return rs.next() ? true:false;
         }
     }
+    
+    public static boolean verifyStudent(String sID, int departmentID, int collegeID) throws SQLException{
+        String sql = "SELECT * FROM STUDENT WHERE S_ID = ? AND COLLEGE_ID = ? AND DEPT_ID = ?";
+        try (Connection conn = connect();PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1,sID);
+            pstmt.setInt(2,collegeID);
+            pstmt.setInt(3,departmentID);
+            ResultSet rs = pstmt.executeQuery();
+            return rs.next() ? true:false;
+        }
+    }
 
     public static boolean verifyUser(int uID) throws SQLException {
         String sql = "SELECT * FROM USER WHERE U_ID = ?";
@@ -1002,4 +1370,26 @@ public class Connect {
             return pstmt.executeQuery().next() ? true:false;
         }
     }
+
+    public static boolean verifyRecord( int tID, String courseID) throws SQLException {
+    String sql = "SELECT * FROM RECORDS WHERE TRANSACT_ID = ? AND COURSE_ID = ?";
+    try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        // pstmt.setString(1, sID);
+        pstmt.setInt(1, tID);
+        pstmt.setString(2, courseID);
+        // pstmt.setInt(4, collegeID);
+        return pstmt.executeQuery().next() ? true:false;
+        }
+    }
+    
+    public static boolean verifyRecord(String studentID, String courseID, int collegeID) throws SQLException {
+        String sql = "SELECT * FROM RECORDS WHERE STUDENT_ID = ? AND COURSE_ID = ? AND COLLEGE_ID = ?";
+        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, studentID);
+            pstmt.setString(2, courseID);
+            pstmt.setInt(3, collegeID);
+            // pstmt.setInt(4, collegeID);
+            return pstmt.executeQuery().next() ? true:false;
+            }
+        }
 }

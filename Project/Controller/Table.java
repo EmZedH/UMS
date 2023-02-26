@@ -11,5 +11,7 @@ public enum Table {
     SUPER_ADMIN,
     TEST,
     TRANSACTIONS,
-    USER
+    USER,
+    COURSE_PROF_TABLE,
+    RECORDS
 }

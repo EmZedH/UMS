@@ -1,25 +1,25 @@
 package Database;
 
 public class Department {
-    private int deptID;
+    private int departmentID;
     private String deptName;
     private int collegeID;
-    public Department(int deptID, String deptName, int collegeID) {
-        this.deptID = deptID;
+    public Department(int departmentID, String deptName, int collegeID) {
+        this.departmentID = departmentID;
         this.deptName = deptName;
         this.collegeID = collegeID;
     }
-    public int getDeptID() {
-        return deptID;
+    public int getDepartmentID() {
+        return departmentID;
     }
-    public void setDeptID(int deptID) {
-        this.deptID = deptID;
+    public void setDepartmentID(int departmentID) {
+        this.departmentID = departmentID;
     }
     public String getDeptName() {
         return deptName;
     }
-    public void setDeptName(String deptName) {
-        this.deptName = deptName;
+    public void setDeptName(String departmentName) {
+        this.deptName = departmentName;
     }
     public int getCollegeID() {
         return collegeID;

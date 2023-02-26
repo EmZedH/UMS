@@ -2,13 +2,13 @@ package Database;
 
 public class Test {
     private int testID;
-    private String sID;
+    private String studentID;
     private String courseID;
     private int collegeID;
     private int testMark;
-    public Test(int testID, String sID, String courseID, int collegeID, int testMark) {
+    public Test(int testID, String studentID, String courseID, int collegeID, int testMark) {
         this.testID = testID;
-        this.sID = sID;
+        this.studentID = studentID;
         this.courseID = courseID;
         this.collegeID = collegeID;
         this.testMark = testMark;
@@ -19,11 +19,11 @@ public class Test {
     public void setTestID(int testID) {
         this.testID = testID;
     }
-    public String getsID() {
-        return sID;
+    public String getStudentID() {
+        return studentID;
     }
-    public void setsID(String sID) {
-        this.sID = sID;
+    public void setStudentID(String studentID) {
+        this.studentID = studentID;
     }
     public String getCourseID() {
         return courseID;

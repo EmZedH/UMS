@@ -14,7 +14,7 @@ public class CollegeAdminLogic {
         int uID = CommonUI.userID();
         String password = CommonUI.password(uID);
         try {
-        if(Connect.verifyUIDPassCAdmin(uID, password)){
+        if(Connect.verifyUIDPassword(uID, password, Table.COLLEGE_ADMIN)){
             CommonDisplay.loginVerified();
             startPage(Connect.returnUser(uID));
         }
@@ -31,7 +31,7 @@ public class CollegeAdminLogic {
         // int uID = CommonUI.userID();
         String password = CommonUI.password(uID);
         try {
-        if(Connect.verifyUIDPassCAdmin(uID, password)){
+        if(Connect.verifyUIDPassword(uID, password, Table.COLLEGE_ADMIN)){
             CommonDisplay.loginVerified();
             startPage(Connect.returnUser(uID));
         }
@@ -62,7 +62,7 @@ public class CollegeAdminLogic {
 
     public static void userManage(User user) throws SQLException {
         int choice;
-        while ((choice = InputUtility.choiceInput("Select Option", new String[]{"Add User","Edit User","Delete User","View User","Back"})) != 5) {
+        while ((choice = InputUtility.inputChoice("Select Option", new String[]{"Add User","Edit User","Delete User","View User","Back"})) != 5) {
             switch (choice) {
                 case 1:
                 break;

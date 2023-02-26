@@ -3,7 +3,7 @@ package UI.Utility;
 public class DisplayUtility {
     static int lineSize = 60;
 
-    public static void singleDialog(String msg){
+    public static void singleDialogDisplay(String msg){
         for (int i = 0; i < 5; i++) {
             if(i==1 || i== 3){
                 for (int j = 0; j < lineSize; j++) {
@@ -53,7 +53,7 @@ public class DisplayUtility {
         }
     }
 
-    public static void dialogWithHeader(String header, String msg) {
+    public static void dialogWithHeaderDisplay(String header, String msg) {
         for (int i = 0; i < 9; i++) {
             if(i==1 || i== 3 || i==7){
                 for (int j = 0; j < lineSize; j++) {
@@ -78,7 +78,7 @@ public class DisplayUtility {
         }
     }
 
-    public static void userPageDialog(String heading,String name, int id, String[] msg) {
+    public static void userPageDialog(String heading,String left, String right, String[] msg) {
         String p = "";
         String ki= "";
         int flag=1;
@@ -109,13 +109,13 @@ public class DisplayUtility {
                 System.out.print(p+Integer.toString(i-4) + ". " + msg[i-5]);
             }
             else if(i==msg.length+7){
-                String uID = "ID: "+Integer.toString(id);
-                name = "Name: " + name;
-                int len = name.length();
-                for(int j=len;j<lineSize-(uID).length();j++){
-                    name=name+" ";
+                // String uID = "ID: "+Integer.toString(left);
+                // left = "Name: " + left;
+                int len = left.length();
+                for(int j=len;j<lineSize-(right).length();j++){
+                    left=left+" ";
                 }
-                System.out.print(name+uID);
+                System.out.print(left+right);
             }
             System.out.println();
         }

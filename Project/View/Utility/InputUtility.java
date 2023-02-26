@@ -10,20 +10,20 @@ public class InputUtility {
     static int number;
 
     public static String inputString(String message) {
-        DisplayUtility.singleDialog(message);
+        DisplayUtility.singleDialogDisplay(message);
         in = new Scanner(System.in);
         return in.nextLine();
     }
 
     public static String inputString(String heading, String message) {
-        DisplayUtility.dialogWithHeader(heading, message);
+        DisplayUtility.dialogWithHeaderDisplay(heading, message);
         in = new Scanner(System.in);
         return in.nextLine();
     }
 
     public static int posInput(String message){
         try {
-            DisplayUtility.singleDialog(message);
+            DisplayUtility.singleDialogDisplay(message);
             in = new Scanner(System.in);
             number = in.nextInt();
             if(number<0){
@@ -39,7 +39,7 @@ public class InputUtility {
 
     public static int posInput(String heading,String message){
         try {
-            DisplayUtility.dialogWithHeader(heading, message);
+            DisplayUtility.dialogWithHeaderDisplay(heading, message);
             in = new Scanner(System.in);
             number = in.nextInt();
             if(number<0){
@@ -55,7 +55,7 @@ public class InputUtility {
 
     public static float floatInput(String message) {
         try{
-            DisplayUtility.singleDialog(message);
+            DisplayUtility.singleDialogDisplay(message);
             in = new Scanner(System.in);
             return in.nextFloat();
         }catch(InputMismatchException e){
@@ -64,7 +64,7 @@ public class InputUtility {
         }
     }
 
-    public static int choiceInput(String heading, String[] choices){
+    public static int inputChoice(String heading, String[] choices){
         try{
         DisplayUtility.optionDialog(heading, choices);
         in = new Scanner(System.in);
@@ -75,13 +75,13 @@ public class InputUtility {
             }
         }
         CommonUI.properPage();
-        return choiceInput(heading, choices);}
+        return inputChoice(heading, choices);}
         catch(InputMismatchException e){
             CommonUI.properPage();
-            return choiceInput(heading, choices);
+            return inputChoice(heading, choices);
         }
     }
-    public static int choiceInput(String heading, String[] choices,String msg){
+    public static int inputChoice(String heading, String[] choices,String msg){
         try{
         DisplayUtility.userPageDialog(heading, msg, choices);
         in = new Scanner(System.in);
@@ -92,15 +92,15 @@ public class InputUtility {
             }
         }
         CommonUI.properPage();
-        return choiceInput(heading, choices,msg);}
+        return inputChoice(heading, choices,msg);}
         catch(InputMismatchException e){
             CommonUI.properPage();
-            return choiceInput(heading, choices, msg);
+            return inputChoice(heading, choices, msg);
         }
     }
-    public static int choiceInput(String heading, String[] choices,String name, int id){
+    public static int choiceInput(String heading, String[] choices,String left, String right){
         try{
-        DisplayUtility.userPageDialog(heading, name, id, choices);
+        DisplayUtility.userPageDialog(heading, left, right, choices);
         in = new Scanner(System.in);
         number = in.nextInt();
         for (int i = 1; i <= choices.length; i++) {
@@ -109,10 +109,10 @@ public class InputUtility {
             }
         }
         CommonUI.properPage();
-        return choiceInput(heading, choices,name,id);}
+        return choiceInput(heading, choices,left,right);}
         catch(InputMismatchException e){
             CommonUI.properPage();
-            return choiceInput(heading, choices, name, id);
+            return choiceInput(heading, choices, left, right);
         }
     }
 }

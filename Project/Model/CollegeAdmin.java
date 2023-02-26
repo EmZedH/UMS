@@ -1,19 +1,19 @@
 package Database;
 
 public class CollegeAdmin {
-    private int caID;
+    private int collegeAdminID;
     private int collegeID;
     private int userID;
-    public CollegeAdmin(int caID, int collegeID, int userID) {
-        this.caID = caID;
+    public CollegeAdmin(int collegeAdminID, int collegeID, int userID) {
+        this.collegeAdminID = collegeAdminID;
         this.collegeID = collegeID;
         this.userID = userID;
     }
-    public int getCaID() {
-        return caID;
+    public int getCollegeAdminID() {
+        return collegeAdminID;
     }
-    public void setCaID(int caID) {
-        this.caID = caID;
+    public void setCollegeAdminID(int collegeAdminID) {
+        this.collegeAdminID = collegeAdminID;
     }
     public int getCollegeID() {
         return collegeID;
