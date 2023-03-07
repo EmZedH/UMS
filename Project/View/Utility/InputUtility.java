@@ -98,7 +98,7 @@ public class InputUtility {
             return inputChoice(heading, choices, msg);
         }
     }
-    public static int choiceInput(String heading, String[] choices,String left, String right){
+    public static int inputChoice(String heading, String[] choices,String left, String right){
         try{
         DisplayUtility.userPageDialog(heading, left, right, choices);
         in = new Scanner(System.in);
@@ -109,10 +109,36 @@ public class InputUtility {
             }
         }
         CommonUI.properPage();
-        return choiceInput(heading, choices,left,right);}
+        return inputChoice(heading, choices,left,right);}
         catch(InputMismatchException e){
             CommonUI.properPage();
-            return choiceInput(heading, choices, left, right);
+            return inputChoice(heading, choices, left, right);
         }
+    }
+
+    public static String inputDate(String heading) {
+        DisplayUtility.dialogWithHeaderDisplay(heading,"(Format YYYY-MM-DD)");
+        CommonUI.in = new Scanner(System.in);
+        String date = CommonUI.in.nextLine();
+        if(date.length()==10 && date.charAt(4) == '-' && date.charAt(7)=='-'){
+            try {
+    
+                int year = Integer.parseInt(date.substring(0, 4));
+                int month = Integer.parseInt(date.substring(5, 7));
+                int day = Integer.parseInt(date.substring(8));
+                if((year>0 && month>0 && day>0)&& (((month==1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) && (day<=31)) || ((month == 4 || month == 6 || month == 9 || month == 11) && (day<=30)) || (month == 2 && day<=28) || (year%4==0 && month==2 && day==29))){
+                    return date;
+                }
+            } catch (NumberFormatException e) {
+                DisplayUtility.singleDialogDisplay("Please ensure correct date is input or check the format");
+                return inputDate(heading);
+            }
+        }
+        DisplayUtility.singleDialogDisplay("Please ensure correct date is input or check the format");
+        return inputDate(heading);
+    }
+
+    public static int inputModeOfAdmission(String degree) {
+        return inputChoice("Select the Option",degree == "B. Tech" ? new String[]{"First Year","Lateral Entry","Enter manually"} : new String[]{"First Year","Enter manually"});
     }
 }

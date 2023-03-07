@@ -12,6 +12,6 @@ public enum Table {
     TEST,
     TRANSACTIONS,
     USER,
-    COURSE_PROF_TABLE,
+    COURSE_PROFESSOR_TABLE,
     RECORDS
 }

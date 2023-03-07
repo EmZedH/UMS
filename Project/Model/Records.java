@@ -1,83 +1,69 @@
 package Model;
 
 public class Records {
-    private String studentID;
-    private String courseID;
-    private int sectionID;
+    private int studentID;
+    private int courseID;
     private int departmentID;
-    private String professorID;
+    private int professorID;
     private int collegeID;
     private int transactionID;
-    private int internalMarks;
+    // private int internalMarks;
     private int externalMarks;
     private int attendance;
-    private float cgpa;
+    private int assignmentMarks;
     private String status;
     private int semCompleted;
-    public Records(String studentID, String courseID, int sectonID, int departmentID, String professorID, int collegeID, int transactionID, int internalMarks,
-            int externalMarks, int attendance, float cgpa, String status, int semCompleted) {
+    public Records(int studentID, int courseID, int departmentID, int professorID, int collegeID, int transactionID,
+            int externalMarks, int attendance, int assignment, String status, int semCompleted) {
         this.studentID = studentID;
         this.courseID = courseID;
-        this.sectionID = sectonID;
         this.departmentID = departmentID;
         this.professorID = professorID;
         this.collegeID = collegeID;
         this.transactionID = transactionID;
-        this.internalMarks = internalMarks;
+        // this.internalMarks = internalMarks;
         this.externalMarks = externalMarks;
         this.attendance = attendance;
-        this.cgpa = cgpa;
+        this.assignmentMarks = assignment;
         this.status = status;
         this.semCompleted = semCompleted;
     }
-    public String getStudentID() {
+    public int getStudentID() {
         return studentID;
     }
-    public void setStudentID(String studentID) {
-        this.studentID = studentID;
-    }
-    public String getCourseID() {
+    // public void setStudentID(int studentID) {
+    //     this.studentID = studentID;
+    // }
+    public int getCourseID() {
         return courseID;
     }
-    public void setCourseID(String courseID) {
-        this.courseID = courseID;
-    }
-    public int getSectionID() {
-        return sectionID;
-    }
-    public void setSectionID(int sectionID) {
-        this.sectionID = sectionID;
-    }
+    // public void setCourseID(int courseID) {
+    //     this.courseID = courseID;
+    // }
     public int getDepartmentID() {
         return departmentID;
     }
-    public void setDepartmentID(int departmentID) {
-        this.departmentID = departmentID;
-    }
-    public String getProfessorID() {
+    // public void setDepartmentID(int departmentID) {
+    //     this.departmentID = departmentID;
+    // }
+    public int getProfessorID() {
         return professorID;
     }
-    public void setProfessorID(String professorID) {
+    public void setProfessorID(int professorID) {
         this.professorID = professorID;
     }
     public int getCollegeID() {
         return collegeID;
     }
-    public void setCollegeID(int collegeID) {
-        this.collegeID = collegeID;
-    }
+    // public void setCollegeID(int collegeID) {
+    //     this.collegeID = collegeID;
+    // }
     public int getTransactionID() {
         return transactionID;
     }
-    public void setTransactionID(int transactionID) {
-        this.transactionID = transactionID;
-    }
-    public int getInternalMarks() {
-        return internalMarks;
-    }
-    public void setInternalMarks(int internalMarks) {
-        this.internalMarks = internalMarks;
-    }
+    // public void setTransactionID(int transactionID) {
+    //     this.transactionID = transactionID;
+    // }
     public int getExternalMarks() {
         return externalMarks;
     }
@@ -90,11 +76,11 @@ public class Records {
     public void setAttendance(int attendance) {
         this.attendance = attendance;
     }
-    public float getCgpa() {
-        return cgpa;
+    public int getAssignmentMarks() {
+        return assignmentMarks;
     }
-    public void setCgpa(float cgpa) {
-        this.cgpa = cgpa;
+    public void setAssignmentMarks(int assignment) {
+        this.assignmentMarks = assignment;
     }
     public String getStatus() {
         return status;

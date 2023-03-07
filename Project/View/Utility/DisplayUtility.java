@@ -14,6 +14,23 @@ public class DisplayUtility {
                 for (int j = 0;j< lineSize - msg.length() -1; j++) {
                     msg = " "  + msg;
                 }
+                System.out.print(msg);
+            }
+            System.out.println();
+        }
+    }
+
+    public static void wrappedDialogDisplay(String msg) {
+        for (int i = 0; i < 5; i++) {
+            if(i==1 || i== 3){
+                for (int j = 0; j < lineSize; j++) {
+                    System.out.print("-");
+                }
+            }
+            else if(i==2){
+                for (int j = 0;j< lineSize - msg.length() -1; j++) {
+                    msg = " "  + msg;
+                }
                     System.out.print(msg);
                 
             }
@@ -165,91 +182,96 @@ public class DisplayUtility {
     }
 
     public static void printTable(String head,String[] headings,String[][] arr) {
-        for (int i = 0; i < headings.length; i++) {
-            int lineSize = headings[i].length() +5;
-            
-            for (int j = 0; j < arr.length; j++) {
-                arr[j][i] = arr[j][i] == null ? "NULL" : arr[j][i];
-                if(lineSize<arr[j][i].length()){
-                    lineSize = arr[j][i].length();
-                }
-            }
-                String m = "|";
-                for (int wordLen = 0;wordLen<=(lineSize-headings[i].length());wordLen++){
-                    if(wordLen==(lineSize-headings[i].length())/2){
-                        m+=headings[i];
-                        continue;
+        try{
+            for (int i = 0; i < headings.length; i++) {
+                int lineSize = headings[i].length() +5;
+                
+                for (int j = 0; j < arr.length; j++) {
+                    arr[j][i] = arr[j][i] == null ? "NULL" : arr[j][i];
+                    if(lineSize<arr[j][i].length()){
+                        lineSize = arr[j][i].length();
                     }
-                    m+=" ";
                 }
-                headings[i] = m;
-    
-            for (int j = 0; j < arr.length; j++) {
-                    m="|"+arr[j][i];
-                    for(int wordLen = 1;wordLen<=(lineSize-arr[j][i].length());wordLen++){
+                    String m = "|";
+                    for (int wordLen = 0;wordLen<=(lineSize-headings[i].length());wordLen++){
+                        if(wordLen==(lineSize-headings[i].length())/2){
+                            m+=headings[i];
+                            continue;
+                        }
                         m+=" ";
                     }
-                    arr[j][i] = m;
-            }
-        }
-        headings[headings.length-1] = headings[headings.length-1]+"|";
-        for (int i = 0; i < arr.length; i++) {
-            arr[i][headings.length-1] = arr[i][headings.length-1] + "|";
-        }
-        System.out.println();
-    
-    
-        int len=0;
-        for (String strings : headings) {
-            len+=strings.length();
-        }
-    
-        for (int j = 0; j < arr.length+7; j++) {
-            if(j==0 || j==2 || j==arr.length+6){
-                for (int i = 0; i < len; i++) {
-                    System.out.print("-");
+                    headings[i] = m;
+
+                for (int j = 0; j < arr.length; j++) {
+                        m="|"+arr[j][i];
+                        for(int wordLen = 1;wordLen<=(lineSize-arr[j][i].length());wordLen++){
+                            m+=" ";
+                        }
+                        arr[j][i] = m;
                 }
-                System.out.println();
             }
-    
-            else if(j==1){
-                String m = "|";
-                for (int wordLen = 0; wordLen < (len-head.length())-1; wordLen++) {
-                    if(wordLen == (len-head.length())/2-1){
-                        m+=head;
-                        continue;
-                    }
-                    m+=" ";
-                }
-                head = m+"|";
-                System.out.println(head);
-            }
-            else if(j==3){
-            for (String strings : headings) {
-                System.out.print(strings);
+            headings[headings.length-1] = headings[headings.length-1]+"|";
+            for (int i = 0; i < arr.length; i++) {
+                arr[i][headings.length-1] = arr[i][headings.length-1] + "|";
             }
             System.out.println();
-    
+
+
+            int len=0;
+            for (String strings : headings) {
+                len+=strings.length();
             }
-            else if(j==4){
-                for (String strings : headings) {
-                    for (int i = 0; i < strings.length(); i++) {
-                        if(i==0){
-                            System.out.print("|");
-                        }
-                        else{
-                        System.out.print("-");}
+
+            for (int j = 0; j < arr.length+7; j++) {
+                if(j==0 || j==2 || j==arr.length+6){
+                    for (int i = 0; i < len; i++) {
+                        System.out.print("-");
                     }
+                    System.out.println();
+                }
+
+                else if(j==1){
+                    String m = "|";
+                    for (int wordLen = 0; wordLen < (len-head.length())-1; wordLen++) {
+                        if(wordLen == (len-head.length())/2-1){
+                            m+=head;
+                            continue;
+                        }
+                        m+=" ";
+                    }
+                    head = m+"|";
+                    System.out.println(head);
+                }
+                else if(j==3){
+                for (String strings : headings) {
+                    System.out.print(strings);
                 }
                 System.out.println();
-            }
-            else if(j>5){   
-                for (int k = 0; k < headings.length; k++) {
-                    System.out.print(arr[j-6][k]);
+
                 }
-                System.out.println();
+                else if(j==4){
+                    for (String strings : headings) {
+                        for (int i = 0; i < strings.length(); i++) {
+                            if(i==0){
+                                System.out.print("|");
+                            }
+                            else{
+                            System.out.print("-");}
+                        }
+                    }
+                    System.out.println();
+                }
+                else if(j>5){   
+                    for (int k = 0; k < headings.length; k++) {
+                        System.out.print(arr[j-6][k]);
+                    }
+                    System.out.println();
+                }
             }
+            System.out.println();
+        }catch(ArrayIndexOutOfBoundsException e){
+            DisplayUtility.singleDialogDisplay("Table Heading - Rows Conflict. Please check");
+            return;
         }
-        System.out.println();
     }
 }

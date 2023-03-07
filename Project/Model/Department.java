@@ -2,11 +2,11 @@ package Model;
 
 public class Department {
     private int departmentID;
-    private String deptName;
+    private String departmentName;
     private int collegeID;
-    public Department(int departmentID, String deptName, int collegeID) {
+    public Department(int departmentID, String departmentName, int collegeID) {
         this.departmentID = departmentID;
-        this.deptName = deptName;
+        this.departmentName = departmentName;
         this.collegeID = collegeID;
     }
     public int getDepartmentID() {
@@ -15,11 +15,11 @@ public class Department {
     public void setDepartmentID(int departmentID) {
         this.departmentID = departmentID;
     }
-    public String getDeptName() {
-        return deptName;
+    public String getDepartmentName() {
+        return departmentName;
     }
-    public void setDeptName(String departmentName) {
-        this.deptName = departmentName;
+    public void setDepartmentName(String departmentName) {
+        this.departmentName = departmentName;
     }
     public int getCollegeID() {
         return collegeID;

@@ -3,17 +3,9 @@ package Model;
 public class CollegeAdmin {
     private int collegeAdminID;
     private int collegeID;
-    private int userID;
-    public CollegeAdmin(int collegeAdminID, int collegeID, int userID) {
-        this.collegeAdminID = collegeAdminID;
+    public CollegeAdmin(int userID, int collegeID) {
         this.collegeID = collegeID;
-        this.userID = userID;
-    }
-    public int getCollegeAdminID() {
-        return collegeAdminID;
-    }
-    public void setCollegeAdminID(int collegeAdminID) {
-        this.collegeAdminID = collegeAdminID;
+        this.collegeAdminID = userID;
     }
     public int getCollegeID() {
         return collegeID;
@@ -21,11 +13,11 @@ public class CollegeAdmin {
     public void setCollegeID(int collegeID) {
         this.collegeID = collegeID;
     }
-    public int getUserID() {
-        return userID;
+    public int getCollegeAdminID() {
+        return collegeAdminID;
     }
-    public void setUserID(int userID) {
-        this.userID = userID;
+    public void setCollegeAdminID(int userID) {
+        this.collegeAdminID = userID;
     }
     
 }

@@ -1,39 +1,31 @@
 package Model;
 
 public class Professor {
-    private String professorID;
+    private int professorID;
     private int departmentID;
-    private int userID;
     private int collegeID;
-    public Professor(String professorID, int departmentID, int userID, int collegeID) {
-        this.professorID = professorID;
+    public Professor(int professorID, int departmentID, int collegeID) {
         this.departmentID = departmentID;
-        this.userID = userID;
+        this.professorID = professorID;
         this.collegeID = collegeID;
     }
-    public String getProfessorID() {
+    public int getProfessorID() {
         return professorID;
     }
-    public void setProfessorID(String professorID) {
+    public void setProfessorID(int professorID) {
         this.professorID = professorID;
     }
     public int getDepartmentID() {
         return departmentID;
     }
-    public void setDepartmentID(int departmentID) {
-        this.departmentID = departmentID;
-    }
-    public int getUserID() {
-        return userID;
-    }
-    public void setUserID(int userID) {
-        this.userID = userID;
-    }
+    // public void setDepartmentID(int departmentID) {
+    //     this.departmentID = departmentID;
+    // }
     public int getCollegeID() {
         return collegeID;
     }
-    public void setCollegeID(int collegeID) {
-        this.collegeID = collegeID;
-    }
+    // public void setCollegeID(int collegeID) {
+    //     this.collegeID = collegeID;
+    // }
     
 }

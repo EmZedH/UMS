@@ -3,20 +3,18 @@ package Model;
 public class User{
     private int userID;
     private String userName;
-    private String userAadhar;
+    private String userContactNumber;
     private String userDOB;
     private String userGender;
     private String userAddress;
-    private String userRole;
     private String uPassword;
-    User(int userID,String userName, String userAadhar, String userDOB, String userGender, String userAddress, String userRole, String userPassword){
+    public User(int userID,String userName, String userContactNumber, String userDOB, String userGender, String userAddress, String userPassword){
         this.userID = userID;
         this.userName = userName;
-        this.userAadhar = userAadhar;
+        this.userContactNumber = userContactNumber;
         this.userDOB = userDOB;
         this.userGender = userGender;
         this.userAddress = userAddress;
-        this.userRole = userRole;
         this.uPassword = userPassword;
     }
     public int getID(){
@@ -25,8 +23,8 @@ public class User{
     public String getName(){
         return this.userName;
     }
-    public String getAadhar(){
-        return this.userAadhar;
+    public String getContactNumber(){
+        return this.userContactNumber;
     }
     public String getDOB(){
         return this.userDOB;
@@ -40,17 +38,14 @@ public class User{
     public String getPassword(){
         return this.uPassword;
     }
-    public String getRole(){
-        return this.userRole;
-    }
     public void setID(int userID) {
         this.userID = userID;
     }
     public void setName(String userName) {
         this.userName = userName;
     }
-    public void setAadhar(String userAadhar) {
-        this.userAadhar = userAadhar;
+    public void setContactNumber(String userContactNumber) {
+        this.userContactNumber = userContactNumber;
     }
     public void setDOB(String userDOB) {
         this.userDOB = userDOB;
@@ -60,9 +55,6 @@ public class User{
     }
     public void setAddress(String userAddress) {
         this.userAddress = userAddress;
-    }
-    public void setRole(String userRole) {
-        this.userRole = userRole;
     }
     public void setPassword(String userPassword) {
         this.uPassword = userPassword;

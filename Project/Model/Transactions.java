@@ -2,25 +2,20 @@ package Model;
 
 public class Transactions {
     private int transactionID;
-    private String studentID;
-    private int collegeID;
+    private int studentID;
     private String date;
     private int amount;
-    public Transactions(int transactionID, String studentID, int collegeID, String date, int amount) {
+    public Transactions(int transactionID, int studentID, String date, int amount) {
         this.transactionID = transactionID;
         this.studentID = studentID;
-        this.collegeID = collegeID;
         this.date = date;
         this.amount = amount;
     }
     public int getTransactionID() {
         return transactionID;
     }
-    public String getStudentID() {
+    public int getStudentID() {
         return studentID;
-    }
-    public int getCollegeID() {
-        return collegeID;
     }
     public String getDate() {
         return date;
@@ -31,12 +26,9 @@ public class Transactions {
     public void setTransactionID(int transactionID) {
         this.transactionID = transactionID;
     }
-    public void setStudentID(String studentID) {
-        this.studentID = studentID;
-    }
-    public void setCollegeID(int collegeID) {
-        this.collegeID = collegeID;
-    }
+    // public void setStudentID(int studentID) {
+    //     this.studentID = studentID;
+    // }
     public void setDate(String date) {
         this.date = date;
     }

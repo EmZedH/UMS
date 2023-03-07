@@ -1,24 +1,26 @@
 package Model;
 
 public class Course {
-    private String courseID;
+    private int courseID;
     private String courseName;
     private int courseSemester;
     private String courseDegree;
     private int courseDepartment;
     private int collegeID;
-    Course(String courseID, String courseName, int courseSemester, int courseDepartment, int collegeID, String courseDegree) {
+    private String courseElective;
+    public Course(int courseID, String courseName, int courseSemester, int courseDepartment, int collegeID, String courseDegree, String courseElective) {
         this.courseID = courseID;
         this.courseName = courseName;
         this.courseSemester = courseSemester;
         this.collegeID = collegeID;
         this.courseDegree = courseDegree;
         this.courseDepartment = courseDepartment;
+        this.courseElective = courseElective;
     }
-    public String getCourseID() {
+    public int getCourseID() {
         return courseID;
     }
-    public void setCourseID(String courseID) {
+    public void setCourseID(int courseID) {
         this.courseID = courseID;
     }
     public String getCourseName() {
@@ -50,5 +52,11 @@ public class Course {
     }
     public void setCollegeID(int collegeID) {
         this.collegeID = collegeID;
+    }
+    public String getCourseElective() {
+        return courseElective;
+    }
+    public void setCourseElective(String courseElective) {
+        this.courseElective = courseElective;
     }
 }

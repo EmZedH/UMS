@@ -2,14 +2,16 @@ package Model;
 
 public class Test {
     private int testID;
-    private String studentID;
-    private String courseID;
+    private int studentID;
+    private int courseID;
+    private int departmentID;
     private int collegeID;
     private int testMark;
-    public Test(int testID, String studentID, String courseID, int collegeID, int testMark) {
+    public Test(int testID, int studentID, int courseID, int departmentID, int collegeID, int testMark) {
         this.testID = testID;
         this.studentID = studentID;
         this.courseID = courseID;
+        this.departmentID = departmentID;
         this.collegeID = collegeID;
         this.testMark = testMark;
     }
@@ -19,24 +21,30 @@ public class Test {
     public void setTestID(int testID) {
         this.testID = testID;
     }
-    public String getStudentID() {
+    public int getStudentID() {
         return studentID;
     }
-    public void setStudentID(String studentID) {
-        this.studentID = studentID;
-    }
-    public String getCourseID() {
+    // public void setStudentID(int studentID) {
+    //     this.studentID = studentID;
+    // }
+    public int getCourseID() {
         return courseID;
     }
-    public void setCourseID(String courseID) {
-        this.courseID = courseID;
+    // public void setCourseID(int courseID) {
+    //     this.courseID = courseID;
+    // }
+    public int getDepartmentID() {
+        return departmentID;
     }
+    // public void setDepartmentID(int departmentID) {
+    //     this.departmentID = departmentID;
+    // }
     public int getCollegeID() {
         return collegeID;
     }
-    public void setCollegeID(int collegeID) {
-        this.collegeID = collegeID;
-    }
+    // public void setCollegeID(int collegeID) {
+    //     this.collegeID = collegeID;
+    // }
     public int getTestMark() {
         return testMark;
     }

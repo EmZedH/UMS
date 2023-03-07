@@ -1,11 +1,11 @@
 package Model;
 
-public class CourseProf {
+public class CourseProfessorTable {
     private String professorID;
     private String courseID;
     private int departmentID;
     private int collegeID;
-    public CourseProf(String professorID, String courseID, int departmentID, int collegeID) {
+    public CourseProfessorTable(String professorID, String courseID, int departmentID, int collegeID) {
         this.professorID = professorID;
         this.courseID = courseID;
         this.departmentID = departmentID;
