@@ -33,10 +33,12 @@ public class SuperAdminUI{
     }
 
     public static int inputEditStudentPage(User userVar, boolean toggleDetails, Student student) {
-        return InputUtility.inputChoice("Edit Student",toggleDetails ? new String[]{"User ID","Name","Aadhar","Date of Birth","Gender","Address","Password","Degree and Semester","Section","Toggle Details","Back"} : new String[]{"User ID - "+userVar.getID(),"Name - "+userVar.getName(), "Aadhar - "+userVar.getContactNumber(),"Date of Birth - "+userVar.getDOB(), "Gender - "+userVar.getGender(),"Address - "+userVar.getAddress(), "Password - "+userVar.getPassword(), "Degree ("+student.getDegree()+"),  and Semester ("+student.getSemester()+")","Section - "+student.getSectionID(),"Toggle Details","Back"},"Name: " + userVar.getName(),"ID: "+ userVar.getID());
+        return InputUtility.inputChoice("Edit Student",toggleDetails ? new String[]{"User ID","Name","Aadhar","Date of Birth","Gender","Address","Password","Section","Toggle Details","Back"} : 
+        new String[]{"User ID - "+userVar.getID(),"Name - "+userVar.getName(), "Aadhar - "+userVar.getContactNumber(),"Date of Birth - "+userVar.getDOB(), "Gender - "+userVar.getGender(),"Address - "+userVar.getAddress(), "Password - "+userVar.getPassword(),"Section - "+student.getSectionID(),"Toggle Details","Back"},"Name: " + userVar.getName(),"ID: "+ userVar.getID());
     }
 
-    public static int inputEditProfessorPage(User userVar, boolean toggleDetails, Professor professor) {
+    public static int inputEditProfessorPage(boolean toggleDetails, Professor professor) {
+        User userVar = professor.getUser();
         return InputUtility.inputChoice("Edit Professor",toggleDetails ? 
         new String[]{"User ID","Name","Aadhar","Date of Birth","Gender",
         "Address","Password","Toggle Details","Back"} : 
@@ -47,18 +49,21 @@ public class SuperAdminUI{
         userVar.getName(), "ID: "+userVar.getID());
     }
 
-    public static int inputEditCollegeAdminPage(User userVar, boolean toggleDetails, CollegeAdmin collegeAdmin) {
+    public static int inputEditCollegeAdminPage(boolean toggleDetails, CollegeAdmin collegeAdmin) {
+        User userVar = collegeAdmin.getUser();
+        College college = collegeAdmin.getCollege();
         return InputUtility.inputChoice("Edit Student",toggleDetails ? 
         new String[]{"User ID","Name","Aadhar","Date of Birth","Gender",
         "Address","Password","College","Toggle Details","Back"} : 
         new String[]{"User ID - "+userVar.getID(),"Name - "+userVar.getName(),
         "Aadhar - "+userVar.getContactNumber(),"Date of Birth - "+userVar.getDOB(),
         "Gender - "+userVar.getGender(),"Address - "+userVar.getAddress(),
-        "Password - "+userVar.getPassword(),"College - "+collegeAdmin.getCollegeID(),"Toggle Details","Back"},
+        "Password - "+userVar.getPassword(),"College - "+college.getCollegeID(),"Toggle Details","Back"},
         userVar.getName(),"ID: " +userVar.getID());
     }
 
-    public static int inputEditSuperAdminPage(User userVar, boolean toggleDetails, SuperAdmin superAdmin) {
+    public static int inputEditSuperAdminPage(boolean toggleDetails, SuperAdmin superAdmin) {
+        User userVar = superAdmin.getUser();
         return InputUtility.inputChoice("Edit Student",toggleDetails ? 
         new String[]{"User ID","Name","Aadhar","Date of Birth","Gender",
         "Address","Password","Toggle Details","Back"} : 

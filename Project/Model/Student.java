@@ -42,13 +42,7 @@ public class Student {
     public int getCollegeID() {
         return collegeID;
     }
-    // public void setCollegeID(int collegeID) {
-    //     this.collegeID = collegeID;
-    // }
     public int getDepartmentID() {
         return departmentID;
     }
-    // public void setDepartmentID(int departmentID) {
-    //     this.departmentID = departmentID;
-    // }
 }

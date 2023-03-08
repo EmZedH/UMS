@@ -26,13 +26,7 @@ public class Section {
     public int getDepartmentID() {
         return departmentID;
     }
-    // public void setDepartmentID(int departmentID) {
-    //     this.departmentID = departmentID;
-    // }
     public int getCollegeID() {
         return collegeID;
     }
-    // public void setCollegeID(int collegeID) {
-    //     this.collegeID = collegeID;
-    // }
 }

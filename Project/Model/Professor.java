@@ -1,31 +1,20 @@
 package Model;
 
 public class Professor {
-    private int professorID;
-    private int departmentID;
-    private int collegeID;
-    public Professor(int professorID, int departmentID, int collegeID) {
-        this.departmentID = departmentID;
-        this.professorID = professorID;
-        this.collegeID = collegeID;
+    User user;
+    Department department;
+    public Professor(User user, Department department) {
+        this.user = user;
+        this.department = department;
     }
-    public int getProfessorID() {
-        return professorID;
+    public User getUser() {
+        return user;
     }
-    public void setProfessorID(int professorID) {
-        this.professorID = professorID;
+    public void setUser(User user) {
+        this.user = user;
     }
-    public int getDepartmentID() {
-        return departmentID;
+    public Department getDepartment() {
+        return department;
     }
-    // public void setDepartmentID(int departmentID) {
-    //     this.departmentID = departmentID;
-    // }
-    public int getCollegeID() {
-        return collegeID;
-    }
-    // public void setCollegeID(int collegeID) {
-    //     this.collegeID = collegeID;
-    // }
     
 }

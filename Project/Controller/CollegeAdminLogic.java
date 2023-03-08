@@ -2,6 +2,7 @@ package Controller;
 
 import java.sql.SQLException;
 
+import Model.College;
 import Model.CollegeAdmin;
 import Model.DatabaseConnect;
 import Model.DatabaseUtility;
@@ -313,7 +314,7 @@ public class CollegeAdminLogic {
     }
 
     public void addTest() throws SQLException {
-        int collegeID = collegeAdmin.getCollegeID();
+        int collegeID = collegeAdmin.getCollege().getCollegeID();
         int testID, testMarks;
         int departmentID = DatabaseUtility.inputExistingDepartmentID(collegeID);
         int courseID = DatabaseUtility.inputExistingCourseID(departmentID, collegeID);
@@ -329,7 +330,7 @@ public class CollegeAdminLogic {
     }
 
     public void editTest() throws SQLException {
-        int collegeID = collegeAdmin.getCollegeID();
+        int collegeID = collegeAdmin.getCollege().getCollegeID();
         int testID, inputChoice;
         int courseID, studentID;
         int departmentID = DatabaseUtility.inputExistingDepartmentID(collegeID);
@@ -363,7 +364,7 @@ public class CollegeAdminLogic {
     }
 
     public void deleteTest() throws SQLException {
-        int collegeID = collegeAdmin.getCollegeID();
+        int collegeID = collegeAdmin.getCollege().getCollegeID();
         int courseID, studentID;
         int testID;
         int departmentID = DatabaseUtility.inputExistingDepartmentID(collegeID);
@@ -384,26 +385,26 @@ public class CollegeAdminLogic {
         while((inputChoice = CollegeAdminUI.inputViewTestPage())!=5){
             switch(inputChoice){
                 case 1:
-                    CollegeAdminUI.viewTestTable(DatabaseConnect.selectTableAllInCollege(Table.TEST, collegeAdmin.getCollegeID()));
+                    CollegeAdminUI.viewTestTable(DatabaseConnect.selectTableAllInCollege(Table.TEST, collegeAdmin.getCollege().getCollegeID()));
                     break;
                 case 2:
                     searchString = CommonUI.inputStudentIDString();
-                    CollegeAdminUI.viewTestTable(DatabaseConnect.searchTableCollegeAdmin(Table.TEST,"TEST.S_ID",searchString ,collegeAdmin.getCollegeID()));
+                    CollegeAdminUI.viewTestTable(DatabaseConnect.searchTableCollegeAdmin(Table.TEST,"TEST.S_ID",searchString ,collegeAdmin.getCollege().getCollegeID()));
                     break;
                 case 3:
                     searchString = CommonUI.inputCourseName();
-                    CollegeAdminUI.viewTestTable(DatabaseConnect.searchTableCollegeAdmin(Table.TEST,"COURSE_NAME",searchString ,collegeAdmin.getCollegeID()));
+                    CollegeAdminUI.viewTestTable(DatabaseConnect.searchTableCollegeAdmin(Table.TEST,"COURSE_NAME",searchString ,collegeAdmin.getCollege().getCollegeID()));
                     break;
                 case 4:
                     searchString = CommonUI.inputTestMarksString();
-                    CollegeAdminUI.viewTestTable(DatabaseConnect.searchTableCollegeAdmin(Table.TEST,"TEST_MARKS",searchString ,collegeAdmin.getCollegeID()));
+                    CollegeAdminUI.viewTestTable(DatabaseConnect.searchTableCollegeAdmin(Table.TEST,"TEST_MARKS",searchString ,collegeAdmin.getCollege().getCollegeID()));
                     break;
             }
         }
     }
 
     public void addRecord() throws SQLException {
-        int collegeID = collegeAdmin.getCollegeID();
+        int collegeID = collegeAdmin.getCollege().getCollegeID();
         int transactionID;
         int professorID;
         while (true) {
@@ -443,7 +444,7 @@ public class CollegeAdminLogic {
 
     public void editRecord() throws SQLException {
         int professorID;
-        int collegeID = this.collegeAdmin.getCollegeID();
+        int collegeID = this.collegeAdmin.getCollege().getCollegeID();
         int departmentID = DatabaseUtility.inputExistingDepartmentID(collegeID);
         int courseID = DatabaseUtility.inputExistingCourseID(departmentID ,collegeID);
         int studentID = DatabaseUtility.inputExistingStudentID(collegeID);
@@ -510,7 +511,7 @@ public class CollegeAdminLogic {
     }
 
     public void deleteRecord() throws SQLException {
-        int collegeID = this.collegeAdmin.getCollegeID();
+        int collegeID = this.collegeAdmin.getCollege().getCollegeID();
         int departmentID = DatabaseUtility.inputExistingDepartmentID(collegeID);
         int courseID = DatabaseUtility.inputExistingCourseID(departmentID ,collegeID);
         int studentID = DatabaseUtility.inputExistingStudentID(collegeID);
@@ -524,11 +525,11 @@ public class CollegeAdminLogic {
     }
 
     public void viewRecord() throws SQLException {
-        DisplayUtility.printTable("REGISTERED STUDENTS DETAILS", new String[]{"S ID","C ID","SEC ID","DEPT ID","PROF ID","T ID","EXTERNALS","ATTND","STATUS","SEM DONE"}, DatabaseConnect.selectTableAllInCollege(Table.RECORDS, collegeAdmin.getCollegeID()));
+        DisplayUtility.printTable("REGISTERED STUDENTS DETAILS", new String[]{"S ID","C ID","SEC ID","DEPT ID","PROF ID","T ID","EXTERNALS","ATTND","STATUS","SEM DONE"}, DatabaseConnect.selectTableAllInCollege(Table.RECORDS, collegeAdmin.getCollege().getCollegeID()));
     }
 
     public void addCourseToProfessor() throws SQLException {
-        int collegeID = collegeAdmin.getCollegeID();
+        int collegeID = collegeAdmin.getCollege().getCollegeID();
         int departmentID = DatabaseUtility.inputExistingDepartmentID(collegeID);
         int professorID = DatabaseUtility.inputExistingProfessorID(collegeID);
         int courseID = DatabaseUtility.inputExistingCourseID(departmentID, collegeID);
@@ -543,7 +544,7 @@ public class CollegeAdminLogic {
     }
 
     public void addProfessorToCourseTable() throws SQLException {
-        int collegeID = collegeAdmin.getCollegeID();
+        int collegeID = collegeAdmin.getCollege().getCollegeID();
         int departmentID = DatabaseUtility.inputExistingDepartmentID(collegeID);
         int professorID = DatabaseUtility.inputExistingProfessorID(collegeID);
         int courseID = DatabaseUtility.inputExistingCourseID(departmentID, collegeID);
@@ -558,7 +559,7 @@ public class CollegeAdminLogic {
     }
 
     public void editProfessorForCourse() throws SQLException {
-        int collegeID = collegeAdmin.getCollegeID();
+        int collegeID = collegeAdmin.getCollege().getCollegeID();
         int departmentID = DatabaseUtility.inputExistingDepartmentID(collegeID);
         int courseID = DatabaseUtility.inputExistingCourseID(departmentID, collegeID);
         int professorID = DatabaseUtility.inputExistingProfessorID(collegeID);
@@ -575,12 +576,12 @@ public class CollegeAdminLogic {
     }
 
     public void viewProfessorCourseTable() throws SQLException {
-        DisplayUtility.printTable("PROFESSOR COURSE LIST", new String[]{"PROFESSOR ID","COURSE ID","DEPT ID"}, DatabaseConnect.selectTableAllInCollege(Table.COURSE_PROFESSOR_TABLE, collegeAdmin.getCollegeID()));
+        DisplayUtility.printTable("PROFESSOR COURSE LIST", new String[]{"PROFESSOR ID","COURSE ID","DEPT ID"}, DatabaseConnect.selectTableAllInCollege(Table.COURSE_PROFESSOR_TABLE, collegeAdmin.getCollege().getCollegeID()));
         manageProfessorCourseTable();
     }
 
     public void addTransaction() throws SQLException {
-        int collegeID = collegeAdmin.getCollegeID();
+        int collegeID = collegeAdmin.getCollege().getCollegeID();
         int studentID = DatabaseUtility.inputExistingStudentID(collegeID);
         int transactionID = DatabaseUtility.inputNonExistingTransaction();
         String transactionDate = CommonUI.inputDateOfBirth();
@@ -591,7 +592,7 @@ public class CollegeAdminLogic {
 
     public void editTransaction() throws SQLException {
         int choiceInput;
-        int collegeID = this.collegeAdmin.getCollegeID();
+        int collegeID = this.collegeAdmin.getCollege().getCollegeID();
         int transactionID = DatabaseUtility.inputExistingTransaction(collegeID);
         boolean toggleDetails = true;
         Transactions transaction = DatabaseConnect.returnTransaction(transactionID);
@@ -632,26 +633,26 @@ public class CollegeAdminLogic {
         while((inputChoice = CollegeAdminUI.inputViewTransactionPage())!=5){
             switch(inputChoice){
                 case 1:
-                    CollegeAdminUI.viewTransactionTable(DatabaseConnect.selectTableAllInCollege(Table.TRANSACTIONS, collegeAdmin.getCollegeID()));
+                    CollegeAdminUI.viewTransactionTable(DatabaseConnect.selectTableAllInCollege(Table.TRANSACTIONS, collegeAdmin.getCollege().getCollegeID()));
                     break;
                 case 2:
                     searchString = CommonUI.inputStudentIDString();
-                    CollegeAdminUI.viewTransactionTable(DatabaseConnect.searchTableCollegeAdmin(Table.TRANSACTIONS,"TRANSACTIONS.S_ID",searchString, collegeAdmin.getCollegeID()));
+                    CollegeAdminUI.viewTransactionTable(DatabaseConnect.searchTableCollegeAdmin(Table.TRANSACTIONS,"TRANSACTIONS.S_ID",searchString, collegeAdmin.getCollege().getCollegeID()));
                     break;
                 case 3:
                     searchString = CommonUI.inputDateOfTransaction();
-                    CollegeAdminUI.viewTransactionTable(DatabaseConnect.searchTableCollegeAdmin(Table.TRANSACTIONS,"T_DATE",searchString, collegeAdmin.getCollegeID()));
+                    CollegeAdminUI.viewTransactionTable(DatabaseConnect.searchTableCollegeAdmin(Table.TRANSACTIONS,"T_DATE",searchString, collegeAdmin.getCollege().getCollegeID()));
                     break;
                 case 4:
                     searchString = CommonUI.inputTransactionAmountString();
-                    CollegeAdminUI.viewTransactionTable(DatabaseConnect.searchTableCollegeAdmin(Table.TRANSACTIONS,"T_AMOUNT",searchString, collegeAdmin.getCollegeID()));
+                    CollegeAdminUI.viewTransactionTable(DatabaseConnect.searchTableCollegeAdmin(Table.TRANSACTIONS,"T_AMOUNT",searchString, collegeAdmin.getCollege().getCollegeID()));
                     break;
             }
         }
     }
 
     public void addSection() throws SQLException {
-        int collegeID = collegeAdmin.getCollegeID();
+        int collegeID = collegeAdmin.getCollege().getCollegeID();
         int departmentID, sectionID;
         departmentID = DatabaseUtility.inputExistingDepartmentID(collegeID);
         sectionID = DatabaseUtility.inputNonExistingSectionID(collegeID, departmentID);
@@ -662,7 +663,7 @@ public class CollegeAdminLogic {
     
     public void editSection() throws SQLException {
         int choice;
-        int collegeID = collegeAdmin.getCollegeID();
+        int collegeID = collegeAdmin.getCollege().getCollegeID();
         int departmentID, sectionID;
         departmentID = DatabaseUtility.inputExistingDepartmentID(collegeID);
         sectionID = DatabaseUtility.inputExistingSectionID(collegeID, departmentID);
@@ -692,7 +693,7 @@ public class CollegeAdminLogic {
     }
 
     public void deleteSection() throws SQLException {
-        int collegeID = collegeAdmin.getCollegeID();
+        int collegeID = collegeAdmin.getCollege().getCollegeID();
         int departmentID, sectionID;
         departmentID = DatabaseUtility.inputExistingDepartmentID(collegeID);
         sectionID = DatabaseUtility.inputExistingSectionID(collegeID, departmentID);
@@ -712,26 +713,26 @@ public class CollegeAdminLogic {
 
                 //VIEW ALL SECTION
                 case 1:
-                    CollegeAdminUI.viewSectionTable(DatabaseConnect.selectTableAllInCollege(Table.SECTION, collegeAdmin.getCollegeID()));
+                    CollegeAdminUI.viewSectionTable(DatabaseConnect.selectTableAllInCollege(Table.SECTION, collegeAdmin.getCollege().getCollegeID()));
                     break;
 
                 //SEARCH SECTION BY NAME
                 case 2:
                     searchString = CommonUI.inputSectionName();
-                    CollegeAdminUI.viewSectionTable(DatabaseConnect.searchTableCollegeAdmin(Table.SECTION,"SEC_NAME",searchString, collegeAdmin.getCollegeID()));
+                    CollegeAdminUI.viewSectionTable(DatabaseConnect.searchTableCollegeAdmin(Table.SECTION,"SEC_NAME",searchString, collegeAdmin.getCollege().getCollegeID()));
                     break;
 
                 //SEARCH SECTION BY DEPARTMENT
                 case 3:
                     searchString = CommonUI.inputDepartmentName();
-                    CollegeAdminUI.viewSectionTable(DatabaseConnect.searchTableCollegeAdmin(Table.SECTION,"DEPT_NAME",searchString, collegeAdmin.getCollegeID()));
+                    CollegeAdminUI.viewSectionTable(DatabaseConnect.searchTableCollegeAdmin(Table.SECTION,"DEPT_NAME",searchString, collegeAdmin.getCollege().getCollegeID()));
                     break;
             }
         }
     }
 
     public void addDepartment() throws SQLException {
-        int collegeID = collegeAdmin.getCollegeID();
+        int collegeID = collegeAdmin.getCollege().getCollegeID();
         int departmentID = DatabaseUtility.inputNonExistingDepartmentID(collegeID);
         String departmentName = CommonUI.inputDepartmentName();
         DatabaseConnect.addDepartment(departmentID, departmentName, collegeID);
@@ -739,7 +740,7 @@ public class CollegeAdminLogic {
     }
 
     public void editDepartment() throws SQLException {
-        int collegeID = collegeAdmin.getCollegeID();
+        int collegeID = collegeAdmin.getCollege().getCollegeID();
         int choiceInput;
         int departmentID = DatabaseUtility.inputExistingDepartmentID(collegeID);
         Department department = DatabaseConnect.returnDepartment(departmentID, collegeID);            
@@ -767,7 +768,7 @@ public class CollegeAdminLogic {
     }
 
     public void deleteDepartment() throws SQLException {
-        int collegeID = collegeAdmin.getCollegeID();
+        int collegeID = collegeAdmin.getCollege().getCollegeID();
         int departmentID = DatabaseUtility.inputExistingDepartmentID(collegeID);
         CollegeAdminUI.displayDepartmentDeletionWarning(collegeID, departmentID);
         if(CollegeAdminUI.inputDeleteConfirmation()==1){
@@ -783,18 +784,18 @@ public class CollegeAdminLogic {
         while((choiceInput = CollegeAdminUI.inputViewDepartmentPage())!=3){
             switch(choiceInput){
                 case 1:
-                    CollegeAdminUI.viewDepartmentTable(DatabaseConnect.selectTableAllInCollege(Table.DEPARTMENT, collegeAdmin.getCollegeID()));
+                    CollegeAdminUI.viewDepartmentTable(DatabaseConnect.selectTableAllInCollege(Table.DEPARTMENT, collegeAdmin.getCollege().getCollegeID()));
                     break;
                 case 2:
                     searchString = CommonUI.inputDepartmentName();
-                    CollegeAdminUI.viewDepartmentTable(DatabaseConnect.searchTableCollegeAdmin(Table.DEPARTMENT,"DEPT_NAME",searchString, collegeAdmin.getCollegeID()));
+                    CollegeAdminUI.viewDepartmentTable(DatabaseConnect.searchTableCollegeAdmin(Table.DEPARTMENT,"DEPT_NAME",searchString, collegeAdmin.getCollege().getCollegeID()));
                     break;
             }
         }
     }
 
     public void addCourse() throws SQLException {
-        int collegeID = collegeAdmin.getCollegeID();
+        int collegeID = collegeAdmin.getCollege().getCollegeID();
         int departmentID = DatabaseUtility.inputExistingDepartmentID(collegeID);
         int courseID = DatabaseUtility.inputNonExistingCourseID(departmentID, collegeID);
         String courseName = CommonUI.inputCourseName();
@@ -809,7 +810,7 @@ public class CollegeAdminLogic {
     }
 
     public void editCourse() throws SQLException {
-        int collegeID = collegeAdmin.getCollegeID();
+        int collegeID = collegeAdmin.getCollege().getCollegeID();
         int departmentID = DatabaseUtility.inputExistingDepartmentID(collegeID);
         int courseID = DatabaseUtility.inputExistingCourseID(departmentID, collegeID);
         int choice;
@@ -840,7 +841,7 @@ public class CollegeAdminLogic {
     }
 
     public void deleteCourse() throws SQLException {
-        int collegeID = collegeAdmin.getCollegeID();
+        int collegeID = collegeAdmin.getCollege().getCollegeID();
         int departmentID = DatabaseUtility.inputExistingDepartmentID(collegeID);
         int courseID = DatabaseUtility.inputExistingCourseID(departmentID, collegeID);
         CollegeAdminUI.displayCourseDeletionWarning(collegeID, departmentID, courseID);
@@ -851,7 +852,7 @@ public class CollegeAdminLogic {
     }
 
     public void viewCourse() throws SQLException {
-        int collegeID = collegeAdmin.getCollegeID();
+        int collegeID = collegeAdmin.getCollege().getCollegeID();
         String searchString;
         int inputChoice;
         while ((inputChoice = CollegeAdminUI.inputViewCoursePage())!=7) {
@@ -896,7 +897,7 @@ public class CollegeAdminLogic {
     }
 
     public void viewUser() throws SQLException {
-        int collegeID = this.collegeAdmin.getCollegeID();
+        int collegeID = this.collegeAdmin.getCollege().getCollegeID();
         // System.out.println(collegeID);
         int inputChoice;
         while ((inputChoice = CollegeAdminUI.inputEditUserPage())!=5) {
@@ -1035,7 +1036,7 @@ public class CollegeAdminLogic {
     }
 
     public void editUser() throws SQLException {
-        int collegeID = this.collegeAdmin.getCollegeID();
+        int collegeID = this.collegeAdmin.getCollege().getCollegeID();
         int userID  = CommonUI.userIDInput();
         while(!DatabaseConnect.verifyUser(userID, collegeID)){
             System.out.println(collegeID);
@@ -1088,21 +1089,15 @@ public class CollegeAdminLogic {
                     break;
 
                 case 8:
-                    student.setDegree(CommonUI.inputDegree());
-                    int year = CommonUI.inputAcademicYear(student.getDegree());
-                    student.setSemester(CommonUI.inputSemester(year));
-                    break;
-
-                case 9:
                     student.setSectionID(DatabaseUtility.inputExistingSectionID(student.getCollegeID(), student.getDepartmentID()));
                     break;
 
-                case 10:
+                case 9:
                     toggleDetails ^= true;
                     editStudent(userID, toggleDetails);
                     return;
 
-                case 11:
+                case 10:
                     manageUser();
                     return;
             }
@@ -1112,15 +1107,14 @@ public class CollegeAdminLogic {
         }
 
     public void editProfessor(int userID, boolean toggleDetails) throws SQLException {
-        User userVar = DatabaseConnect.returnUser(userID);
         Professor professor = DatabaseConnect.returnProfessor(userID);
+        User userVar = professor.getUser();
 
         switch(
             CollegeAdminUI.inputEditProfessorPage(toggleDetails, userVar)){
 
             case 1:
                 userVar.setID(DatabaseUtility.inputNonExistingUserID());
-                professor.setProfessorID(userVar.getID());
                 break;
 
             case 2:
@@ -1156,7 +1150,7 @@ public class CollegeAdminLogic {
                 manageUser();
                 return;
         }
-        DatabaseConnect.editProfessor(userID, userVar, professor);
+        DatabaseConnect.editProfessor(userID,professor);
         userID = userVar.getID();
         CommonUI.processSuccessDisplay();
         editProfessor(userID, toggleDetails);
@@ -1164,13 +1158,14 @@ public class CollegeAdminLogic {
     }
 
     public void editCollegeAdmin(int userID, boolean toggleDetails) throws SQLException {
-        User userVar = DatabaseConnect.returnUser(userID);
+        // User userVar = DatabaseConnect.returnUser(userID);
         CollegeAdmin collegeAdmin = DatabaseConnect.returnCollegeAdmin(userID);
-        switch(CollegeAdminUI.inputEditCollegeAdminPage(toggleDetails, userVar)){
+        User userVar = collegeAdmin.getUser();
+        switch(CollegeAdminUI.inputEditCollegeAdminPage(toggleDetails, collegeAdmin)){
 
             case 1:
                 userVar.setID(DatabaseUtility.inputNonExistingUserID());
-                collegeAdmin.setCollegeAdminID(userVar.getID());
+                // collegeAdmin.setCollegeAdminID(userVar.getID());
                 break;
 
             case 2:
@@ -1206,8 +1201,9 @@ public class CollegeAdminLogic {
                 manageUser();
                 return;
         }
-        DatabaseConnect.editCollegeAdmin(userID, userVar, collegeAdmin);
+        DatabaseConnect.editCollegeAdmin(userID,collegeAdmin);
         CommonUI.processSuccessDisplay();
+        userID = collegeAdmin.getUser().getID();
         editCollegeAdmin(userID, toggleDetails);
     }
 
@@ -1239,7 +1235,7 @@ public class CollegeAdminLogic {
     }
 
     public void addStudent(User user) throws SQLException{
-        int collegeID = this.collegeAdmin.getCollegeID();
+        int collegeID = this.collegeAdmin.getCollege().getCollegeID();
         int departmentID = DatabaseUtility.inputExistingDepartmentID(collegeID);
         int sectionID = DatabaseUtility.inputExistingSectionID(collegeID, departmentID);
         int semester = 1;
@@ -1285,23 +1281,24 @@ public class CollegeAdminLogic {
     }
 
     public void addProfessor(User user) throws SQLException {
-        int collegeID = this.collegeAdmin.getCollegeID();
+        int collegeID = this.collegeAdmin.getCollege().getCollegeID();
         // int professorID = DatabaseUtility.inputNonExistingUserID();
         int departmentID = DatabaseUtility.inputExistingDepartmentID(collegeID);
-        Professor professor = new Professor(user.getID(), departmentID, collegeID);
-        DatabaseConnect.addProfessor(user, professor);
+        Department department = DatabaseConnect.returnDepartment(departmentID, collegeID);
+        Professor professor = new Professor(user, department);
+        DatabaseConnect.addProfessor(professor);
     }
 
     public void addCollegeAdmin(User user) throws SQLException {
-        int collegeID = this.collegeAdmin.getCollegeID();
+        College collegeID = this.collegeAdmin.getCollege();
         // int collegeAdminID = DatabaseUtility.inputNonExistingUserID();
-        CollegeAdmin collegeAdmin = new CollegeAdmin(user.getID(), collegeID);
-        DatabaseConnect.addCollegeAdmin(collegeAdmin, user);
+        CollegeAdmin collegeAdmin = new CollegeAdmin(user, collegeID);
+        DatabaseConnect.addCollegeAdmin(collegeAdmin);
     }
 
     public void deleteUser() throws SQLException {
         int userID;
-        int collegeID = this.collegeAdmin.getCollegeID();
+        int collegeID = this.collegeAdmin.getCollege().getCollegeID();
         userID = CommonUI.userIDInput();
         if(!DatabaseConnect.verifyUser(userID, collegeID)){
             CommonUI.displayUserIDNotExist();

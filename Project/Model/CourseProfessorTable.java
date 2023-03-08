@@ -20,20 +20,11 @@ public class CourseProfessorTable {
     public String getCourseID() {
         return courseID;
     }
-    public void setCourseID(String courseID) {
-        this.courseID = courseID;
-    }
     public int getDepartmentID() {
         return departmentID;
     }
-    public void setDepartmentID(int departmentID) {
-        this.departmentID = departmentID;
-    }
     public int getCollegeID() {
         return collegeID;
-    }
-    public void setCollegeID(int collegeID) {
-        this.collegeID = collegeID;
     }
     
 }

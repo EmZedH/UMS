@@ -35,28 +35,13 @@ public class Course {
     public String getCourseDegree() {
         return courseDegree;
     }
-    public void setCourseDegree(String courseDegree) {
-        this.courseDegree = courseDegree;
-    }
-    public void setCourseSemester(int courseSemester) {
-        this.courseSemester = courseSemester;
-    }
     public int getCourseDepartment() {
         return courseDepartment;
-    }
-    public void setCourseDepartment(int courseDepartment) {
-        this.courseDepartment = courseDepartment;
     }
     public int getCollegeID() {
         return collegeID;
     }
-    public void setCollegeID(int collegeID) {
-        this.collegeID = collegeID;
-    }
     public String getCourseElective() {
         return courseElective;
-    }
-    public void setCourseElective(String courseElective) {
-        this.courseElective = courseElective;
     }
 }

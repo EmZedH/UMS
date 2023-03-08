@@ -12,13 +12,23 @@ public class InputUtility {
     public static String inputString(String message) {
         DisplayUtility.singleDialogDisplay(message);
         in = new Scanner(System.in);
-        return in.nextLine();
+        String userInput =  in.nextLine();
+        if(userInput.equals("")){
+            CommonUI.properPage();
+            return inputString(userInput);
+        }
+        return userInput;
     }
 
     public static String inputString(String heading, String message) {
         DisplayUtility.dialogWithHeaderDisplay(heading, message);
         in = new Scanner(System.in);
-        return in.nextLine();
+        String userInput =  in.nextLine();
+        if(userInput.equals("")){
+            CommonUI.properPage();
+            return inputString(userInput, message);
+        }
+        return userInput;
     }
 
     public static int posInput(String message){

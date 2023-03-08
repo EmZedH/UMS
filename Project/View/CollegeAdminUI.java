@@ -3,6 +3,7 @@ package View;
 import java.sql.SQLException;
 import java.util.Scanner;
 
+import Model.CollegeAdmin;
 import Model.Course;
 import Model.DatabaseConnect;
 import Model.Department;
@@ -196,11 +197,11 @@ public class CollegeAdminUI {
     public static int inputEditStudentPage(boolean toggleDetails, User userVar, Student student) {
         return InputUtility.inputChoice("Edit Student",toggleDetails ? 
         new String[]{"User ID","Name","Contact","Date of Birth","Gender",
-        "Address","Password","Degree and Semester", "Section","Toggle Details","Back"} : 
+        "Address","Password", "Section","Toggle Details","Back"} : 
         new String[]{"User ID - "+userVar.getID(),"Name - "+userVar.getName(),
         "Contact - "+userVar.getContactNumber(),"Date of Birth - "+userVar.getDOB(),
         "Gender - "+userVar.getGender(),"Address - "+userVar.getAddress(),
-        "Password - "+userVar.getPassword(), "Degree ("+student.getDegree()+") and Semester ("+student.getSemester()+")",
+        "Password - "+userVar.getPassword(),
         "Section - "+student.getSectionID(),
         "Toggle Details","Back"},"Name: "+
         userVar.getName(),"ID: "+ userVar.getID());
@@ -217,10 +218,11 @@ public class CollegeAdminUI {
       userVar.getName(), "ID: "+userVar.getID());
     }
 
-    public static int inputEditCollegeAdminPage(boolean toggleDetails, User userVar) {
+    public static int inputEditCollegeAdminPage(boolean toggleDetails, CollegeAdmin collegeAdmin) {
+        User userVar = collegeAdmin.getUser();
         return InputUtility.inputChoice("Edit Student",toggleDetails ? 
         new String[]{"User ID","Name","Contact","Date of Birth","Gender",
-        "Address","Password","College Admin ID","Toggle Details","Back"} : 
+        "Address","Password","Toggle Details","Back"} : 
         new String[]{"User ID - "+userVar.getID(),"Name - "+userVar.getName(),
         "Contact - "+userVar.getContactNumber(),"Date of Birth - "+userVar.getDOB(),
         "Gender - "+userVar.getGender(),"Address - "+userVar.getAddress(),

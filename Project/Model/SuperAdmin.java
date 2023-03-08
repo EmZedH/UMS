@@ -1,15 +1,15 @@
 package Model;
 
 public class SuperAdmin {
-    private int superAdminID;
-    public SuperAdmin(int superAdminID) {
-        this.superAdminID = superAdminID;
+    User user;
+    public SuperAdmin(User user) {
+        this.user = user;
     }
-    public int getSuperAdminID() {
-        return superAdminID;
+    public User getUser() {
+        return user;
     }
-    public void setSuperAdminID(int superAdminID) {
-        this.superAdminID = superAdminID;
+    public void setUser(User user) {
+        this.user = user;
     }
     
 }

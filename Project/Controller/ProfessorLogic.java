@@ -60,9 +60,9 @@ public class ProfessorLogic {
         
             //EDIT TEST
             case 2:
-                int studentID = DatabaseUtility.inputExistingStudentID(this.professor.getDepartmentID(), this.professor.getCollegeID());
-                int courseiD = DatabaseUtility.inputExistingCourseID(this.professor.getDepartmentID(), this.professor.getCollegeID());
-                editStudentTest(this.professor.getDepartmentID(), this.professor.getCollegeID(), courseiD, studentID);
+                int studentID = DatabaseUtility.inputExistingStudentID(this.professor.getDepartment().getDepartmentID(), this.professor.getDepartment().getCollegeID());
+                int courseiD = DatabaseUtility.inputExistingCourseID(this.professor.getDepartment().getDepartmentID(), this.professor.getDepartment().getCollegeID());
+                editStudentTest(this.professor.getDepartment().getDepartmentID(), this.professor.getDepartment().getCollegeID(), courseiD, studentID);
                 break;
             
             //DELETE TEST
@@ -83,9 +83,9 @@ public class ProfessorLogic {
     }
 
     public void addTest() throws SQLException {
-        int collegeID = this.professor.getCollegeID();
+        int collegeID = this.professor.getDepartment().getCollegeID();
         int testID, testMarks;
-        int departmentID = this.professor.getDepartmentID();
+        int departmentID = this.professor.getDepartment().getDepartmentID();
         int courseID = DatabaseUtility.inputExistingCourseID(departmentID, collegeID);
         int studentID = DatabaseUtility.inputExistingStudentID(collegeID);
         if(!DatabaseConnect.verifyRecord(studentID, courseID, departmentID, collegeID)){
@@ -99,10 +99,10 @@ public class ProfessorLogic {
     }
 
     public void deleteTest() throws SQLException {
-        int collegeID = this.professor.getCollegeID();
+        int collegeID = this.professor.getDepartment().getCollegeID();
         int courseID, studentID;
         int testID;
-        int departmentID = this.professor.getDepartmentID();
+        int departmentID = this.professor.getDepartment().getDepartmentID();
         courseID = DatabaseUtility.inputExistingCourseID(departmentID, collegeID);
         studentID = DatabaseUtility.inputExistingStudentID(departmentID,collegeID);
         testID = DatabaseUtility.inputExistingTestID(collegeID, courseID, studentID);
@@ -119,12 +119,12 @@ public class ProfessorLogic {
 
             //VIEW ALL TESTS
             case 1:
-                DisplayUtility.printTable("ALL TESTS", new String[]{"TEST NUMBER","STUDENT ID","MARKS"}, DatabaseConnect.selectAllTestByProfessor(this.professor.getProfessorID()));
+                DisplayUtility.printTable("ALL TESTS", new String[]{"TEST NUMBER","STUDENT ID","MARKS"}, DatabaseConnect.selectAllTestByProfessor(this.professor.getUser().getID()));
                 break;
         
             //SELECT TESTS BY STUDENT ID
             case 2:
-                int studentID = DatabaseUtility.inputExistingStudentID(this.professor.getDepartmentID(), this.professor.getCollegeID());
+                int studentID = DatabaseUtility.inputExistingStudentID(this.professor.getDepartment().getDepartmentID(), this.professor.getDepartment().getCollegeID());
                 int studentSemester = DatabaseConnect.returnStudent(studentID).getSemester();
                 DisplayUtility.printTable("ALL TESTS", new String[]{"TEST NUMBER","MARKS"}, DatabaseConnect.selectStudentTest(studentID, studentSemester));
                 break;
@@ -177,7 +177,8 @@ public class ProfessorLogic {
                 startPage();
                 return;
         }
-        DatabaseConnect.editProfessor(userID, this.user, this.professor);
+        DatabaseConnect.editProfessor(userID,this.professor);
+        userID = this.professor.getUser().getID();
         manageProfile(toggleDetails);
     }
 
@@ -187,7 +188,7 @@ public class ProfessorLogic {
 
             //VIEW STUDENT RECORDS
             case 1:
-                viewStudentRecord(this.professor.getProfessorID());
+                viewStudentRecord(this.professor.getUser().getID());
                 break;
 
             //EDIT STUDENT RECORDS
@@ -208,8 +209,8 @@ public class ProfessorLogic {
     }
 
     public void editStudentRecord() throws SQLException {
-        int collegeID = this.professor.getCollegeID();
-        int departmentID = this.professor.getDepartmentID();
+        int collegeID = this.professor.getDepartment().getCollegeID();
+        int departmentID = this.professor.getDepartment().getDepartmentID();
         int studentID = DatabaseUtility.inputExistingStudentID(departmentID, collegeID);
         int courseID = DatabaseUtility.inputExistingCourseID(departmentID, collegeID);
 
@@ -249,7 +250,7 @@ public class ProfessorLogic {
     }
 
     public void viewStudentCGPA(int studentID, Records records) throws SQLException {
-        String[][] test = DatabaseConnect.selectAllTestByProfessor(this.professor.getProfessorID());
+        String[][] test = DatabaseConnect.selectAllTestByProfessor(this.professor.getUser().getID());
         int testMark = 0, count = 0;
         for (String[] strings : test) {
             if(Integer.parseInt(strings[1]) == studentID){

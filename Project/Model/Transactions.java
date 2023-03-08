@@ -26,9 +26,6 @@ public class Transactions {
     public void setTransactionID(int transactionID) {
         this.transactionID = transactionID;
     }
-    // public void setStudentID(int studentID) {
-    //     this.studentID = studentID;
-    // }
     public void setDate(String date) {
         this.date = date;
     }

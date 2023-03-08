@@ -1,23 +1,23 @@
 package Model;
 
 public class CollegeAdmin {
-    private int collegeAdminID;
-    private int collegeID;
-    public CollegeAdmin(int userID, int collegeID) {
-        this.collegeID = collegeID;
-        this.collegeAdminID = userID;
+    private User user;
+    private College college;
+    public CollegeAdmin(User user, College college) {
+        this.user = user;
+        this.college = college;
     }
-    public int getCollegeID() {
-        return collegeID;
+    public User getUser() {
+        return user;
     }
-    public void setCollegeID(int collegeID) {
-        this.collegeID = collegeID;
+    public void setUser(User user) {
+        this.user = user;
     }
-    public int getCollegeAdminID() {
-        return collegeAdminID;
+    public College getCollege() {
+        return college;
     }
-    public void setCollegeAdminID(int userID) {
-        this.collegeAdminID = userID;
+    public void setCollege(College college) {
+        this.college = college;
     }
     
 }
