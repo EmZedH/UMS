@@ -1,19 +1,21 @@
 package Model;
 
 public class Student {
-    private int studentID;
+    private User user;
     private int semester;
     private String degree;
-    private int sectionID;
-    private int collegeID;
-    private int departmentID;
-    public Student(int userID, int semester, String degree, int sectionID, int collegeID, int departmentID) {
+    private Section section;
+    public Student(User user, int semester, String degree, Section section) {
+        this.user = user;
         this.semester = semester;
         this.degree = degree;
-        this.sectionID = sectionID;
-        this.studentID = userID;
-        this.collegeID = collegeID;
-        this.departmentID = departmentID;
+        this.section = section;
+    }
+    public User getUser() {
+        return user;
+    }
+    public void setUser(User user) {
+        this.user = user;
     }
     public int getSemester() {
         return semester;
@@ -27,22 +29,10 @@ public class Student {
     public void setDegree(String degree) {
         this.degree = degree;
     }
-    public int getSectionID() {
-        return sectionID;
+    public Section getSection() {
+        return section;
     }
-    public void setSectionID(int sectionID) {
-        this.sectionID = sectionID;
-    }
-    public int getStudentID() {
-        return studentID;
-    }
-    public void setStudentID(int userID) {
-        this.studentID = userID;
-    }
-    public int getCollegeID() {
-        return collegeID;
-    }
-    public int getDepartmentID() {
-        return departmentID;
+    public void setSection(Section section) {
+        this.section = section;
     }
 }

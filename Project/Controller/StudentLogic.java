@@ -21,12 +21,12 @@ public class StudentLogic {
 
     StudentLogic(Student student, User user) throws SQLException{
         this.student = student;
-        this.user = user;
+        user = this.student.getUser();
         startPage();
     }
 
     public void startPage() throws SQLException{
-        int inputChoice = StudentUI.inputStartPage(this.user.getID(), this.user.getName());
+        int inputChoice = StudentUI.inputStartPage(this.student);
         switch (inputChoice) {
 
             //MANAGE PROFILE
@@ -57,38 +57,38 @@ public class StudentLogic {
     }
 
     public void manageProfile(boolean toggleDetails) throws SQLException {
-        int userID = this.user.getID();
-        int inputChoice = StudentUI.inputManageProfile(this.user,toggleDetails);
+        int inputChoice = StudentUI.inputManageProfile(this.student, toggleDetails);
+        int userID = this.student.getUser().getID();
         switch (inputChoice) {
 
             //USER ID
             case 1:
-                this.user.setID(DatabaseUtility.inputNonExistingUserID());
+                this.student.getUser().setID(DatabaseUtility.inputNonExistingUserID());
                 break;
         
             //USER NAME
             case 2:
-                this.user.setName(CommonUI.inputUserName());
+                this.student.getUser().setName(CommonUI.inputUserName());
                 break;
 
             //CONTACT NUMBER
             case 3:
-                this.user.setContactNumber(CommonUI.inputContactNumber());
+                this.student.getUser().setContactNumber(CommonUI.inputContactNumber());
                 break;
 
             //DATE OF BIRTH
             case 4:
-                this.user.setDOB(CommonUI.inputDateOfBirth());
+                this.student.getUser().setDOB(CommonUI.inputDateOfBirth());
                 break;
 
             //ADDRESS
             case 5:
-                this.user.setAddress(CommonUI.inputUserAddress());
+                this.student.getUser().setAddress(CommonUI.inputUserAddress());
                 break;
 
             //PASSWORD
             case 6:
-                this.user.setPassword(CommonUI.inputUserPassword());
+                this.student.getUser().setPassword(CommonUI.inputUserPassword());
                 break;
 
             //TOGGLE DETAILS
@@ -101,7 +101,7 @@ public class StudentLogic {
                 startPage();
                 return;
         }
-        DatabaseConnect.editStudent(userID, this.user, this.student);
+        DatabaseConnect.editStudent(userID,this.student);
         manageProfile(toggleDetails);
     }
 
@@ -111,12 +111,12 @@ public class StudentLogic {
             
             //VIEW ALL SEMESTER RECORDS
             case 1:
-                DisplayUtility.printTable("ALL SEMESTER RECORD", new String[]{"COURSE ID","COURSE NAME","STATUS","SEMESTER COMPLETED","PROF ID","PROF NAME","EXT MARK","ATTENDANCE","ASSIGNMENT"}, DatabaseConnect.selectAllRecordByStudent(this.student.getStudentID()));
+                DisplayUtility.printTable("ALL SEMESTER RECORD", new String[]{"COURSE ID","COURSE NAME","STATUS","SEMESTER COMPLETED","PROF ID","PROF NAME","EXT MARK","ATTENDANCE","ASSIGNMENT"}, DatabaseConnect.selectAllRecordByStudent(this.student.getUser().getID()));
                 break;
             
             //VIEW CURRENT SEMESTER RECORDS
             case 2:
-                DisplayUtility.printTable("CURRENT SEMESTER RECORD", new String[]{"COURSE ID", "COURSE NAME","PROF ID","PROF NAME","EXT MARK","ATTENDANCE","ASSIGNMENT"}, DatabaseConnect.selectCurrentSemesterRecordsByStudent(this.student.getStudentID()));
+                DisplayUtility.printTable("CURRENT SEMESTER RECORD", new String[]{"COURSE ID", "COURSE NAME","PROF ID","PROF NAME","EXT MARK","ATTENDANCE","ASSIGNMENT"}, DatabaseConnect.selectCurrentSemesterRecordsByStudent(this.student.getUser().getID()));
                 break;
             
             //BACK
@@ -134,12 +134,12 @@ public class StudentLogic {
 
             //VIEW ALL TRANSACTIONS
             case 1:
-                DisplayUtility.printTable("ALL TRANSACTIONS", new String[]{"TRANSACTION ID","DATE","AMOUNT"}, DatabaseConnect.selectAllTransactionByStudent(this.student.getStudentID()));
+                DisplayUtility.printTable("ALL TRANSACTIONS", new String[]{"TRANSACTION ID","DATE","AMOUNT"}, DatabaseConnect.selectAllTransactionByStudent(this.student.getUser().getID()));
                 break;
         
             //PAY FEES
             case 2:
-                if(DatabaseConnect.verifyCurrentSemesterRecord(this.student.getStudentID())){
+                if(DatabaseConnect.verifyCurrentSemesterRecord(this.student.getUser().getID())){
                     StudentUI.displayAlreadyPaidForSemester();
                     break;
                 }
@@ -189,7 +189,7 @@ public class StudentLogic {
 
             //VIEW ALL TESTS
             case 2:
-                DisplayUtility.printTable("ALL TESTS", new String[]{"TEST ID","TEST MARKS"}, DatabaseConnect.selectStudentTest(this.student.getStudentID(), this.student.getSemester()));
+                DisplayUtility.printTable("ALL TESTS", new String[]{"TEST ID","TEST MARKS"}, DatabaseConnect.selectStudentTest(this.student.getUser().getID(), this.student.getSemester()));
                 break;
 
             //GO BACK
@@ -217,14 +217,14 @@ public class StudentLogic {
     }
 
     public void viewOpenElectiveTestList() throws SQLException {
-        int departmentID = DatabaseUtility.inputOtherDepartment(this.student.getDepartmentID(), this.student.getCollegeID());
-        int courseID = DatabaseUtility.inputExistingCourseID(departmentID, this.student.getCollegeID());
-        DisplayUtility.printTable("TEST LIST", new String[]{"TEST ID","TEST MARKS"}, DatabaseConnect.selectAllCourseTestOfStudent(this.student.getStudentID(), courseID, departmentID, this.student.getCollegeID()));
+        int departmentID = DatabaseUtility.inputOtherDepartment(this.student.getSection().getDepartmentID(), this.student.getSection().getCollegeID());
+        int courseID = DatabaseUtility.inputExistingCourseID(departmentID, this.student.getSection().getCollegeID());
+        DisplayUtility.printTable("TEST LIST", new String[]{"TEST ID","TEST MARKS"}, DatabaseConnect.selectAllCourseTestOfStudent(this.student.getUser().getID(), courseID, departmentID, this.student.getSection().getCollegeID()));
     }
 
     public void viewProfessionalElectiveTestList() throws SQLException {
-        int courseID = DatabaseUtility.inputExistingCourseID(this.student.getDepartmentID(), this.student.getCollegeID());
-        DisplayUtility.printTable("TEST LIST", new String[]{"TEST ID","TEST MARKS"}, DatabaseConnect.selectAllCourseTestOfStudent(this.student.getStudentID(), courseID, this.student.getDepartmentID(), this.student.getCollegeID()));
+        int courseID = DatabaseUtility.inputExistingCourseID(this.student.getSection().getDepartmentID(), this.student.getSection().getCollegeID());
+        DisplayUtility.printTable("TEST LIST", new String[]{"TEST ID","TEST MARKS"}, DatabaseConnect.selectAllCourseTestOfStudent(this.student.getUser().getID(), courseID, this.student.getSection().getDepartmentID(), this.student.getSection().getCollegeID()));
     }
 
     private void viewCourseCGPA() throws SQLException {
@@ -245,8 +245,8 @@ public class StudentLogic {
     }
 
     private void viewProfessionalElectiveCGPA() throws SQLException {
-        int courseID = DatabaseUtility.inputExistingCourseID(this.student.getDepartmentID(), this.student.getCollegeID());
-        String[][] test = DatabaseConnect.selectAllCourseTestOfStudent(this.student.getStudentID(), courseID, this.student.getDepartmentID(), this.student.getCollegeID());
+        int courseID = DatabaseUtility.inputExistingCourseID(this.student.getSection().getDepartmentID(), this.student.getSection().getCollegeID());
+        String[][] test = DatabaseConnect.selectAllCourseTestOfStudent(this.student.getUser().getID(), courseID, this.student.getSection().getDepartmentID(), this.student.getSection().getCollegeID());
         int testMark = 0, count = 0;
         for (String[] strings : test) {
             // if(Integer.parseInt(strings[1]) == studentID){
@@ -257,9 +257,9 @@ public class StudentLogic {
         if(count==0){
             count = 1;
         }
-        if(DatabaseConnect.verifyRecord(this.student.getStudentID(), courseID, this.student.getDepartmentID(), this.student.getCollegeID())){
-            Records records = DatabaseConnect.returnRecords(this.student.getStudentID(), courseID, student.getDepartmentID(), student.getCollegeID());
-            double cgpa = (1.0*records.getAssignmentMarks()+(records.getAttendance()/20) + (testMark/count) + records.getExternalMarks())/10;
+        if(DatabaseConnect.verifyRecord(this.student.getUser().getID(), courseID, this.student.getSection().getDepartmentID(), this.student.getSection().getCollegeID())){
+            Records records = DatabaseConnect.returnRecords(this.student.getUser().getID(), courseID, student.getSection().getDepartmentID(), student.getSection().getCollegeID());
+            float cgpa = (1.0f*records.getAssignmentMarks()+(records.getAttendance()/20) + (testMark/count) + records.getExternalMarks())/10;
             StudentUI.displayStudentCGPA(cgpa);
         }else{
             CommonUI.displayCourseIDNotExist();
@@ -268,9 +268,9 @@ public class StudentLogic {
     }
 
     private void viewOpenElectiveCGPA() throws SQLException {
-        int departmentID = DatabaseUtility.inputOtherDepartment(this.student.getDepartmentID(), this.student.getCollegeID());
-        int courseID = DatabaseUtility.inputExistingCourseID(departmentID, this.student.getCollegeID());
-        String[][] test = DatabaseConnect.selectAllCourseTestOfStudent(this.student.getStudentID(), courseID, this.student.getDepartmentID(), this.student.getCollegeID());
+        int departmentID = DatabaseUtility.inputOtherDepartment(this.student.getSection().getDepartmentID(), this.student.getSection().getCollegeID());
+        int courseID = DatabaseUtility.inputExistingCourseID(departmentID, this.student.getSection().getCollegeID());
+        String[][] test = DatabaseConnect.selectAllCourseTestOfStudent(this.student.getUser().getID(), courseID, this.student.getSection().getDepartmentID(), this.student.getSection().getCollegeID());
         int testMark = 0, count = 0;
         for (String[] strings : test) {
             // if(Integer.parseInt(strings[1]) == studentID){
@@ -281,8 +281,8 @@ public class StudentLogic {
         if(count==0){
             count = 1;
         }
-        if(DatabaseConnect.verifyRecord(this.student.getStudentID(), courseID, this.student.getDepartmentID(), this.student.getCollegeID())){
-            Records records = DatabaseConnect.returnRecords(this.student.getStudentID(), courseID, student.getDepartmentID(), student.getCollegeID());
+        if(DatabaseConnect.verifyRecord(this.student.getUser().getID(), courseID, this.student.getSection().getDepartmentID(), this.student.getSection().getCollegeID())){
+            Records records = DatabaseConnect.returnRecords(this.student.getUser().getID(), courseID, student.getSection().getDepartmentID(), student.getSection().getCollegeID());
             double cgpa = (1.0*records.getAssignmentMarks()+(records.getAttendance()/20) + (testMark/count) + records.getExternalMarks())/10;
             StudentUI.displayStudentCGPA(cgpa);
         }else{
@@ -297,11 +297,11 @@ public class StudentLogic {
         while (DatabaseConnect.verifyTransaction(i)) {
             i++;
         }
-        DatabaseConnect.addTransaction(i, this.student.getStudentID(), LocalDate.now().toString(), 20000);
+        DatabaseConnect.addTransaction(i, this.student.getUser().getID(), LocalDate.now().toString(), 20000);
         if(payment.paymentStatus()){
-            for(String[] course : DatabaseConnect.selectAllProgramElectiveCourses(this.student.getSemester(), this.student.getDegree(), this.student.getDepartmentID(), this.student.getCollegeID())){
-                if(!DatabaseConnect.verifyRecord(this.student.getStudentID(), Integer.parseInt(course[1]), this.student.getDepartmentID(), this.student.getCollegeID())){
-                    DatabaseConnect.addRecord(this.student.getStudentID(), Integer.parseInt(course[1]), this.student.getDepartmentID(), Integer.parseInt(course[0]), this.student.getCollegeID(), i, 0, 0, 0, "NC", null);
+            for(String[] course : DatabaseConnect.selectAllProgramElectiveCourses(this.student.getSemester(), this.student.getDegree(), this.student.getSection().getDepartmentID(), this.student.getSection().getCollegeID())){
+                if(!DatabaseConnect.verifyRecord(this.student.getUser().getID(), Integer.parseInt(course[1]), this.student.getSection().getDepartmentID(), this.student.getSection().getCollegeID())){
+                    DatabaseConnect.addRecord(this.student.getUser().getID(), Integer.parseInt(course[1]), this.student.getSection().getDepartmentID(), Integer.parseInt(course[0]), this.student.getSection().getCollegeID(), i, 0, 0, 0, "NC", null);
                 }
             }
         StudentUI.displayCourseRegistrationSuccessful();
@@ -329,11 +329,11 @@ public class StudentLogic {
             StudentUI.displayCourseRegistrationSuccessful();
             return;
         }
-        int departmentID = DatabaseUtility.inputOtherDepartment(this.student.getDepartmentID(), this.student.getCollegeID());
-        int courseID = DatabaseUtility.inputOpenElectiveCourse(departmentID, this.student.getCollegeID());
-        if(!DatabaseConnect.verifyRecord(this.student.getStudentID(), courseID, departmentID, this.student.getCollegeID())){
-            String professor = DatabaseConnect.selectAllOpenElectiveCourses(courseID, this.student.getSemester(), this.student.getDegree(), departmentID, this.student.getCollegeID())[0][0];
-            DatabaseConnect.addRecord(this.student.getStudentID(), courseID, departmentID, Integer.parseInt(professor), this.student.getCollegeID(), transactionID, 0, 0, 0, "NC", null);
+        int departmentID = DatabaseUtility.inputOtherDepartment(this.student.getSection().getDepartmentID(), this.student.getSection().getCollegeID());
+        int courseID = DatabaseUtility.inputOpenElectiveCourse(departmentID, this.student.getSection().getCollegeID());
+        if(!DatabaseConnect.verifyRecord(this.student.getUser().getID(), courseID, departmentID, this.student.getSection().getCollegeID())){
+            String professor = DatabaseConnect.selectAllOpenElectiveCourses(courseID, this.student.getSemester(), this.student.getDegree(), departmentID, this.student.getSection().getCollegeID())[0][0];
+            DatabaseConnect.addRecord(this.student.getUser().getID(), courseID, departmentID, Integer.parseInt(professor), this.student.getSection().getCollegeID(), transactionID, 0, 0, 0, "NC", null);
             count--;
             StudentUI.displayCourseRegisteredPage(courseID);
             addOpenElectiveRecord(transactionID, count);

@@ -163,8 +163,9 @@ public class DatabaseUtility {
     }
 
     public static int inputRecordCourse(Student student) throws SQLException {
+        Section section = student.getSection();
         int courseID;
-        while (!DatabaseConnect.verifyRecord(student.getStudentID(), courseID = InputUtility.posInput("Enter the Course ID"), student.getDepartmentID(), student.getCollegeID())) {
+        while (!DatabaseConnect.verifyRecord(student.getUser().getID(), courseID = InputUtility.posInput("Enter the Course ID"), section.getDepartmentID(), section.getCollegeID())) {
             CommonUI.displayCourseIDNotExist();
         }
         return courseID;

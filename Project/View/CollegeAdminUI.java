@@ -194,7 +194,8 @@ public class CollegeAdminUI {
         return InputUtility.inputChoice("Confirm? (You will be logged out once deleted)",new String[]{"Confirm Delete","Back"});
     }
 
-    public static int inputEditStudentPage(boolean toggleDetails, User userVar, Student student) {
+    public static int inputEditStudentPage(boolean toggleDetails, Student student) {
+        User userVar = student.getUser();
         return InputUtility.inputChoice("Edit Student",toggleDetails ? 
         new String[]{"User ID","Name","Contact","Date of Birth","Gender",
         "Address","Password", "Section","Toggle Details","Back"} : 
@@ -202,7 +203,7 @@ public class CollegeAdminUI {
         "Contact - "+userVar.getContactNumber(),"Date of Birth - "+userVar.getDOB(),
         "Gender - "+userVar.getGender(),"Address - "+userVar.getAddress(),
         "Password - "+userVar.getPassword(),
-        "Section - "+student.getSectionID(),
+        "Section - "+student.getSection().getSectionID(),
         "Toggle Details","Back"},"Name: "+
         userVar.getName(),"ID: "+ userVar.getID());
     }

@@ -32,9 +32,11 @@ public class SuperAdminUI{
         return InputUtility.inputChoice("Select Option", new String[]{"Add Department","Edit Department","Delete Department","View Department","Back"});
     }
 
-    public static int inputEditStudentPage(User userVar, boolean toggleDetails, Student student) {
+    public static int inputEditStudentPage(boolean toggleDetails, Student student) {
+        User userVar = student.getUser();
+        Section section = student.getSection();
         return InputUtility.inputChoice("Edit Student",toggleDetails ? new String[]{"User ID","Name","Aadhar","Date of Birth","Gender","Address","Password","Section","Toggle Details","Back"} : 
-        new String[]{"User ID - "+userVar.getID(),"Name - "+userVar.getName(), "Aadhar - "+userVar.getContactNumber(),"Date of Birth - "+userVar.getDOB(), "Gender - "+userVar.getGender(),"Address - "+userVar.getAddress(), "Password - "+userVar.getPassword(),"Section - "+student.getSectionID(),"Toggle Details","Back"},"Name: " + userVar.getName(),"ID: "+ userVar.getID());
+        new String[]{"User ID - "+userVar.getID(),"Name - "+userVar.getName(), "Aadhar - "+userVar.getContactNumber(),"Date of Birth - "+userVar.getDOB(), "Gender - "+userVar.getGender(),"Address - "+userVar.getAddress(), "Password - "+userVar.getPassword(),"Section - "+section.getSectionID(),"Toggle Details","Back"},"Name: " + userVar.getName(),"ID: "+ userVar.getID());
     }
 
     public static int inputEditProfessorPage(boolean toggleDetails, Professor professor) {
@@ -214,7 +216,7 @@ public class SuperAdminUI{
     }
 
     public static void displayCurrentStudentSelected(Student student) throws SQLException {
-        DisplayUtility.dialogWithHeaderDisplay("STUDENT SELECTED", "Student ID: "+student.getStudentID()+" Name: "+DatabaseConnect.returnUser(student.getStudentID()));
+        DisplayUtility.dialogWithHeaderDisplay("STUDENT SELECTED", "Student ID: "+student.getUser()+" Name: "+student.getUser().getName());
     }
 
     public static void displayRecordAlreadyExist() {

@@ -153,6 +153,8 @@ public class SuperAdminLogic {
         int collegeID = DatabaseUtility.inputExistingCollegeID();
         int departmentID = DatabaseUtility.inputExistingDepartmentID(collegeID);
         int sectionID = DatabaseUtility.inputExistingSectionID(collegeID, departmentID);
+
+        Section studentSection = DatabaseConnect.returnSection(collegeID, departmentID, sectionID);
         int semester = 1;
         int year = 1;
         String degree = CommonUI.inputDegree();
@@ -191,8 +193,8 @@ public class SuperAdminLogic {
                     break;
             }
 
-        Student student = new Student(user.getID(), semester, degree, sectionID, collegeID, departmentID);
-        DatabaseConnect.addStudent(user, student);
+        Student student = new Student(user, semester, degree, studentSection);
+        DatabaseConnect.addStudent(student);
     }
 
     public void addProfessor(User user) throws SQLException {
@@ -235,14 +237,14 @@ public class SuperAdminLogic {
     }
 
     public void editStudent(int userID, boolean toggleDetails) throws SQLException {
-        User userVar = DatabaseConnect.returnUser(userID);
-        Student student = DatabaseConnect.returnStudent(userVar.getID());
-        int inputChoice = SuperAdminUI.inputEditStudentPage(userVar, toggleDetails, student);
+        Student student = DatabaseConnect.returnStudent(userID);
+        User userVar = student.getUser();
+        Section section = student.getSection();
+        int inputChoice = SuperAdminUI.inputEditStudentPage(toggleDetails, student);
         switch(inputChoice){
 
                 case 1:
                     userVar.setID(DatabaseUtility.inputNonExistingUserID());
-                    student.setStudentID(userVar.getID());
                     break;
 
                 case 2:
@@ -270,7 +272,7 @@ public class SuperAdminLogic {
                     break;
 
                 case 8:
-                    student.setSectionID(DatabaseUtility.inputExistingSectionID(student.getCollegeID(), student.getDepartmentID()));
+                    section.setSectionID(DatabaseUtility.inputExistingSectionID(section.getCollegeID(), section.getDepartmentID()));
                     break;
 
                 case 9:
@@ -282,7 +284,7 @@ public class SuperAdminLogic {
                     manageUser();
                     return;
             }
-            DatabaseConnect.editStudent(userID, userVar, student);
+            DatabaseConnect.editStudent(userID, student);
             CommonUI.processSuccessDisplay();
             editStudent(userVar.getID(), toggleDetails);
         }
@@ -1084,14 +1086,15 @@ public class SuperAdminLogic {
                 transactionID = DatabaseUtility.inputExistingTransaction();
                 Transactions transaction = DatabaseConnect.returnTransaction(transactionID);
                 Student student = DatabaseConnect.returnStudent(transaction.getStudentID());
-                int courseID = DatabaseUtility.inputExistingCourseID(student.getDepartmentID(), student.getCollegeID());
+                Section section = student.getSection();
+                int courseID = DatabaseUtility.inputExistingCourseID(section.getDepartmentID(), section.getCollegeID());
                 SuperAdminUI.displayCurrentStudentSelected(student);
-                if(DatabaseConnect.verifyRecord(student.getStudentID(), courseID, student.getDepartmentID(), student.getCollegeID())){
+                if(DatabaseConnect.verifyRecord(student.getUser().getID(), courseID, section.getDepartmentID(), section.getCollegeID())){
                     SuperAdminUI.displayRecordAlreadyExist();
                     continue;
                 }
                 int professorID;
-                while (!DatabaseConnect.verifyCourseProfessor(professorID = CommonUI.inputProfessorID(), courseID, student.getDepartmentID(), student.getCollegeID())) {
+                while (!DatabaseConnect.verifyCourseProfessor(professorID = CommonUI.inputProfessorID(), courseID, section.getDepartmentID(), section.getCollegeID())) {
                     SuperAdminUI.displayProfessorNotTakeCourse(courseID);
                 }
                 int assignment = 0;
@@ -1107,7 +1110,7 @@ public class SuperAdminLogic {
                     String choiceArray[] = SuperAdminUI.inputStudentCompletionSemester(student);
                     semesterCompleted = SuperAdminUI.inputCourseCompletionSemester(choiceArray);
             }
-            DatabaseConnect.addRecord(student.getStudentID(), courseID, student.getDepartmentID(), professorID, student.getCollegeID(), transactionID, externalMark, attendance, assignment, status, semesterCompleted);
+            DatabaseConnect.addRecord(student.getUser().getID(), courseID, section.getDepartmentID(), professorID, section.getCollegeID(), transactionID, externalMark, attendance, assignment, status, semesterCompleted);
             CommonUI.processSuccessDisplay();
             manageRecord();
             break;
@@ -1186,11 +1189,12 @@ public class SuperAdminLogic {
     private void deleteRecord() throws SQLException {
         int studentID = DatabaseUtility.inputExistingStudentID();
         Student student = DatabaseConnect.returnStudent(studentID);
+        Section section = student.getSection();
         int courseID;
-            while (!DatabaseConnect.verifyRecord(studentID, courseID = DatabaseUtility.inputExistingCourseID(student.getDepartmentID(), student.getCollegeID()), student.getDepartmentID(), student.getCollegeID())) {
+            while (!DatabaseConnect.verifyRecord(studentID, courseID = DatabaseUtility.inputExistingCourseID(section.getDepartmentID(), section.getCollegeID()), section.getDepartmentID(), section.getCollegeID())) {
                 CommonUI.displayCourseIDNotExist();
             }
-        DatabaseConnect.deleteRecord(studentID, courseID,student.getDepartmentID(),student.getCollegeID());
+        DatabaseConnect.deleteRecord(studentID, courseID,section.getDepartmentID(),section.getCollegeID());
         CommonUI.processSuccessDisplay();
         manageRecord();
     }

@@ -1,16 +1,18 @@
 package Controller;
 
+import Model.Student;
 import Model.User;
 import View.Utility.DisplayUtility;
 import View.Utility.InputUtility;
 
 public class StudentUI {
     
-    public static int inputStartPage(int userID, String userName) {
-        return InputUtility.inputChoice("Student Page",new String[]{"Manage Profile","My Records","Transactions","My Performance","Log Out"},"ID: "+userID, "Name: "+userName);
+    public static int inputStartPage(Student student) {
+        return InputUtility.inputChoice("Student Page",new String[]{"Manage Profile","My Records","Transactions","My Performance","Log Out"},"ID: "+student.getUser().getID(), "Name: "+student.getUser().getName());
     }
 
-    public static int inputManageProfile(User userVar, boolean toggleDetails) {
+    public static int inputManageProfile(Student student, boolean toggleDetails) {
+        User userVar = student.getUser();
         return InputUtility.inputChoice("Select the Option to Edit", toggleDetails ? new String[]{"User ID","User Name","Contact","Date of Birth","Address","Password","Toggle Details","Back"} : new String[]{"User ID - "+userVar.getID(),"User Name - "+userVar.getName(),"Contact - "+userVar.getContactNumber(),"Date of Birth - "+userVar.getDOB(),"Address - "+userVar.getAddress(),"Password - "+userVar.getPassword(),"Toggle Details","Back"});
     }
     
@@ -19,7 +21,7 @@ public class StudentUI {
     }
 
     public static int inputStudentTransactionPage() {
-        return InputUtility.inputChoice("Select the Option", new String[]{"View All Transaction","Pay Fees","Back"});
+        return InputUtility.inputChoice("Select the Option", new String[]{"View All Transaction","Pay Fees and Register Course","Back"});
     }
 
     public static void displayAlreadyPaidForSemester() {
