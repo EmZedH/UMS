@@ -1,10 +1,10 @@
-package View;
+package UI;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-import View.Utility.DisplayUtility;
-import View.Utility.InputUtility;
+import UI.Utility.DisplayUtility;
+import UI.Utility.InputUtility;
 
 public class CommonUI {
     public static Scanner in;
@@ -261,15 +261,15 @@ public class CommonUI {
     }
 
     public static String inputContactNumber() {
-        return InputUtility.inputString("Enter the Aadhar number");
+        return inputPhoneNumber("Enter the Contact number");
     }
 
     public static String inputDateOfBirth() {
-        return InputUtility.inputDate("Enter the Date of Birth");
+        return CommonUI.inputDate("Enter the Date of Birth");
     }
 
     public static String inputDateOfTransaction() {
-        return InputUtility.inputDate("Enter the Date of Transaction");
+        return CommonUI.inputDate("Enter the Date of Transaction");
     }
 
     public static String inputTransactionAmountString() {
@@ -311,7 +311,12 @@ public class CommonUI {
     }
 
     public static int inputExternalMark() {
-        return InputUtility.posInput("Enter the External Mark");
+        int externalMark =  InputUtility.posInput("Enter the External Mark");
+        if(externalMark > 0 && externalMark <=60){
+            return externalMark;
+        }
+        DisplayUtility.singleDialogDisplay("Please enter proper External Mark");
+        return inputExternalMark();
     }
 
     public static void displayStudentRecordsNotExist() {
@@ -331,7 +336,7 @@ public class CommonUI {
     }
 
     public static String inputCollegeTelephone() {
-        return InputUtility.inputString("Enter the College Telephone");
+        return inputPhoneNumber("Enter the College Telephone");
     }
 
     public static String inputCollegeAddress() {
@@ -340,6 +345,52 @@ public class CommonUI {
 
     public static String inputSectionName() {
         return InputUtility.inputString("Enter the Section name");
+    }
+
+    public static int inputModeOfAdmission(String degree) {
+        return InputUtility.inputChoice("Select the Option",degree == "B. Tech" ? new String[]{"First Year","Lateral Entry","Enter manually"} : new String[]{"First Year","Enter manually"});
+    }
+
+    public static String inputDate(String heading) {
+        DisplayUtility.dialogWithHeaderDisplay(heading,"(Format YYYY-MM-DD)");
+        in = new Scanner(System.in);
+        String date = in.nextLine();
+        if(date.length()==10 && date.charAt(4) == '-' && date.charAt(7)=='-'){
+            try {
+    
+                int year = Integer.parseInt(date.substring(0, 4));
+                int month = Integer.parseInt(date.substring(5, 7));
+                int day = Integer.parseInt(date.substring(8));
+                if((year>0 && month>0 && day>0)&& (((month==1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) && (day<=31)) || ((month == 4 || month == 6 || month == 9 || month == 11) && (day<=30)) || (month == 2 && day<=28) || (year%4==0 && month==2 && day==29))){
+                    return date;
+                }
+            } catch (NumberFormatException e) {
+                DisplayUtility.singleDialogDisplay("Please ensure correct date is input or check the format");
+                return inputDate(heading);
+            }
+        }
+        DisplayUtility.singleDialogDisplay("Please ensure correct date is input or check the format");
+        return inputDate(heading);
+    }
+
+    public static String inputPhoneNumber(String heading){
+        try {
+
+            DisplayUtility.dialogWithHeaderDisplay(heading, "(10 digit number format))");
+            in = new Scanner(System.in);
+            String input = in.nextLine();
+            if(input.length()==10){
+                for (int i = 0; i < input.length(); i++) {
+                    Integer.parseInt(input.charAt(i)+"");
+                }
+                return input;
+            }
+            DisplayUtility.singleDialogDisplay("Please ensure correct telephone number format");
+            return inputPhoneNumber(heading);
+        } catch (NumberFormatException e) {
+            DisplayUtility.singleDialogDisplay("Please ensure correct telephone number format");
+            return inputPhoneNumber(heading);
+        }
     }
  }
 

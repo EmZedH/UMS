@@ -24,4 +24,7 @@ public class Department {
     public int getCollegeID() {
         return collegeID;
     }
+    public void setCollegeID(int collegeID) {
+        this.collegeID = collegeID;
+    }
 }

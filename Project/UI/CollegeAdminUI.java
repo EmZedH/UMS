@@ -1,4 +1,4 @@
-package View;
+package UI;
 
 import java.sql.SQLException;
 import java.util.Scanner;
@@ -13,14 +13,14 @@ import Model.Student;
 import Model.Test;
 import Model.Transactions;
 import Model.User;
-import View.Utility.DisplayUtility;
-import View.Utility.InputUtility;
+import UI.Utility.DisplayUtility;
+import UI.Utility.InputUtility;
 
 public class CollegeAdminUI {
     static Scanner in;
 
-    public static int inputStartPage(String name, int id) {
-        return InputUtility.inputChoice("College Admin Page", new String[]{"User","Course","Department","Students Record","Professor Course List","Section","Test Records","Transactions","Log Out"},"Name: "+ name,"ID: "+ id);
+    public static int inputStartPage(CollegeAdmin collegeAdmin) {
+        return InputUtility.inputChoice("College Admin Page", new String[]{"User","Course","Department","Students Record","Professor Course List","Section","Test Records","Transactions","College","Log Out"},"Name: "+ collegeAdmin.getUser().getName(),"ID: "+ collegeAdmin.getUser().getID());
     }
 
     public static int inputUserManagePage() {
@@ -48,7 +48,7 @@ public class CollegeAdminUI {
     }
 
     public static int inputManageCourseProfessorTable() {
-        return InputUtility.inputChoice("Select Option", new String[]{"Add Course to Professor","Add Professor to Course","Edit Professor for Course","View List","Back"});
+        return InputUtility.inputChoice("Select Option", new String[]{"Add Course to Professor","Edit Professor for Course","View List","Back"});
     }
 
     public static int inputManageRecordPage() {
@@ -98,8 +98,8 @@ public class CollegeAdminUI {
         return InputUtility.inputChoice("Select Option to Edit", toggleDetails ? new String[]{"Section ID","Section Name","Toggle Details","Back"} : new String[]{"Section - "+section.getSectionID(),"Section Name - "+section.getSectionName(),"Toggle Details","Back"});
     }
 
-    public static void displaySectionDeleteWarning(int collegeID, int departmentID, int sectionID) throws SQLException {
-        DisplayUtility.dialogWithHeaderDisplay("Warning", "Section ID: "+sectionID+" Name: "+DatabaseConnect.returnSection(collegeID, departmentID, sectionID).getSectionName()+" selected for deletion");
+    public static void displaySectionDeleteWarning(Section section) throws SQLException {
+        DisplayUtility.dialogWithHeaderDisplay("Warning", "Section ID: "+section.getSectionID()+" Name: "+section.getSectionName()+" selected for deletion");
     }
 
     public static int inputDeleteConfirmation() {
@@ -147,7 +147,7 @@ public class CollegeAdminUI {
     }
 
     public static void viewCourseTable(String[][] databaseTable) throws SQLException {
-        DisplayUtility.printTable("COURSE DETAILS", new String[]{"COURSE ID","NAME","SEMESTER","DEPARTMENT","DEGREE","ELECTIVE"}, databaseTable);
+        DisplayUtility.printTable("COURSE DETAILS", new String[]{"COURSE ID","NAME","SEMESTER","DEPARTMENT ID","DEPARTMENT NAME","DEGREE","ELECTIVE"}, databaseTable);
     }
 
     public static int inputEditUserPage() {
@@ -275,11 +275,11 @@ public class CollegeAdminUI {
     }
 
     public static int inputRecordValueEntryPage() {
-        return InputUtility.inputChoice("Select Option", new String[]{"Default values","Enter values"});
+        return InputUtility.inputChoice("Select Option to enter Record Values", new String[]{"Default values","Enter values"});
     }
 
     public static int inputEditRecordsPage(boolean toggleDetails, Records record) {
-        return InputUtility.inputChoice("Select the Option to Edit", toggleDetails ? new String[]{"Change Professor","Edit External","Edit Attendance","Status","Toggle Details","Back"} : new String[]{"Change Professor - "+record.getProfessorID(),"Edit External - "+record.getExternalMarks(),"Edit Attendance - "+record.getAttendance(),"Status - "+record.getStatus(),"Toggle Details","Back"});
+        return InputUtility.inputChoice("Select the Option to Edit", toggleDetails ? new String[]{"Change Professor","Edit External","Edit Attendance","Status","Toggle Details","Back"} : new String[]{"Change Professor - "+record.getCourseProfessor().getProfessorID(),"Edit External - "+record.getExternalMarks(),"Edit Attendance - "+record.getAttendance(),"Status - "+record.getStatus(),"Toggle Details","Back"});
     }
 
     public static int inputCourseCompletionSemester(String[] choiceArray) {

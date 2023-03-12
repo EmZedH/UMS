@@ -1,4 +1,4 @@
-package Controller;
+package Logic;
 
 import java.sql.SQLException;
 
@@ -7,23 +7,20 @@ import Model.DatabaseUtility;
 import Model.Professor;
 import Model.Records;
 import Model.Test;
-import Model.User;
-import View.CommonUI;
-import View.ProfessorUI;
-import View.Utility.DisplayUtility;
-import View.Utility.InputUtility;
+import UI.CommonUI;
+import UI.ProfessorUI;
+import UI.Utility.DisplayUtility;
+import UI.Utility.InputUtility;
 
 public class ProfessorLogic {
     Professor professor;
-    User user;
-    public ProfessorLogic(Professor professor, User user) throws SQLException {
+    public ProfessorLogic(Professor professor) throws SQLException {
         this.professor = professor;
-        this.user = user;
         startPage();
     }
 
     public void startPage() throws SQLException {
-        int inputChoice = ProfessorUI.inputStartPage(this.user.getID(), this.user.getName());
+        int inputChoice = ProfessorUI.inputStartPage(this.professor);
         switch (inputChoice) {
 
             //MANAGE PROFILE
@@ -86,13 +83,13 @@ public class ProfessorLogic {
         int collegeID = this.professor.getDepartment().getCollegeID();
         int testID, testMarks;
         int departmentID = this.professor.getDepartment().getDepartmentID();
-        int courseID = DatabaseUtility.inputExistingCourseID(departmentID, collegeID);
+        int courseID = DatabaseUtility.inputExistingCourseID(this.professor.getDepartment().getDepartmentID(), this.professor.getDepartment().getCollegeID());
         int studentID = DatabaseUtility.inputExistingStudentID(collegeID);
         if(!DatabaseConnect.verifyRecord(studentID, courseID, departmentID, collegeID)){
             DisplayUtility.singleDialogDisplay("Student Record doesn't exist. Please try again");
             return;
         }
-        testID = DatabaseUtility.inputNonExistingTestID(collegeID, courseID, studentID);
+        testID = DatabaseUtility.inputNonExistingTestID(collegeID, departmentID, courseID, studentID);
         testMarks = CommonUI.inputTestMarks();
         DatabaseConnect.addTest(testID, studentID, courseID, departmentID, collegeID, testMarks);
         CommonUI.processSuccessDisplay();
@@ -103,9 +100,9 @@ public class ProfessorLogic {
         int courseID, studentID;
         int testID;
         int departmentID = this.professor.getDepartment().getDepartmentID();
-        courseID = DatabaseUtility.inputExistingCourseID(departmentID, collegeID);
+        courseID = DatabaseUtility.inputExistingCourseID(this.professor.getDepartment().getDepartmentID(), this.professor.getDepartment().getCollegeID());
         studentID = DatabaseUtility.inputExistingStudentID(departmentID,collegeID);
-        testID = DatabaseUtility.inputExistingTestID(collegeID, courseID, studentID);
+        testID = DatabaseUtility.inputExistingTestID(collegeID, departmentID, courseID, studentID);
         DisplayUtility.dialogWithHeaderDisplay("Warning", "Test ID: "+testID+" Marks: "+DatabaseConnect.returnTest(testID,studentID,courseID,departmentID,collegeID).getTestMark()+" about to be deleted");
         if(InputUtility.inputChoice("Confirm? (All data will be deleted)", new String[]{"Confirm","Back"})==1){
             DatabaseConnect.deleteTest(testID, studentID, courseID, departmentID, collegeID);
@@ -211,7 +208,7 @@ public class ProfessorLogic {
         int collegeID = this.professor.getDepartment().getCollegeID();
         int departmentID = this.professor.getDepartment().getDepartmentID();
         int studentID = DatabaseUtility.inputExistingStudentID(departmentID, collegeID);
-        int courseID = DatabaseUtility.inputExistingCourseID(departmentID, collegeID);
+        int courseID = DatabaseUtility.inputExistingCourseID(this.professor.getDepartment().getDepartmentID(), this.professor.getDepartment().getCollegeID());
 
         if(!DatabaseConnect.verifyRecord(studentID, courseID, departmentID, collegeID)){
             CommonUI.displayStudentRecordsNotExist();
@@ -281,7 +278,7 @@ public class ProfessorLogic {
     }
 
     public void editStudentTest(int departmentID, int collegeID, int courseID, int studentID) throws SQLException {
-        int testID = DatabaseUtility.inputExistingTestID(collegeID, courseID, studentID);
+        int testID = DatabaseUtility.inputExistingTestID(collegeID, departmentID, courseID, studentID);
         Test test = DatabaseConnect.returnTest(testID, studentID, courseID, departmentID, collegeID);
         int inputChoice;
         boolean toggleDetails = true;
@@ -290,7 +287,7 @@ public class ProfessorLogic {
 
                 //EDUT TEST ID
                 case 1:
-                    test.setTestID(DatabaseUtility.inputNonExistingTestID(collegeID, courseID, studentID));
+                    test.setTestID(DatabaseUtility.inputNonExistingTestID(collegeID, departmentID, courseID, studentID));
                     break;
 
                 //EDIT TEST MARK

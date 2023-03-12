@@ -1,4 +1,4 @@
-package Controller;
+package Logic;
 
 
 public class Main{

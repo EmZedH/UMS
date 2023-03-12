@@ -1,9 +1,9 @@
-package Controller;
+package UI;
 
 import Model.Student;
 import Model.User;
-import View.Utility.DisplayUtility;
-import View.Utility.InputUtility;
+import UI.Utility.DisplayUtility;
+import UI.Utility.InputUtility;
 
 public class StudentUI {
     

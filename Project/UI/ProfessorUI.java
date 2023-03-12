@@ -1,13 +1,14 @@
-package View;
+package UI;
 
+import Model.Professor;
 import Model.Records;
 import Model.Test;
 import Model.User;
-import View.Utility.InputUtility;
+import UI.Utility.InputUtility;
 
 public class ProfessorUI{
-    public static int inputStartPage(int userID, String userName) {
-        return InputUtility.inputChoice("Professor Page", new String[]{"Manage Profile","Student Records","Manage Tests","Log Out"},"ID: "+ userID, "Name: "+ userName);
+    public static int inputStartPage(Professor professor) {
+        return InputUtility.inputChoice("Professor Page", new String[]{"Manage Profile","Student Records","Manage Tests","Log Out"},"ID: "+ professor.getUser().getID(), "Name: "+ professor.getUser().getName());
     }
 
     public static int inputManageProfile(User userVar, boolean toggleDetails) {

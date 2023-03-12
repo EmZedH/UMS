@@ -1,12 +1,12 @@
-package Controller;
+package Logic;
 import java.sql.SQLException;
 
 import Model.CollegeAdmin;
 import Model.DatabaseConnect;
 import Model.Professor;
 import Model.Student;
-import Model.User;
-import View.CommonUI;
+import Model.SuperAdmin;
+import UI.CommonUI;
 
 public class StartupLogic {
     static int inputChoice;
@@ -57,10 +57,10 @@ public class StartupLogic {
         String password = CommonUI.inputStartPagePasswordPage(userID);
 
         try {
-            if(DatabaseConnect.verifyUserIDPassword(userID, password, Table.SUPER_ADMIN)){
+            if(DatabaseConnect.verifySuperAdminIDPassword(userID, password)){
                 CommonUI.displayLoginVerified();
-                User user = DatabaseConnect.returnUser(userID);
-                new SuperAdminLogic(user);
+                SuperAdmin superAdmin = DatabaseConnect.returnSuperAdmin(userID);
+                new SuperAdminLogic(superAdmin);
             }
             else{
                 StartupLogic.displayWrongCredentials(4,userID);
@@ -75,10 +75,10 @@ public class StartupLogic {
         String password = CommonUI.inputStartPagePasswordPage(userID);
 
         try {
-            if(DatabaseConnect.verifyUserIDPassword(userID, password,Table.SUPER_ADMIN)){
+            if(DatabaseConnect.verifySuperAdminIDPassword(userID, password)){
                 CommonUI.displayLoginVerified();
-                User user = DatabaseConnect.returnUser(userID);
-                new SuperAdminLogic(user);
+                SuperAdmin superAdmin = DatabaseConnect.returnSuperAdmin(userID);
+                new SuperAdminLogic(superAdmin);
             }
             else{
                 StartupLogic.displayWrongCredentials(4,userID);
@@ -164,11 +164,10 @@ public class StartupLogic {
         int userID = CommonUI.inputStartPageUserID();
         String password = CommonUI.inputStartPagePasswordPage(userID);
         try {
-            if(DatabaseConnect.verifyUserIDPassword(userID, password, Table.COLLEGE_ADMIN)){
+            if(DatabaseConnect.verifyCollegeAdminIDPassword(userID, password)){
                 CommonUI.displayLoginVerified();
                 CollegeAdmin collegeAdmin = DatabaseConnect.returnCollegeAdmin(userID);
-                User user = DatabaseConnect.returnUser(userID);
-                new CollegeAdminLogic(user, collegeAdmin);
+                new CollegeAdminLogic(collegeAdmin);
             }
             else{
                 displayWrongCredentials(3,userID);
@@ -183,11 +182,10 @@ public class StartupLogic {
     public static void startUpCollegeAdmin(int userID) {
         String password = CommonUI.inputStartPagePasswordPage(userID);
         try {
-            if(DatabaseConnect.verifyUserIDPassword(userID, password, Table.COLLEGE_ADMIN)){
+            if(DatabaseConnect.verifyCollegeAdminIDPassword(userID, password)){
                 CommonUI.displayLoginVerified();
                 CollegeAdmin collegeAdmin = DatabaseConnect.returnCollegeAdmin(userID);
-                User user = DatabaseConnect.returnUser(userID);
-                new CollegeAdminLogic(user, collegeAdmin);
+                new CollegeAdminLogic(collegeAdmin);
             }
             else{
                 displayWrongCredentials(3,userID);
@@ -202,11 +200,10 @@ public class StartupLogic {
         int userID = CommonUI.inputStartPageUserID();
         String password = CommonUI.inputStartPagePasswordPage(userID);
         try {
-            if(DatabaseConnect.verifyUserIDPassword(userID, password, Table.PROFESSOR)){
+            if(DatabaseConnect.verifyProfessorIDPassword(userID, password)){
                 CommonUI.displayLoginVerified();
                 Professor professor = DatabaseConnect.returnProfessor(userID);
-                User user = DatabaseConnect.returnUser(userID);
-                new ProfessorLogic(professor, user);
+                new ProfessorLogic(professor);
             }
             else{
                 displayWrongCredentials(2,userID);
@@ -220,11 +217,10 @@ public class StartupLogic {
     public static void startUpProfessor(int userID){
         String password = CommonUI.inputStartPagePasswordPage(userID);
         try {
-            if(DatabaseConnect.verifyUserIDPassword(userID, password, Table.PROFESSOR)){
+            if(DatabaseConnect.verifyProfessorIDPassword(userID, password)){
                 CommonUI.displayLoginVerified();
                 Professor professor = DatabaseConnect.returnProfessor(userID);
-                User user = DatabaseConnect.returnUser(userID);
-                new ProfessorLogic(professor, user);
+                new ProfessorLogic(professor);
             }
             else{
                 displayWrongCredentials(2,userID);
@@ -239,11 +235,10 @@ public class StartupLogic {
         int userID = CommonUI.inputStartPageUserID();
         String password = CommonUI.inputStartPagePasswordPage(userID);
         try {
-            if(DatabaseConnect.verifyUserIDPassword(userID, password, Table.STUDENT)){
+            if(DatabaseConnect.verifyStudentIDPassword(userID, password)){
                 CommonUI.displayLoginVerified();
                 Student student = DatabaseConnect.returnStudent(userID);
-                User user = DatabaseConnect.returnUser(userID);
-                new StudentLogic(student, user);
+                new StudentLogic(student);
             }
             else{
                 displayWrongCredentials(1, userID);
@@ -257,11 +252,10 @@ public class StartupLogic {
     public static void startUpStudent(int userID) {
         String password = CommonUI.inputStartPagePasswordPage(userID);
         try {
-            if(DatabaseConnect.verifyUserIDPassword(userID, password, Table.STUDENT)){
+            if(DatabaseConnect.verifyStudentIDPassword(userID, password)){
                 CommonUI.displayLoginVerified();
                 Student student = DatabaseConnect.returnStudent(userID);
-                User user = DatabaseConnect.returnUser(userID);
-                new StudentLogic(student, user);
+                new StudentLogic(student);
             }
             else{
                 displayWrongCredentials(1, userID);

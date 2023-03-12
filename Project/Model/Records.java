@@ -2,50 +2,41 @@ package Model;
 
 public class Records {
     private int studentID;
-    private int courseID;
-    private int departmentID;
-    private int professorID;
-    private int collegeID;
+    private CourseProfessor courseProfessor;
     private int transactionID;
     private int externalMarks;
     private int attendance;
     private int assignmentMarks;
     private String status;
-    private int semCompleted;
-    public Records(int studentID, int courseID, int departmentID, int professorID, int collegeID, int transactionID,
-            int externalMarks, int attendance, int assignment, String status, int semCompleted) {
+    private Integer semCompleted;
+    public Records(int studentID, CourseProfessor courseProfessor, int transactionID, int externalMarks, int attendance,
+            int assignmentMarks, String status, int semCompleted) {
         this.studentID = studentID;
-        this.courseID = courseID;
-        this.departmentID = departmentID;
-        this.professorID = professorID;
-        this.collegeID = collegeID;
+        this.courseProfessor = courseProfessor;
         this.transactionID = transactionID;
         this.externalMarks = externalMarks;
         this.attendance = attendance;
-        this.assignmentMarks = assignment;
+        this.assignmentMarks = assignmentMarks;
         this.status = status;
         this.semCompleted = semCompleted;
     }
     public int getStudentID() {
         return studentID;
     }
-    public int getCourseID() {
-        return courseID;
+    public void setStudentID(int studentID) {
+        this.studentID = studentID;
     }
-    public int getDepartmentID() {
-        return departmentID;
+    public CourseProfessor getCourseProfessor() {
+        return courseProfessor;
     }
-    public int getProfessorID() {
-        return professorID;
-    }
-    public void setProfessorID(int professorID) {
-        this.professorID = professorID;
-    }
-    public int getCollegeID() {
-        return collegeID;
+    public void setCourseProfessor(CourseProfessor courseProfessor) {
+        this.courseProfessor = courseProfessor;
     }
     public int getTransactionID() {
         return transactionID;
+    }
+    public void setTransactionID(int transactionID) {
+        this.transactionID = transactionID;
     }
     public int getExternalMarks() {
         return externalMarks;
@@ -62,8 +53,8 @@ public class Records {
     public int getAssignmentMarks() {
         return assignmentMarks;
     }
-    public void setAssignmentMarks(int assignment) {
-        this.assignmentMarks = assignment;
+    public void setAssignmentMarks(int assignmentMarks) {
+        this.assignmentMarks = assignmentMarks;
     }
     public String getStatus() {
         return status;
@@ -74,7 +65,7 @@ public class Records {
     public int getSemCompleted() {
         return semCompleted;
     }
-    public void setSemCompleted(int semCompleted) {
+    public void setSemCompleted(Integer semCompleted) {
         this.semCompleted = semCompleted;
     }
 }

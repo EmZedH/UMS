@@ -1,6 +1,7 @@
-package View;
+package UI;
 
 import java.sql.SQLException;
+
 
 import Model.College;
 import Model.CollegeAdmin;
@@ -15,17 +16,17 @@ import Model.SuperAdmin;
 import Model.Test;
 import Model.Transactions;
 import Model.User;
-import View.Utility.DisplayUtility;
-import View.Utility.InputUtility;
+import UI.Utility.DisplayUtility;
+import UI.Utility.InputUtility;
 
 public class SuperAdminUI{
 
-    public static int inputStartPage(String name, int id) {
-        return InputUtility.inputChoice("Super Admin Page",new String[]{"User","Course","Department","Students Record","Professor Course List","Section","Test Records","Transactions","Colleges","Log Out"},"Name: " + name,"ID: " + id);
+    public static int inputStartPage(SuperAdmin superAdmin) {
+        return InputUtility.inputChoice("Super Admin Page",new String[]{"User","Course","Department","Students Record","Professor Course List","Section","Test Records","Transactions","Colleges","Log Out"},"Name: " + superAdmin.getUser().getName(),"ID: " + superAdmin.getUser().getID());
     }
 
     public static int inputUserManagePage() {
-        return InputUtility.inputChoice("Select Option", new String[]{"Add User","Edit User","Delete User","View Users","Back"});
+            return InputUtility.inputChoice("Select Option", new String[]{"Add User","Edit User","Delete User","View Users","Back"});
     }
 
     public static int inputDeptManagePage() {
@@ -33,47 +34,41 @@ public class SuperAdminUI{
     }
 
     public static int inputEditStudentPage(boolean toggleDetails, Student student) {
-        User userVar = student.getUser();
-        Section section = student.getSection();
         return InputUtility.inputChoice("Edit Student",toggleDetails ? new String[]{"User ID","Name","Aadhar","Date of Birth","Gender","Address","Password","Section","Toggle Details","Back"} : 
-        new String[]{"User ID - "+userVar.getID(),"Name - "+userVar.getName(), "Aadhar - "+userVar.getContactNumber(),"Date of Birth - "+userVar.getDOB(), "Gender - "+userVar.getGender(),"Address - "+userVar.getAddress(), "Password - "+userVar.getPassword(),"Section - "+section.getSectionID(),"Toggle Details","Back"},"Name: " + userVar.getName(),"ID: "+ userVar.getID());
+        new String[]{"User ID - "+student.getUser().getID(),"Name - "+student.getUser().getName(), "Aadhar - "+student.getUser().getContactNumber(),"Date of Birth - "+student.getUser().getDOB(), "Gender - "+student.getUser().getGender(),"Address - "+student.getUser().getAddress(), "Password - "+student.getUser().getPassword(),"Section - "+student.getSection().getSectionID(),"Toggle Details","Back"},"Name: " + student.getUser().getName(),"ID: "+ student.getUser().getID());
     }
 
     public static int inputEditProfessorPage(boolean toggleDetails, Professor professor) {
-        User userVar = professor.getUser();
         return InputUtility.inputChoice("Edit Professor",toggleDetails ? 
         new String[]{"User ID","Name","Aadhar","Date of Birth","Gender",
         "Address","Password","Toggle Details","Back"} : 
-        new String[]{"User ID - "+userVar.getID(),"Name - "+userVar.getName(),
-        "Aadhar - "+userVar.getContactNumber(),"Date of Birth - "+userVar.getDOB(),
-        "Gender - "+userVar.getGender(),"Address - "+userVar.getAddress(),
-        "Password - "+userVar.getPassword(),"Toggle Details","Back"},"Name: "+
-        userVar.getName(), "ID: "+userVar.getID());
+        new String[]{"User ID - "+professor.getUser().getID(),"Name - "+professor.getUser().getName(),
+        "Aadhar - "+professor.getUser().getContactNumber(),"Date of Birth - "+professor.getUser().getDOB(),
+        "Gender - "+professor.getUser().getGender(),"Address - "+professor.getUser().getAddress(),
+        "Password - "+professor.getUser().getPassword(),"Toggle Details","Back"},"Name: "+
+        professor.getUser().getName(), "ID: "+professor.getUser().getID());
     }
 
     public static int inputEditCollegeAdminPage(boolean toggleDetails, CollegeAdmin collegeAdmin) {
-        User userVar = collegeAdmin.getUser();
-        College college = collegeAdmin.getCollege();
         return InputUtility.inputChoice("Edit Student",toggleDetails ? 
         new String[]{"User ID","Name","Aadhar","Date of Birth","Gender",
         "Address","Password","College","Toggle Details","Back"} : 
-        new String[]{"User ID - "+userVar.getID(),"Name - "+userVar.getName(),
-        "Aadhar - "+userVar.getContactNumber(),"Date of Birth - "+userVar.getDOB(),
-        "Gender - "+userVar.getGender(),"Address - "+userVar.getAddress(),
-        "Password - "+userVar.getPassword(),"College - "+college.getCollegeID(),"Toggle Details","Back"},
-        userVar.getName(),"ID: " +userVar.getID());
+        new String[]{"User ID - "+collegeAdmin.getUser().getID(),"Name - "+collegeAdmin.getUser().getName(),
+        "Aadhar - "+collegeAdmin.getUser().getContactNumber(),"Date of Birth - "+collegeAdmin.getUser().getDOB(),
+        "Gender - "+collegeAdmin.getUser().getGender(),"Address - "+collegeAdmin.getUser().getAddress(),
+        "Password - "+collegeAdmin.getUser().getPassword(),"College - "+collegeAdmin.getCollege().getCollegeID(),"Toggle Details","Back"},
+        collegeAdmin.getUser().getName(),"ID: " +collegeAdmin.getUser().getID());
     }
 
     public static int inputEditSuperAdminPage(boolean toggleDetails, SuperAdmin superAdmin) {
-        User userVar = superAdmin.getUser();
         return InputUtility.inputChoice("Edit Student",toggleDetails ? 
         new String[]{"User ID","Name","Aadhar","Date of Birth","Gender",
         "Address","Password","Toggle Details","Back"} : 
-        new String[]{"User ID - "+userVar.getID(),"Name - "+userVar.getName(),
-        "Aadhar - "+userVar.getContactNumber(),"Date of Birth - "+userVar.getDOB(),
-        "Gender - "+userVar.getGender(),"Address - "+userVar.getAddress(),
-        "Password - "+userVar.getPassword(), "Toggle Details","Back"},
-        "Name: "+ userVar.getName(),"ID: "+ userVar.getID());
+        new String[]{"User ID - "+superAdmin.getUser().getID(),"Name - "+superAdmin.getUser().getName(),
+        "Aadhar - "+superAdmin.getUser().getContactNumber(),"Date of Birth - "+superAdmin.getUser().getDOB(),
+        "Gender - "+superAdmin.getUser().getGender(),"Address - "+superAdmin.getUser().getAddress(),
+        "Password - "+superAdmin.getUser().getPassword(), "Toggle Details","Back"},
+        "Name: "+ superAdmin.getUser().getName(),"ID: "+ superAdmin.getUser().getID());
     }
 
     public static int inputEditTestPage(int courseID, int studentID, boolean toggleDetails, Test test) {
@@ -136,7 +131,7 @@ public class SuperAdminUI{
     }
 
     public static int inputTransactionDeleteConfirmation() {
-        return InputUtility.inputChoice("Confirm? (All Transaction data will be deleted)", new String[]{"Confirm","Back"});
+        return InputUtility.inputChoice("Confirm? (All Transaction and Linked Records data will be deleted)", new String[]{"Confirm","Back"});
     }
 
     public static int inputTestDeleteConfirmation() {
@@ -184,7 +179,7 @@ public class SuperAdminUI{
     }
 
     public static void viewCourseTable(String[][] databaseTable) throws SQLException {
-        DisplayUtility.printTable("COURSE DETAILS", new String[]{"COURSE ID","NAME","SEMESTER","DEPARTMENT","COLLEGE NAME","DEGREE","ELECTIVE"}, databaseTable);
+        DisplayUtility.printTable("COURSE DETAILS", new String[]{"COURSE ID","NAME","SEMESTER","DEPARTMENT ID","DEPARTMENT NAME","COLLEGE NAME","DEGREE","ELECTIVE"}, databaseTable);
     }
 
     public static int inputManageTestPage() {
@@ -227,47 +222,41 @@ public class SuperAdminUI{
         DisplayUtility.singleDialogDisplay("Professor doesn't take Course ID :"+courseID);
     }
 
-    public static String[] inputStudentCompletionSemester(Student student) {
-        String[] choiceArray = new String[]{};
-        if(student.getSemester()>1 && student.getDegree().equals("B. Tech")){
-            switch(student.getSemester()-1){
-                case 1:
-                    choiceArray = new String[]{"Semester 1"};
+    public static String[] inputStudentCompletionSemester(String degree, int semester) {
+        System.out.println(degree);
+        System.out.println(semester);
+            switch (degree) {
+                case "B. Tech":
+                    switch(semester-1){
+                        case 1:
+                            return new String[]{"Semester 1"};
+                        case 2:
+                            return new String[]{"Semester 1","Semester 2"};
+                        case 3:
+                            return new String[]{"Semester 1","Semester 2","Semester 3"};
+                        case 4:
+                            return new String[]{"Semester 1","Semester 2","Semester 3","Semester 4"};
+                        case 5:
+                            return new String[]{"Semester 1","Semester 2","Semester 3","Semester 4","Semester 5"};
+                        case 6:
+                            return new String[]{"Semester 1","Semester 2","Semester 3","Semester 4","Semester 5","Semester 6"};
+                        case 7:
+                            return new String[]{"Semester 1","Semester 2","Semester 3","Semester 4","Semester 5","Semester 6","Semester 7"};
+                    }
                     break;
-                case 2:
-                    choiceArray = new String[]{"Semester 1","Semester 2"};
-                    break;
-                case 3:
-                    choiceArray = new String[]{"Semester 1","Semester 2","Semester 3"};
-                    break;
-                case 4:
-                    choiceArray = new String[]{"Semester 1","Semester 2","Semester 3","Semester 4"};
-                    break;
-                case 5:
-                    choiceArray = new String[]{"Semester 1","Semester 2","Semester 3","Semester 4","Semester 5"};
-                    break;
-                case 6:
-                    choiceArray = new String[]{"Semester 1","Semester 2","Semester 3","Semester 4","Semester 5","Semester 6"};
-                    break;
-                case 7:
-                    choiceArray = new String[]{"Semester 1","Semester 2","Semester 3","Semester 4","Semester 5","Semester 6","Semester 7"};
+            
+                case "M. Tech":
+                    switch(semester-1){
+                    case 1:
+                        return new String[]{"Semester 1"};
+                    case 2:
+                        return new String[]{"Semester 1","Semester 2"};
+                    case 3:
+                        return new String[]{"Semester 1","Semester 2","Semester 3"};
+                    }
                     break;
             }
-        }
-        else if(student.getSemester()>1 && student.getDegree().equals("M. Tech")){
-            switch(student.getSemester()-1){
-            case 1:
-                choiceArray = new String[]{"Semester 1"};
-                break;
-            case 2:
-                choiceArray = new String[]{"Semester 1","Semester 2"};
-                break;
-            case 3:
-                choiceArray = new String[]{"Semester 1","Semester 2","Semester 3"};
-                break;
-        }
-            }
-        return choiceArray;
+            return null;
     }
 
     public static int inputCourseCompletionSemester(String[] choiceArray) {
@@ -283,7 +272,7 @@ public class SuperAdminUI{
     }
 
     public static int inputEditRecordsPage(boolean toggleDetails, Records record) {
-        return InputUtility.inputChoice("Select the Option to Edit", toggleDetails ? new String[]{"Change Professor","Edit External","Edit Attendance","Status","Toggle Details","Back"} : new String[]{"Change Professor - "+record.getProfessorID(),"Edit External - "+record.getExternalMarks(),"Edit Attendance - "+record.getAttendance(),"Status - "+record.getStatus(),"Toggle Details","Back"});
+        return InputUtility.inputChoice("Select the Option to Edit", toggleDetails ? new String[]{"Change Professor","Edit External","Edit Attendance","Status","Toggle Details","Back"} : new String[]{"Change Professor - "+record.getCourseProfessor().getProfessorID(),"Edit External - "+record.getExternalMarks(),"Edit Attendance - "+record.getAttendance(),"Status - "+record.getStatus(),"Toggle Details","Back"});
     }
 
     public static int inputManageCourseProfessorPage() {
@@ -326,11 +315,19 @@ public class SuperAdminUI{
         return InputUtility.inputChoice("Select Option", new String[]{"Add Section","Edit Section","Delete Section","View Section","Back"});
     }
 
-    public static void displaySectionDeleteWarning(int collegeID, int sectionID, int departmentID) throws SQLException {
-        DisplayUtility.dialogWithHeaderDisplay("Warning", "Sextion ID: "+sectionID+" Name: "+DatabaseConnect.returnSection(collegeID, departmentID, sectionID).getSectionName()+" selected for deletion");
+    public static void displaySectionDeleteWarning(int sectionID, String sectionName) throws SQLException {
+        DisplayUtility.dialogWithHeaderDisplay("Warning", "Sextion ID: "+sectionID+" Name: "+sectionName+" selected for deletion");
     }
 
     public static int inputTestEditPage(int courseID, int studentID, boolean toggleDetails, Test test) {
         return InputUtility.inputChoice("Edit Option",toggleDetails ? new String[]{"Test ID","Test Marks","Toggle Details","Back"} : new String[]{"Test ID - "+test.getTestID(),"Test Marks - "+test.getTestMark(),"Toggle Details","Back"},"Student ID: "+studentID+" Course ID: "+courseID);
+    }
+
+    public static int inputViewSectionPage() {
+        return InputUtility.inputChoice("View Section", new String[]{"View all Section","Search by name","Search by department","Search by college","Back"});
+    }
+
+    public static void viewSectionTable(String[][] databaseTable) throws SQLException {
+        DisplayUtility.printTable("SECTION DETAILS", new String[]{"SECTION ID","NAME","DEPARTMENT NAME","COLLEGE NAME"}, databaseTable);
     }
 }

@@ -1,4 +1,4 @@
-package Controller;
+package Logic;
 
 import java.sql.SQLException;
 
@@ -15,24 +15,22 @@ import Model.Student;
 import Model.Test;
 import Model.Transactions;
 import Model.User;
-import View.CollegeAdminUI;
-import View.CommonUI;
-import View.SuperAdminUI;
-import View.Utility.DisplayUtility;
-import View.Utility.InputUtility;
+import UI.CollegeAdminUI;
+import UI.CommonUI;
+import UI.SuperAdminUI;
+import UI.Utility.DisplayUtility;
+import UI.Utility.InputUtility;
 
 public class CollegeAdminLogic {
     CollegeAdmin collegeAdmin;
-    User user;
 
-    CollegeAdminLogic(User user, CollegeAdmin collegeAdmin) throws SQLException{
-        this.user = user;
+    CollegeAdminLogic(CollegeAdmin collegeAdmin) throws SQLException{
         this.collegeAdmin = collegeAdmin;
         startPage();
     }
 
     public void startPage() throws SQLException{
-            int inputChoice = CollegeAdminUI.inputStartPage(user.getName(),user.getID());
+            int inputChoice = CollegeAdminUI.inputStartPage(this.collegeAdmin);
             switch(inputChoice){
 
                 //MANAGE USER
@@ -74,8 +72,12 @@ public class CollegeAdminLogic {
                     manageTransaction();
                     break;
 
-                //LOG OUT
                 case 9:
+                    manageCollege(true);
+                    break;
+
+                //LOG OUT
+                case 10:
                     StartupLogic.userSelect();
                     break;
             }
@@ -228,26 +230,21 @@ public class CollegeAdminLogic {
 
     public void manageProfessorCourseTable() throws SQLException {
         int inputChoice;
-        while ((inputChoice = CollegeAdminUI.inputManageCourseProfessorTable())!=5) {
+        while ((inputChoice = CollegeAdminUI.inputManageCourseProfessorTable())!=4) {
             switch (inputChoice) {
 
                 //ADD COURSE TO PROFESSOR
                 case 1:
                     addCourseToProfessor();
                     break;
-                    
-                //ADD PROFESSOR TO COURSE
-                case 2:
-                    addProfessorToCourseTable();
-                    break;
 
                 //EDIT PROFESSOR FOR COURSE
-                case 3:
+                case 2:
                     editProfessorForCourse();
                     break;
 
                 //VIEW PROFESSOR COURSE TABLE
-                case 4:
+                case 3:
                     viewProfessorCourseTable();
                     break;
             }
@@ -313,17 +310,55 @@ public class CollegeAdminLogic {
         startPage();
     }
 
+    public void manageCollege(boolean toggleDetails) throws SQLException{
+        int inputChoice = InputUtility.inputChoice("Select the Option to Edit", toggleDetails ? new String[]{"College Name","College Address","College Telephone","Toggle Details","Back"} : new String[]{"College Name - "+this.collegeAdmin.getCollege().getCollegeName(),"College Address - "+this.collegeAdmin.getCollege().getCollegeAddress(),"College Telephone - "+this.collegeAdmin.getCollege().getCollegeTelephone(),"Toggle Details","Back"});
+
+        switch (inputChoice) {
+
+            //EDIT COLLEGE NAME
+            case 1:
+                this.collegeAdmin.getCollege().setCollegeName(CommonUI.inputCollegeName());
+                break;
+        
+            //EDIT COLLEGE ADDRESS
+            case 2:
+                this.collegeAdmin.getCollege().setCollegeAddress(CommonUI.inputCollegeAddress());
+                break;
+
+            //EDIT COLLEGE TELEPHONE
+            case 3:
+                this.collegeAdmin.getCollege().setCollegeTelephone(CommonUI.inputCollegeTelephone());
+                break;
+
+            //TOGGLE DETAILS
+            case 4:
+                toggleDetails^=true;
+                manageCollege(toggleDetails);
+                return;
+
+            //GO BACK
+            case 5:
+                startPage();
+                return;
+        }
+        DatabaseConnect.editCollege(this.collegeAdmin.getCollege());
+        CommonUI.processSuccessDisplay();
+        manageCollege(toggleDetails);
+    }
+
     public void addTest() throws SQLException {
         int collegeID = collegeAdmin.getCollege().getCollegeID();
         int testID, testMarks;
         int departmentID = DatabaseUtility.inputExistingDepartmentID(collegeID);
+
+        
         int courseID = DatabaseUtility.inputExistingCourseID(departmentID, collegeID);
         int studentID = DatabaseUtility.inputExistingStudentID(collegeID);
         if(!DatabaseConnect.verifyRecord(studentID, courseID, departmentID, collegeID)){
             CommonUI.displayStudentRecordsNotExist();
             return;
         }
-        testID = DatabaseUtility.inputNonExistingTestID(collegeID, courseID, studentID);
+        testID = DatabaseUtility.inputNonExistingTestID(collegeID, departmentID, courseID, studentID);
         testMarks = CommonUI.inputTestMarks();
         DatabaseConnect.addTest(testID, studentID, courseID, departmentID, collegeID, testMarks);
         CommonUI.processSuccessDisplay();
@@ -332,11 +367,13 @@ public class CollegeAdminLogic {
     public void editTest() throws SQLException {
         int collegeID = collegeAdmin.getCollege().getCollegeID();
         int testID, inputChoice;
-        int courseID, studentID;
+        int studentID;
         int departmentID = DatabaseUtility.inputExistingDepartmentID(collegeID);
-        courseID = DatabaseUtility.inputExistingCourseID(departmentID, collegeID);
+
+        
+        int courseID = DatabaseUtility.inputExistingCourseID(departmentID, collegeID);
         studentID = DatabaseUtility.inputExistingStudentID(collegeID);
-        testID = DatabaseUtility.inputExistingTestID(collegeID, courseID, studentID);
+        testID = DatabaseUtility.inputExistingTestID(collegeID, departmentID, courseID, studentID);
         boolean toggleDetails = true;
         Test test = DatabaseConnect.returnTest(testID, studentID, courseID, departmentID, collegeID);
         while ((inputChoice = SuperAdminUI.inputTestEditPage(courseID, studentID, toggleDetails, test))!=4) {
@@ -344,7 +381,7 @@ public class CollegeAdminLogic {
 
                 //EDIT TEST ID
                 case 1:
-                    test.setTestID(DatabaseUtility.inputNonExistingTestID(collegeID, courseID, studentID));
+                    test.setTestID(DatabaseUtility.inputNonExistingTestID(collegeID, departmentID, courseID, studentID));
                     break;
 
                 //EDIT TEST MARK
@@ -365,12 +402,12 @@ public class CollegeAdminLogic {
 
     public void deleteTest() throws SQLException {
         int collegeID = collegeAdmin.getCollege().getCollegeID();
-        int courseID, studentID;
+        int studentID;
         int testID;
         int departmentID = DatabaseUtility.inputExistingDepartmentID(collegeID);
-        courseID = DatabaseUtility.inputExistingCourseID(departmentID, collegeID);
+        int courseID = DatabaseUtility.inputExistingCourseID(departmentID, collegeID);
         studentID = DatabaseUtility.inputExistingStudentID(collegeID);
-        testID = DatabaseUtility.inputExistingTestID(collegeID, courseID, studentID);
+        testID = DatabaseUtility.inputExistingTestID(collegeID, departmentID, courseID, studentID);
         // DisplayUtility.dialogWithHeaderDisplay("Warning", "Test ID: "+testID+" Marks: "+DatabaseConnect.returnTest(testID,studentID,courseID,departmentID,collegeID).getTestMark()+" about to be deleted");
         CollegeAdminUI.displayTestDeleteWarning(DatabaseConnect.returnTest(testID, studentID, courseID, departmentID, collegeID));
         if(CollegeAdminUI.inputTestDeleteConfirmation()==1){
@@ -404,67 +441,83 @@ public class CollegeAdminLogic {
     }
 
     public void addRecord() throws SQLException {
-        int collegeID = collegeAdmin.getCollege().getCollegeID();
-        int transactionID;
-        int professorID;
-        while (true) {
-            int departmentID = DatabaseUtility.inputExistingDepartmentID(collegeID);
-            int courseID = DatabaseUtility.inputExistingCourseID(departmentID ,collegeID);
-            int studentID = DatabaseUtility.inputExistingStudentID(collegeID);
-            if(DatabaseConnect.verifyRecord(studentID, courseID, departmentID, collegeID)){
-                CommonUI.displayStudentRecordsAlreadyExist();
-                manageRecord();
-                return;
-            }
-                Student student = DatabaseConnect.returnStudent(studentID);
-                Section section = student.getSection();
-                while (!DatabaseConnect.verifyCourseProfessor(professorID = CommonUI.inputProfessorID(), courseID, section.getDepartmentID(), collegeID)) {
-                    // DisplayUtility.singleDialogDisplay("Professor doesn't take Course ID :"+courseID);
-                    CommonUI.displayCourseProfessorNotExist();
-                }
-                transactionID = DatabaseUtility.inputExistingTransaction(collegeID);
-                int externalMark = 0;
-                int attendance = 0;
-                int assignment = 0;
-                String status = "NC";
-                int semesterCompleted = 0;
-                if(CollegeAdminUI.inputRecordValueEntryPage()==2){
-                    externalMark = CommonUI.inputExternalMark();
-                    attendance = CommonUI.inputAttendance();
-                    assignment = CommonUI.inputAssignmentMark();
-                    status = SuperAdminUI.inputCourseCompletionStatus();
-                    String choiceArray[] = SuperAdminUI.inputStudentCompletionSemester(student);
-                    semesterCompleted = CollegeAdminUI.inputCourseCompletionSemester(choiceArray);
-            }
-            DatabaseConnect.addRecord(student.getUser().getID(), courseID, section.getDepartmentID(), professorID, section.getCollegeID(), transactionID, externalMark, attendance,assignment, status, semesterCompleted);
-            CommonUI.processSuccessDisplay();
-            manageRecord();
-            break;
+
+        int collegeID = this.collegeAdmin.getCollege().getCollegeID();
+        int transactionID = DatabaseUtility.inputExistingTransaction();
+
+        Transactions transactions = DatabaseConnect.returnTransaction(transactionID);
+
+        int studentID = transactions.getStudentID();
+        Student student = DatabaseConnect.returnStudent(studentID);
+        int studentDepartmentID = student.getSection().getDepartmentID();
+
+            
+        int[] recordsKeyList = InputUtility.keyListInput("Enter Course Details", new String[]{"Enter Course Department ID","Enter the Course ID"});
+        int courseDepartmentID = recordsKeyList[1];
+        int courseID = recordsKeyList[2];
+        Course course = DatabaseConnect.returnCourse(courseID, courseDepartmentID, student.getSection().getCollegeID());
+
+        if((course.getCourseSemester()<=student.getSemester()) || ((course.getCourseElective())=="P" && (studentDepartmentID==courseDepartmentID)) || ((course.getCourseElective()=="O") && (studentDepartmentID!=courseDepartmentID))){
+            DisplayUtility.singleDialogDisplay("Student and Course Department/Elective/Semester conflict");
+            editRecord();
         }
+
+        if(DatabaseConnect.verifyRecord(studentID, courseID, courseDepartmentID, collegeID)){
+            CommonUI.displayStudentRecordsAlreadyExist();
+            editRecord();
+        }
+
+
+        int professorID;
+        while (!DatabaseConnect.verifyCourseProfessor(professorID = CommonUI.inputProfessorID(), courseID, courseDepartmentID, collegeID)) {
+            SuperAdminUI.displayProfessorNotTakeCourse(courseID);
+        }
+        int assignment = 0;
+        int externalMark = 0;
+        int attendance = 0;
+        String status = "NC";
+        int semesterCompleted = 0;
+        if(student.getSemester()!=1){
+            if(SuperAdminUI.inputRecordValueEntryPage()==2){
+                externalMark = CommonUI.inputExternalMark();
+                attendance = CommonUI.inputAttendance();
+                assignment = CommonUI.inputAssignmentMark();
+                status = SuperAdminUI.inputCourseCompletionStatus();
+                String choiceArray[] = SuperAdminUI.inputStudentCompletionSemester(student.getDegree(), student.getSemester());
+                semesterCompleted = SuperAdminUI.inputCourseCompletionSemester(choiceArray);
+            }
+        }
+        DatabaseConnect.addRecord(student.getUser().getID(), courseID, courseDepartmentID, professorID, collegeID, transactionID, externalMark, attendance, assignment, status, semesterCompleted);
+        CommonUI.processSuccessDisplay();
+        manageRecord();
     }
 
     public void editRecord() throws SQLException {
-        int professorID;
+        int inputChoice;
         int collegeID = this.collegeAdmin.getCollege().getCollegeID();
-        int departmentID = DatabaseUtility.inputExistingDepartmentID(collegeID);
-        int courseID = DatabaseUtility.inputExistingCourseID(departmentID ,collegeID);
         int studentID = DatabaseUtility.inputExistingStudentID(collegeID);
+        Student student = DatabaseConnect.returnStudent(studentID);
+
+        int[] recordsKeyList = InputUtility.keyListInput("Enter Record Details", new String[]{"Enter the Department ID","Enter the Course ID"});
+        int departmentID = recordsKeyList[0];
+        int courseID = recordsKeyList[1];
         if(!DatabaseConnect.verifyRecord(studentID, courseID, departmentID, collegeID)){
-            CommonUI.displayStudentRecordsNotExist();           
-            manageRecord();
-            return;
+            CommonUI.displayStudentRecordsNotExist();
+            editRecord();
         }
-        int choice;
-        boolean toggleDetails = true;
+
         Records record = DatabaseConnect.returnRecords(studentID, courseID, departmentID, collegeID);
-        while((choice = CollegeAdminUI.inputEditRecordsPage(toggleDetails, record))!=6) {
-            switch(choice){
+
+        int professorID;
+        boolean toggleDetails = true;
+        while((inputChoice = CollegeAdminUI.inputEditRecordsPage(toggleDetails, record))!=6) {
+            switch(inputChoice){
 
                 case 1:
-                    while (!DatabaseConnect.verifyCourseProfessor(professorID = CommonUI.inputProfessorID(), record.getCourseID(), record.getDepartmentID(), record.getCollegeID())) {
+                    while (!DatabaseConnect.verifyCourseProfessor(professorID = CommonUI.inputProfessorID(), record.getCourseProfessor().getCourseID(), record.getCourseProfessor().getDepartmentID(), record.getCourseProfessor().getCollegeID())) {
                         CommonUI.displayProfessorIDNotExist();
                     }
-                    record.setProfessorID(professorID);
+                    record.getCourseProfessor().setProfessorID(professorID);
                     break;
 
                 case 2:
@@ -484,15 +537,18 @@ public class CollegeAdminLogic {
                     break;
 
                 case 4:
+                    if(student.getSemester()==1){
+                        DisplayUtility.singleDialogDisplay("Cannot edit status as student is in 1st semester");
+                        continue;
+                    }
                     record.setStatus(SuperAdminUI.inputCourseCompletionStatus());
                     switch(record.getStatus()){
                         case "NC":
                             record.setSemCompleted(0);
                             break;
                         case "C":
-                            Student student = DatabaseConnect.returnStudent(record.getStudentID());
                             String choiceArray[] = new String[]{};
-                            choiceArray = SuperAdminUI.inputStudentCompletionSemester(student);
+                            choiceArray = SuperAdminUI.inputStudentCompletionSemester(student.getDegree(), student.getSemester());
                             record.setSemCompleted(InputUtility.inputChoice("Select the Semester", choiceArray));
                             break;
                     }
@@ -506,7 +562,7 @@ public class CollegeAdminLogic {
                 // record.setCgpa((record.getInternalMarks()+record.getExternalMarks())/10);
                 DatabaseConnect.editRecord(studentID, courseID, record);
                 studentID = record.getStudentID();
-                courseID = record.getCourseID();
+                courseID = record.getCourseProfessor().getCourseID();
                 CommonUI.processSuccessDisplay();
             }
     }
@@ -514,7 +570,9 @@ public class CollegeAdminLogic {
     public void deleteRecord() throws SQLException {
         int collegeID = this.collegeAdmin.getCollege().getCollegeID();
         int departmentID = DatabaseUtility.inputExistingDepartmentID(collegeID);
-        int courseID = DatabaseUtility.inputExistingCourseID(departmentID ,collegeID);
+
+        
+        int courseID = DatabaseUtility.inputExistingCourseID(departmentID, collegeID);
         int studentID = DatabaseUtility.inputExistingStudentID(collegeID);
         if(!DatabaseConnect.verifyRecord(studentID, courseID, departmentID, collegeID)){
             CommonUI.displayStudentRecordsNotExist();
@@ -533,6 +591,8 @@ public class CollegeAdminLogic {
         int collegeID = collegeAdmin.getCollege().getCollegeID();
         int departmentID = DatabaseUtility.inputExistingDepartmentID(collegeID);
         int professorID = DatabaseUtility.inputExistingProfessorID(collegeID);
+
+        
         int courseID = DatabaseUtility.inputExistingCourseID(departmentID, collegeID);
         if(DatabaseConnect.verifyCourseProfessor(professorID, courseID, departmentID, collegeID)){
 
@@ -544,27 +604,20 @@ public class CollegeAdminLogic {
         CommonUI.processSuccessDisplay();
     }
 
-    public void addProfessorToCourseTable() throws SQLException {
+    public void editProfessorForCourse() throws SQLException {
         int collegeID = collegeAdmin.getCollege().getCollegeID();
         int departmentID = DatabaseUtility.inputExistingDepartmentID(collegeID);
-        int professorID = DatabaseUtility.inputExistingProfessorID(collegeID);
+
+        
         int courseID = DatabaseUtility.inputExistingCourseID(departmentID, collegeID);
-        if(DatabaseConnect.verifyCourseProfessor(professorID, courseID, departmentID, collegeID)){           
-            
+        int professorID = DatabaseUtility.inputExistingProfessorID(collegeID);
+        if(!DatabaseConnect.verifyCourseProfessor(professorID, courseID, departmentID, collegeID)){
+
             CommonUI.displayCourseProfessorAlreadyExist();
             manageProfessorCourseTable();
             return;
         }
-        DatabaseConnect.addCourseProfessor(courseID, professorID, departmentID, collegeID);
-        CommonUI.processSuccessDisplay();
-    }
-
-    public void editProfessorForCourse() throws SQLException {
-        int collegeID = collegeAdmin.getCollege().getCollegeID();
-        int departmentID = DatabaseUtility.inputExistingDepartmentID(collegeID);
-        int courseID = DatabaseUtility.inputExistingCourseID(departmentID, collegeID);
-        int professorID = DatabaseUtility.inputExistingProfessorID(collegeID);
-        int newProfessorID = DatabaseUtility.inputNonExistingUserID();
+        int newProfessorID = DatabaseUtility.inputExistingProfessorID(collegeID);
         if(DatabaseConnect.verifyCourseProfessor(newProfessorID, courseID, departmentID, collegeID)){
 
             CommonUI.displayCourseProfessorAlreadyExist();
@@ -664,17 +717,21 @@ public class CollegeAdminLogic {
     
     public void editSection() throws SQLException {
         int choice;
-        int collegeID = collegeAdmin.getCollege().getCollegeID();
-        int departmentID, sectionID;
-        departmentID = DatabaseUtility.inputExistingDepartmentID(collegeID);
-        sectionID = DatabaseUtility.inputExistingSectionID(collegeID, departmentID);
-        boolean toggleDetails = true;
+
+        int collegeID = this.collegeAdmin.getCollege().getCollegeID();
+        int[] sectiionKeyList = DatabaseUtility.inputExistingSection(collegeID);
+
+        int sectionID = sectiionKeyList[1];
+        int departmentID = sectiionKeyList[0];
+
         Section section = DatabaseConnect.returnSection(collegeID, departmentID, sectionID);
+
+        boolean toggleDetails = true;
         while ((choice = CollegeAdminUI.inputEditSectionPage(toggleDetails, section))!=4) {
             switch (choice) {
 
                 case 1:
-                    section.setSectionID(DatabaseUtility.inputExistingSectionID(collegeID, departmentID));
+                    section.setSectionID(DatabaseUtility.inputExistingSection(departmentID, collegeID));
                     break;
 
                 case 2:
@@ -694,11 +751,15 @@ public class CollegeAdminLogic {
     }
 
     public void deleteSection() throws SQLException {
-        int collegeID = collegeAdmin.getCollege().getCollegeID();
-        int departmentID, sectionID;
-        departmentID = DatabaseUtility.inputExistingDepartmentID(collegeID);
-        sectionID = DatabaseUtility.inputExistingSectionID(collegeID, departmentID);
-        CollegeAdminUI.displaySectionDeleteWarning(collegeID, departmentID, sectionID);
+
+        int collegeID = this.collegeAdmin.getCollege().getCollegeID();
+        int[] sectionKeyList = DatabaseUtility.inputExistingSection(collegeID);
+
+        int sectionID = sectionKeyList[1];
+        int departmentID = sectionKeyList[0];
+
+        Section section = DatabaseConnect.returnSection(collegeID, departmentID, sectionID);
+        CollegeAdminUI.displaySectionDeleteWarning(section);
         if(CollegeAdminUI.inputDeleteConfirmation() == 1){
             DatabaseConnect.deleteSection(sectionID, departmentID, collegeID);
             CommonUI.processSuccessDisplay();
@@ -744,7 +805,7 @@ public class CollegeAdminLogic {
         int collegeID = collegeAdmin.getCollege().getCollegeID();
         int choiceInput;
         int departmentID = DatabaseUtility.inputExistingDepartmentID(collegeID);
-        Department department = DatabaseConnect.returnDepartment(departmentID, collegeID);            
+        Department department = DatabaseConnect.returnDepartment(departmentID, collegeID);
         boolean toggleDetails = true;
         while ((choiceInput = CollegeAdminUI.inputEditDepartmentPage(departmentID, department, toggleDetails)) != 4) {
             switch (choiceInput){
@@ -799,13 +860,15 @@ public class CollegeAdminLogic {
         int collegeID = collegeAdmin.getCollege().getCollegeID();
         int departmentID = DatabaseUtility.inputExistingDepartmentID(collegeID);
         int courseID = DatabaseUtility.inputNonExistingCourseID(departmentID, collegeID);
+
+        
         String courseName = CommonUI.inputCourseName();
         String degree = CommonUI.inputDegree();
         int year = CommonUI.inputAcademicYear(degree);
         int courseSemester = CommonUI.inputSemester(year);
         String elective = CollegeAdminUI.inputCourseElectivePage();
 
-        Course course = new Course(courseID, courseName, courseSemester, departmentID, collegeID, degree, elective);
+        Course course = new Course(courseID, courseName, courseSemester, degree, departmentID, collegeID, elective);
         DatabaseConnect.addCourse(course);
         CommonUI.processSuccessDisplay();
     }
@@ -813,6 +876,8 @@ public class CollegeAdminLogic {
     public void editCourse() throws SQLException {
         int collegeID = collegeAdmin.getCollege().getCollegeID();
         int departmentID = DatabaseUtility.inputExistingDepartmentID(collegeID);
+
+        
         int courseID = DatabaseUtility.inputExistingCourseID(departmentID, collegeID);
         int choice;
         boolean toggleDetails = true;
@@ -844,6 +909,8 @@ public class CollegeAdminLogic {
     public void deleteCourse() throws SQLException {
         int collegeID = collegeAdmin.getCollege().getCollegeID();
         int departmentID = DatabaseUtility.inputExistingDepartmentID(collegeID);
+
+        
         int courseID = DatabaseUtility.inputExistingCourseID(departmentID, collegeID);
         CollegeAdminUI.displayCourseDeletionWarning(collegeID, departmentID, courseID);
         if(CollegeAdminUI.inputDeleteConfirmation()==1){
@@ -1090,7 +1157,8 @@ public class CollegeAdminLogic {
                     break;
 
                 case 8:
-                    section.setSectionID(DatabaseUtility.inputExistingSectionID(section.getCollegeID(), section.getDepartmentID()));
+                    int sectionID = DatabaseUtility.inputExistingSection(section.getCollegeID(), section.getDepartmentID());
+                    section.setSectionID(sectionID);
                     break;
 
                 case 9:
@@ -1237,13 +1305,16 @@ public class CollegeAdminLogic {
 
     public void addStudent(User user) throws SQLException{
         int collegeID = this.collegeAdmin.getCollege().getCollegeID();
-        int departmentID = DatabaseUtility.inputExistingDepartmentID(collegeID);
-        int sectionID = DatabaseUtility.inputExistingSectionID(collegeID, departmentID);
+        int[] sectionKeyList = DatabaseUtility.inputExistingSection(collegeID);
+
+        int sectionID = sectionKeyList[1];
+        int departmentID = sectionKeyList[0];
+
         Section section = DatabaseConnect.returnSection(collegeID, departmentID, sectionID);
         int semester = 1;
         int year = 1;
         String degree = CommonUI.inputDegree();
-        int modeOfAdmission =InputUtility.inputModeOfAdmission(degree);
+        int modeOfAdmission =CommonUI.inputModeOfAdmission(degree);
 
         switch (degree) {
             case "B. Tech":
@@ -1284,7 +1355,6 @@ public class CollegeAdminLogic {
 
     public void addProfessor(User user) throws SQLException {
         int collegeID = this.collegeAdmin.getCollege().getCollegeID();
-        // int professorID = DatabaseUtility.inputNonExistingUserID();
         int departmentID = DatabaseUtility.inputExistingDepartmentID(collegeID);
         Department department = DatabaseConnect.returnDepartment(departmentID, collegeID);
         Professor professor = new Professor(user, department);
@@ -1293,7 +1363,6 @@ public class CollegeAdminLogic {
 
     public void addCollegeAdmin(User user) throws SQLException {
         College collegeID = this.collegeAdmin.getCollege();
-        // int collegeAdminID = DatabaseUtility.inputNonExistingUserID();
         CollegeAdmin collegeAdmin = new CollegeAdmin(user, collegeID);
         DatabaseConnect.addCollegeAdmin(collegeAdmin);
     }
@@ -1307,7 +1376,7 @@ public class CollegeAdminLogic {
             deleteUser();
             return;
         }
-        if(user.getID()!=userID){
+        if(this.collegeAdmin.getUser().getID()!=userID){
             CollegeAdminUI.displayUserDeletionWarning(userID);
             if(CollegeAdminUI.inputUserDeleteConfirmation() == 1){
                 DatabaseConnect.deleteUser(userID);
@@ -1316,7 +1385,7 @@ public class CollegeAdminLogic {
                 return;
             }
         }
-        else if(user.getID() == userID){
+        else if(this.collegeAdmin.getUser().getID() == userID){
             CollegeAdminUI.displayLoggedInUserDeleteWarning();
             if(CollegeAdminUI.inputLoggedInUserDeleteConfirmation() == 1){
                 DatabaseConnect.deleteUser(userID);

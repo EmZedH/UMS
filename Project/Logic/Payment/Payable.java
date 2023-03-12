@@ -1,4 +1,4 @@
-package Controller.Payment;
+package Logic.Payment;
 
 public interface Payable {
     public void pay();

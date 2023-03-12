@@ -5,16 +5,17 @@ public class Course {
     private String courseName;
     private int courseSemester;
     private String courseDegree;
-    private int courseDepartment;
+    private int departmentID;
     private int collegeID;
     private String courseElective;
-    public Course(int courseID, String courseName, int courseSemester, int courseDepartment, int collegeID, String courseDegree, String courseElective) {
+    public Course(int courseID, String courseName, int courseSemester, String courseDegree, int departmentID,
+            int collegeID, String courseElective) {
         this.courseID = courseID;
         this.courseName = courseName;
         this.courseSemester = courseSemester;
-        this.collegeID = collegeID;
         this.courseDegree = courseDegree;
-        this.courseDepartment = courseDepartment;
+        this.departmentID = departmentID;
+        this.collegeID = collegeID;
         this.courseElective = courseElective;
     }
     public int getCourseID() {
@@ -32,16 +33,31 @@ public class Course {
     public int getCourseSemester() {
         return courseSemester;
     }
+    public void setCourseSemester(int courseSemester) {
+        this.courseSemester = courseSemester;
+    }
     public String getCourseDegree() {
         return courseDegree;
     }
-    public int getCourseDepartment() {
-        return courseDepartment;
+    public void setCourseDegree(String courseDegree) {
+        this.courseDegree = courseDegree;
+    }
+    public int getDepartmentID() {
+        return departmentID;
+    }
+    public void setDepartmentID(int departmentID) {
+        this.departmentID = departmentID;
     }
     public int getCollegeID() {
         return collegeID;
     }
+    public void setCollegeID(int collegeID) {
+        this.collegeID = collegeID;
+    }
     public String getCourseElective() {
         return courseElective;
+    }
+    public void setCourseElective(String courseElective) {
+        this.courseElective = courseElective;
     }
 }

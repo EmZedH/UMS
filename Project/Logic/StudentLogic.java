@@ -1,27 +1,25 @@
-package Controller;
+package Logic;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
 
-import Controller.Payment.CreditCard;
-import Controller.Payment.DebitCard;
-import Controller.Payment.Payable;
-import Controller.Payment.UPIPayment;
+import Logic.Payment.CreditCard;
+import Logic.Payment.DebitCard;
+import Logic.Payment.Payable;
+import Logic.Payment.UPIPayment;
 import Model.DatabaseConnect;
 import Model.DatabaseUtility;
 import Model.Records;
 import Model.Student;
-import Model.User;
-import View.CommonUI;
-import View.Utility.DisplayUtility;
+import UI.CommonUI;
+import UI.StudentUI;
+import UI.Utility.DisplayUtility;
 
 public class StudentLogic {
     Student student;
-    User user;
 
-    StudentLogic(Student student, User user) throws SQLException{
+    StudentLogic(Student student) throws SQLException{
         this.student = student;
-        user = this.student.getUser();
         startPage();
     }
 
@@ -218,6 +216,7 @@ public class StudentLogic {
 
     public void viewOpenElectiveTestList() throws SQLException {
         int departmentID = DatabaseUtility.inputOtherDepartment(this.student.getSection().getDepartmentID(), this.student.getSection().getCollegeID());
+
         int courseID = DatabaseUtility.inputExistingCourseID(departmentID, this.student.getSection().getCollegeID());
         DisplayUtility.printTable("TEST LIST", new String[]{"TEST ID","TEST MARKS"}, DatabaseConnect.selectAllCourseTestOfStudent(this.student.getUser().getID(), courseID, departmentID, this.student.getSection().getCollegeID()));
     }
@@ -269,6 +268,7 @@ public class StudentLogic {
 
     private void viewOpenElectiveCGPA() throws SQLException {
         int departmentID = DatabaseUtility.inputOtherDepartment(this.student.getSection().getDepartmentID(), this.student.getSection().getCollegeID());
+        
         int courseID = DatabaseUtility.inputExistingCourseID(departmentID, this.student.getSection().getCollegeID());
         String[][] test = DatabaseConnect.selectAllCourseTestOfStudent(this.student.getUser().getID(), courseID, this.student.getSection().getDepartmentID(), this.student.getSection().getCollegeID());
         int testMark = 0, count = 0;
@@ -332,7 +332,7 @@ public class StudentLogic {
         int departmentID = DatabaseUtility.inputOtherDepartment(this.student.getSection().getDepartmentID(), this.student.getSection().getCollegeID());
         int courseID = DatabaseUtility.inputOpenElectiveCourse(departmentID, this.student.getSection().getCollegeID());
         if(!DatabaseConnect.verifyRecord(this.student.getUser().getID(), courseID, departmentID, this.student.getSection().getCollegeID())){
-            String professor = DatabaseConnect.selectAllOpenElectiveCourses(courseID, this.student.getSemester(), this.student.getDegree(), departmentID, this.student.getSection().getCollegeID())[0][0];
+            String professor = DatabaseConnect.selectAllOpenElectiveCourseProfessor(courseID, this.student.getSemester(), this.student.getDegree(), departmentID, this.student.getSection().getCollegeID())[0][0];
             DatabaseConnect.addRecord(this.student.getUser().getID(), courseID, departmentID, Integer.parseInt(professor), this.student.getSection().getCollegeID(), transactionID, 0, 0, 0, "NC", null);
             count--;
             StudentUI.displayCourseRegisteredPage(courseID);

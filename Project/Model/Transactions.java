@@ -14,23 +14,22 @@ public class Transactions {
     public int getTransactionID() {
         return transactionID;
     }
+    public void setTransactionID(int transactionID) {
+        this.transactionID = transactionID;
+    }
     public int getStudentID() {
         return studentID;
     }
     public String getDate() {
         return date;
     }
-    public int getAmount() {
-        return amount;
-    }
-    public void setTransactionID(int transactionID) {
-        this.transactionID = transactionID;
-    }
     public void setDate(String date) {
         this.date = date;
+    }
+    public int getAmount() {
+        return amount;
     }
     public void setAmount(int amount) {
         this.amount = amount;
     }
-    
 }

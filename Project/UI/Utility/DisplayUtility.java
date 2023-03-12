@@ -1,4 +1,4 @@
-package View.Utility;
+package UI.Utility;
 
 public class DisplayUtility {
     static int lineSize = 60;
@@ -20,22 +20,19 @@ public class DisplayUtility {
         }
     }
 
-    public static void wrappedDialogDisplay(String msg) {
-        for (int i = 0; i < 5; i++) {
-            if(i==1 || i== 3){
-                for (int j = 0; j < lineSize; j++) {
-                    System.out.print("-");
-                }
-            }
-            else if(i==2){
-                for (int j = 0;j< lineSize - msg.length() -1; j++) {
-                    msg = " "  + msg;
-                }
-                    System.out.print(msg);
+    public static String wrappedDialogDisplay(String msg) {
+        String msgCopy = msg;
+        int length = msgCopy.length();
+        while(length>=lineSize){
+            if(msgCopy.indexOf('\n')==-1){
+                length = msgCopy.indexOf(' ', length/2);
                 
             }
-            System.out.println();
+            else{
+
+            }
         }
+        return msgCopy;
     }
 
     public static void optionDialog(String heading,String[] msg) {
@@ -64,7 +61,7 @@ public class DisplayUtility {
                     p = " "+p;
                 }
                 flag=0;
-                System.out.print(p+Integer.toString(i-4) + ". " + msg[i-5]);
+                System.out.print(p+(i-4) + ". " + msg[i-5]);
             }
             System.out.println();
         }
@@ -117,17 +114,13 @@ public class DisplayUtility {
                         ki = msg[k];
                     }
                 }
-                // msg[i-5] = Integer.toString(i-4) + ". " + msg[i-5]; 
                 for (int j = 0;j+3< lineSize - (p+ki).length() -1 && flag==1; j++) {
                     p = " "+p;
                 }
                 flag=0;
-                // System.out.print(p+msg[i-5]);
-                System.out.print(p+Integer.toString(i-4) + ". " + msg[i-5]);
+                System.out.print(p+(i-4) + ". " + msg[i-5]);
             }
             else if(i==msg.length+7){
-                // String uID = "ID: "+Integer.toString(left);
-                // left = "Name: " + left;
                 int len = left.length();
                 for(int j=len;j<lineSize-(right).length();j++){
                     left=left+" ";
@@ -160,17 +153,13 @@ public class DisplayUtility {
                         ki = option[k];
                     }
                 }
-                // msg[i-5] = Integer.toString(i-4) + ". " + msg[i-5]; 
                 for (int j = 0;j+3< lineSize - (p+ki).length() -1 && flag==1; j++) {
                     p = " "+p;
                 }
                 flag=0;
-                // System.out.print(p+msg[i-5]);
-                System.out.print(p+Integer.toString(i-4) + ". " + option[i-5]);
+                System.out.print(p+(i-4) + ". " + option[i-5]);
             }
             else if(i==option.length+7){
-                // String uID = "ID: "+Integer.toString(id);
-                // msg = "Name: " + msg;
                 int len = msg.length();
                 for(int j=len;j<lineSize;j++){
                     msg=msg+" ";

@@ -1,6 +1,6 @@
-package Controller.Payment;
+package Logic.Payment;
 
-import View.Utility.DisplayUtility;
+import UI.Utility.DisplayUtility;
 
 public class CreditCard implements Payable{
     boolean status = false;
