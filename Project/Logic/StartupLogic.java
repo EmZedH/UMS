@@ -1,11 +1,22 @@
 package Logic;
 import java.sql.SQLException;
 
+import Logic.CollegeAdminLogic.CollegeAdminMainPage;
+import Logic.CollegeAdminLogic.CollegeAdminServicesFactory;
+import Logic.ProfessorLogic.ProfessorMainPage;
+import Logic.ProfessorLogic.ProfessorServicesFactory;
+import Logic.StudentLogic.StudentMainPage;
+import Logic.StudentLogic.StudentServicesFactory;
+import Logic.SuperAdminLogic.SuperAdminMainPage;
+import Logic.SuperAdminLogic.SuperAdminServicesFactory;
 import Model.CollegeAdmin;
-import Model.DatabaseConnect;
 import Model.Professor;
 import Model.Student;
 import Model.SuperAdmin;
+import Model.DatabaseAccessObject.CollegeAdminDAO;
+import Model.DatabaseAccessObject.ProfessorDAO;
+import Model.DatabaseAccessObject.StudentDAO;
+import Model.DatabaseAccessObject.SuperAdminDAO;
 import UI.CommonUI;
 
 public class StartupLogic {
@@ -53,14 +64,16 @@ public class StartupLogic {
         }
 
     public static void startUpSuperAdmin() {
+        SuperAdminDAO superAdminDAO = new SuperAdminDAO();
         int userID = CommonUI.inputStartPageUserID();
         String password = CommonUI.inputStartPagePasswordPage(userID);
 
         try {
-            if(DatabaseConnect.verifySuperAdminIDPassword(userID, password)){
+            if(superAdminDAO.verifySuperAdminIDPassword(userID, password)){
                 CommonUI.displayLoginVerified();
-                SuperAdmin superAdmin = DatabaseConnect.returnSuperAdmin(userID);
-                new SuperAdminLogic(superAdmin);
+                SuperAdmin superAdmin = superAdminDAO.returnSuperAdmin(userID);
+                UserInterface userInterface = new UserInterface();
+                userInterface.userInterface(new SuperAdminMainPage(superAdmin, new SuperAdminServicesFactory()));
             }
             else{
                 StartupLogic.displayWrongCredentials(4,userID);
@@ -72,13 +85,15 @@ public class StartupLogic {
     }
     
     public static void startUpSuperAdmin(int userID) {
+        SuperAdminDAO superAdminDAO = new SuperAdminDAO();
         String password = CommonUI.inputStartPagePasswordPage(userID);
 
         try {
-            if(DatabaseConnect.verifySuperAdminIDPassword(userID, password)){
+            if(superAdminDAO.verifySuperAdminIDPassword(userID, password)){
                 CommonUI.displayLoginVerified();
-                SuperAdmin superAdmin = DatabaseConnect.returnSuperAdmin(userID);
-                new SuperAdminLogic(superAdmin);
+                SuperAdmin superAdmin = superAdminDAO.returnSuperAdmin(userID);
+                UserInterface userInterface = new UserInterface();
+                userInterface.userInterface(new SuperAdminMainPage(superAdmin, new SuperAdminServicesFactory()));
             }
             else{
                 StartupLogic.displayWrongCredentials(4,userID);
@@ -161,13 +176,15 @@ public class StartupLogic {
 
 
     public static void startUpCollegeAdmin() {
+        CollegeAdminDAO collegeAdminDAO = new CollegeAdminDAO();
         int userID = CommonUI.inputStartPageUserID();
         String password = CommonUI.inputStartPagePasswordPage(userID);
         try {
-            if(DatabaseConnect.verifyCollegeAdminIDPassword(userID, password)){
+            if(collegeAdminDAO.verifyCollegeAdminIDPassword(userID, password)){
                 CommonUI.displayLoginVerified();
-                CollegeAdmin collegeAdmin = DatabaseConnect.returnCollegeAdmin(userID);
-                new CollegeAdminLogic(collegeAdmin);
+                CollegeAdmin collegeAdmin = collegeAdminDAO.returnCollegeAdmin(userID);
+                UserInterface userInterface = new UserInterface();
+                userInterface.userInterface(new CollegeAdminMainPage(new CollegeAdminServicesFactory(), collegeAdmin));
             }
             else{
                 displayWrongCredentials(3,userID);
@@ -177,15 +194,17 @@ public class StartupLogic {
             displaySqlError(3,userID);
         } 
     }
-
-
+    
+    
     public static void startUpCollegeAdmin(int userID) {
+        CollegeAdminDAO collegeAdminDAO = new CollegeAdminDAO();
         String password = CommonUI.inputStartPagePasswordPage(userID);
         try {
-            if(DatabaseConnect.verifyCollegeAdminIDPassword(userID, password)){
+            if(collegeAdminDAO.verifyCollegeAdminIDPassword(userID, password)){
                 CommonUI.displayLoginVerified();
-                CollegeAdmin collegeAdmin = DatabaseConnect.returnCollegeAdmin(userID);
-                new CollegeAdminLogic(collegeAdmin);
+                CollegeAdmin collegeAdmin = collegeAdminDAO.returnCollegeAdmin(userID);
+                UserInterface userInterface = new UserInterface();
+                userInterface.userInterface(new CollegeAdminMainPage(new CollegeAdminServicesFactory(), collegeAdmin));
             }
             else{
                 displayWrongCredentials(3,userID);
@@ -197,13 +216,16 @@ public class StartupLogic {
     }
 
     public static void startUpProfessor(){
+        ProfessorDAO professorDAO = new ProfessorDAO();
         int userID = CommonUI.inputStartPageUserID();
         String password = CommonUI.inputStartPagePasswordPage(userID);
         try {
-            if(DatabaseConnect.verifyProfessorIDPassword(userID, password)){
+            if(professorDAO.verifyProfessorIDPassword(userID, password)){
                 CommonUI.displayLoginVerified();
-                Professor professor = DatabaseConnect.returnProfessor(userID);
-                new ProfessorLogic(professor);
+                Professor professor = professorDAO.returnProfessor(userID);
+                UserInterface userInterface = new UserInterface();
+                ProfessorServicesFactory professorServicesFactory = new ProfessorServicesFactory();
+                userInterface.userInterface(new ProfessorMainPage(professorServicesFactory, professor));
             }
             else{
                 displayWrongCredentials(2,userID);
@@ -213,14 +235,17 @@ public class StartupLogic {
             displaySqlError(2,userID);
         }
     }
-
+    
     public static void startUpProfessor(int userID){
+        ProfessorDAO professorDAO = new ProfessorDAO();
         String password = CommonUI.inputStartPagePasswordPage(userID);
         try {
-            if(DatabaseConnect.verifyProfessorIDPassword(userID, password)){
+            if(professorDAO.verifyProfessorIDPassword(userID, password)){
                 CommonUI.displayLoginVerified();
-                Professor professor = DatabaseConnect.returnProfessor(userID);
-                new ProfessorLogic(professor);
+                Professor professor = professorDAO.returnProfessor(userID);
+                UserInterface userInterface = new UserInterface();
+                ProfessorServicesFactory professorServicesFactory = new ProfessorServicesFactory();
+                userInterface.userInterface(new ProfessorMainPage(professorServicesFactory, professor));
             }
             else{
                 displayWrongCredentials(2,userID);
@@ -232,13 +257,16 @@ public class StartupLogic {
     }
 
     public static void startUpStudent() {
+        StudentDAO studentDAO = new StudentDAO();
         int userID = CommonUI.inputStartPageUserID();
         String password = CommonUI.inputStartPagePasswordPage(userID);
         try {
-            if(DatabaseConnect.verifyStudentIDPassword(userID, password)){
+            if(studentDAO.verifyStudentIDPassword(userID, password)){
                 CommonUI.displayLoginVerified();
-                Student student = DatabaseConnect.returnStudent(userID);
-                new StudentLogic(student);
+                Student student = studentDAO.returnStudent(userID);
+                
+                UserInterface userInterface = new UserInterface();
+                userInterface.userInterface(new StudentMainPage(new StudentServicesFactory(), student));
             }
             else{
                 displayWrongCredentials(1, userID);
@@ -248,14 +276,17 @@ public class StartupLogic {
             displaySqlError(1,userID);
         }
     }
-
+    
     public static void startUpStudent(int userID) {
+        StudentDAO studentDAO = new StudentDAO();
         String password = CommonUI.inputStartPagePasswordPage(userID);
         try {
-            if(DatabaseConnect.verifyStudentIDPassword(userID, password)){
+            if(studentDAO.verifyStudentIDPassword(userID, password)){
                 CommonUI.displayLoginVerified();
-                Student student = DatabaseConnect.returnStudent(userID);
-                new StudentLogic(student);
+                Student student = studentDAO.returnStudent(userID);
+                
+                UserInterface userInterface = new UserInterface();
+                userInterface.userInterface(new StudentMainPage(new StudentServicesFactory(), student));
             }
             else{
                 displayWrongCredentials(1, userID);

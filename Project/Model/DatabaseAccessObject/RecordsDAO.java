@@ -1,6 +1,8 @@
 package Model.DatabaseAccessObject;
 
 import java.sql.Statement;
+import java.util.List;
+
 import com.sun.org.apache.xalan.internal.xsltc.compiler.util.Type;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,33 +11,40 @@ import java.sql.SQLException;
 
 import Model.Connect;
 import Model.CourseProfessor;
-import Model.DatabaseConnect;
 import Model.Records;
 
 public class RecordsDAO extends Connect{
     
-    public String[][] selectAllRecords() throws SQLException{
+    public List<List<String>> selectAllRecords() throws SQLException{
         return createArrayFromTable("SELECT * FROM RECORDS", new String[]{"STUDENT_ID","COURSE_ID","DEPT_ID","PROF_ID","COLLEGE_ID","TRANSACT_ID","EXT_MARK","ATTENDANCE","ASSIGNMENT","STATUS","SEM_COMPLETED"});
     }
 
-    public String[][] selectRecordsInCollege(int collegeID) throws SQLException {
+    public List<List<String>> selectRecordsInCollege(int collegeID) throws SQLException {
         return createArrayFromTable("SELECT * FROM RECORDS WHERE COLLEGE_ID = "+collegeID, new String[]{"STUDENT_ID","COURSE_ID","DEPT_ID","PROF_ID","TRANSACT_ID","EXT_MARK","ATTENDANCE","ASSIGNMENT","STATUS","SEM_COMPLETED"});
     }
 
-    public String[][] selectRecordsByProfessor(int professorID) throws SQLException {
+    public List<List<String>> selectRecordsByProfessor(int professorID) throws SQLException {
         return createArrayFromTable("SELECT STUDENT_ID, U_NAME, COURSE_ID, EXT_MARK, ATTENDANCE, ASSIGNMENT FROM RECORDS INNER JOIN USER ON USER.U_ID = STUDENT_ID WHERE PROF_ID = "+professorID, new String[]{"STUDENT_ID","U_NAME","COURSE_ID","EXT_MARK","ATTENDANCE","ASSIGNMENT"});
     }
     
-    public String[][] selectCurrentSemesterRecordsByStudent(int studentID) throws SQLException {
+    public List<List<String>> selectCurrentSemesterRecordsByStudent(int studentID) throws SQLException {
         return createArrayFromTable("SELECT RECORDS.COURSE_ID, COURSE_NAME, PROF_ID, USER.U_NAME, EXT_MARK, ATTENDANCE, ASSIGNMENT FROM RECORDS INNER JOIN COURSE ON (COURSE.COURSE_ID = RECORDS.COURSE_ID AND COURSE.DEPT_ID = RECORDS.DEPT_ID AND COURSE.COLLEGE_ID = RECORDS.COLLEGE_ID) INNER JOIN USER ON USER.U_ID = RECORDS.PROF_ID WHERE STATUS = \"NC\" AND STUDENT_ID = "+studentID, new String[]{"COURSE_ID","COURSE_NAME","PROF_ID","U_NAME","EXT_MARK","ATTENDANCE","ASSIGNMENT"});
     }
 
-    public static boolean verifyCurrentSemesterRecord(int studentID) throws SQLException {
+    public boolean verifyCurrentSemesterRecord(int studentID) throws SQLException {
         ResultSet resultSet;
-        try(Connection connection = DatabaseConnect.connection();Statement stmt = connection.createStatement()){
+        try(Connection connection = connection();Statement stmt = connection.createStatement()){
             resultSet = stmt.executeQuery("SELECT RECORDS.COURSE_ID, COURSE_NAME, PROF_ID, USER.U_NAME FROM RECORDS INNER JOIN COURSE ON COURSE.COURSE_ID = RECORDS.COURSE_ID INNER JOIN USER ON USER.U_ID = RECORDS.PROF_ID WHERE STATUS = \"NC\" AND STUDENT_ID = "+studentID);
             return resultSet.next();
         }
+    }
+
+    public List<List<String>> selectRecordByProfessor(int professorID) throws SQLException {
+        return createArrayFromTable("SELECT STUDENT_ID, U_NAME, COURSE_ID, EXT_MARK, ATTENDANCE, ASSIGNMENT FROM RECORDS INNER JOIN USER ON USER.U_ID = STUDENT_ID WHERE PROF_ID = "+professorID, new String[]{"STUDENT_ID","U_NAME","COURSE_ID","EXT_MARK","ATTENDANCE","ASSIGNMENT"});
+    }
+
+    public List<List<String>> selectAllRecordByStudent(int studentID) throws SQLException {
+        return createArrayFromTable("SELECT RECORDS.COURSE_ID, COURSE_NAME, STATUS, SEM_COMPLETED, PROF_ID, USER.U_NAME, EXT_MARK, ATTENDANCE, ASSIGNMENT FROM RECORDS INNER JOIN COURSE ON (COURSE.COURSE_ID = RECORDS.COURSE_ID AND COURSE.DEPT_ID = RECORDS.DEPT_ID AND COURSE.COLLEGE_ID = RECORDS.COLLEGE_ID) INNER JOIN USER ON USER.U_ID = RECORDS.PROF_ID WHERE STUDENT_ID = "+studentID, new String[]{"COURSE_ID","COURSE_NAME","STATUS","SEM_COMPLETED","PROF_ID","U_NAME","EXT_MARK","ATTENDANCE","ASSIGNMENT"});
     }
     
     public Records returnRecords(int studentID, int courseID, int departmentID, int collegeID) throws SQLException {
@@ -95,7 +104,7 @@ public class RecordsDAO extends Connect{
         } 
     }
     
-    public static void editRecord(int studentID, int courseID, Records record) throws SQLException {
+    public void editRecord(int studentID, int courseID, Records record) throws SQLException {
         String sqlRecord = "UPDATE RECORDS SET PROF_ID = ?, EXT_MARK = ? , ATTENDANCE = ?, ASSIGNMENT = ? , STATUS = ? , SEM_COMPLETED = ? WHERE STUDENT_ID = ? AND COURSE_ID = ?";
         try (Connection connection = connection(); PreparedStatement pstmt = connection.prepareStatement(sqlRecord)) {
             pstmt.setInt(1, record.getCourseProfessor().getProfessorID());

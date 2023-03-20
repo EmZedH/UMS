@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 import Model.Connect;
 import Model.SuperAdmin;
@@ -21,15 +22,15 @@ public class SuperAdminDAO extends Connect{
         }
     }
 
-    public String[][] selectAllSuperAdmin() throws SQLException{
+    public List<List<String>> selectAllSuperAdmin() throws SQLException{
         return createArrayFromTable("SELECT SA_ID,U_NAME,U_PASSWORD FROM SUPER_ADMIN LEFT JOIN USER ON USER.U_ID = SUPER_ADMIN.SA_ID", new String[]{"SA_ID","U_NAME","U_PASSWORD"});
     }
 
-    public String[][] searchAllSuperAdmin(String column, String searchString ) throws SQLException{
+    public List<List<String>> searchAllSuperAdmin(String column, String searchString ) throws SQLException{
         return createArrayFromTable("SELECT SA_ID,U_NAME,U_PASSWORD FROM (SELECT SA_ID,U_NAME,U_PASSWORD,1 as type FROM SUPER_ADMIN LEFT JOIN USER ON USER.U_ID = SUPER_ADMIN.SA_ID WHERE "+column+" LIKE '"+searchString+"%' UNION SELECT * FROM (SELECT SA_ID,U_NAME,U_PASSWORD,2 AS TYPE FROM SUPER_ADMIN LEFT JOIN USER ON USER.U_ID = SUPER_ADMIN.SA_ID WHERE "+column+" LIKE '%"+searchString+"%' EXCEPT SELECT SA_ID,U_NAME,U_PASSWORD,2 AS TYPE FROM SUPER_ADMIN LEFT JOIN USER ON USER.U_ID = SUPER_ADMIN.SA_ID WHERE "+column+" LIKE '"+searchString+"%')) ORDER BY TYPE;", new String[]{"SA_ID","U_NAME","U_PASSWORD"});
     }
 
-    public static SuperAdmin returnSuperAdmin(int superAdminID) throws SQLException{
+    public SuperAdmin returnSuperAdmin(int superAdminID) throws SQLException{
         String sqlUser = "SELECT * FROM USER INNER JOIN SUPER_ADMIN ON (USER.U_ID = SUPER_ADMIN.SA_ID) WHERE U_ID = ?";
         try(Connection connection = connection(); 
         PreparedStatement pstmtUser = connection.prepareStatement(sqlUser);

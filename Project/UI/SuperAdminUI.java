@@ -1,7 +1,7 @@
 package UI;
 
 import java.sql.SQLException;
-
+import java.util.List;
 
 import Model.College;
 import Model.CollegeAdmin;
@@ -107,19 +107,19 @@ public class SuperAdminUI{
     }
 
     public static int inputUserViewAndSearchPage() {
-        return InputUtility.inputChoice("View User", new String[]{"View All User","Search by name","Search by Aadhar","Search by Address","Back"});
+        return InputUtility.inputChoice("View User", new String[]{"View All User","Search by name","Search by Aadhar","Search by Address","View Student Table","View Professor Table","View College Admin Table","View Super Admin Table","Back"});
     }
 
-    public static void viewUserTable(String[][] databaseTable) {
-        DisplayUtility.printTable("USER DETAILS", new String[]{"USER ID","NAME","AADHAR","DATE OF BIRTH","GENDER","ADDRESS","PASSWORD"}, databaseTable);
+    public static void viewUserTable(List<List<String>> list) {
+        DisplayUtility.printTable("USER DETAILS", new String[]{"USER ID","NAME","AADHAR","DATE OF BIRTH","GENDER","ADDRESS","PASSWORD"}, list);
     }
 
-    public static void viewStudentTable(String[][] databaseTable) throws SQLException {
-        DisplayUtility.printTable("STUDENT DETAILS", new String[]{"STUDENT ID","NAME","SECTION","SEMESTER","DEPARTMENT","DEGREE","COLLEGE","PASSWORD"}, databaseTable);
+    public static void viewStudentTable(List<List<String>> list) throws SQLException {
+        DisplayUtility.printTable("STUDENT DETAILS", new String[]{"STUDENT ID","NAME","SECTION","DEPARTMENT","DEGREE","COLLEGE","PASSWORD"}, list);
     }
 
     public static int inputStudentViewAndSearchPage() {
-        return InputUtility.inputChoice("View Student", new String[]{"View All Student","Search by name","Search by Section","Search by Semester","Search by Year","Search by Department","Search by Degree","Search by College","Back"});
+        return InputUtility.inputChoice("View Student", new String[]{"View All Student","Search by name","Search by Section","Search by Semester","Search by Department","Search by Degree","Search by College","Back"});
     }
 
     public static int inputManageTransactionPage() {
@@ -146,16 +146,16 @@ public class SuperAdminUI{
         return InputUtility.inputChoice("Confirm? (All Section data will be deleted)", new String[]{"Confirm","Back"});
     }
 
-    public static void viewProfessorTable(String[][] databaseTable) throws SQLException {
-        DisplayUtility.printTable("PROFESSOR DETAILS", new String[]{"PROFESSOR ID","NAME","DEPARTMENT","COLLEGE","PASSWORD"}, databaseTable);
+    public static void viewProfessorTable(List<List<String>> list) throws SQLException {
+        DisplayUtility.printTable("PROFESSOR DETAILS", new String[]{"PROFESSOR ID","NAME","DEPARTMENT","COLLEGE","PASSWORD"}, list);
     }
 
-    public static void viewCollegeAdminTable(String[][] databaseTable) throws SQLException {
-        DisplayUtility.printTable("COLLEGE ADMIN DETAILS", new String[]{"COLLEGE ADMIN ID","NAME","COLLEGE","PASSWORD"}, databaseTable);
+    public static void viewCollegeAdminTable(List<List<String>> list) throws SQLException {
+        DisplayUtility.printTable("COLLEGE ADMIN DETAILS", new String[]{"COLLEGE ADMIN ID","NAME","COLLEGE","PASSWORD"}, list);
     }
 
-    public static void viewSuperAdminTable(String[][] databaseTable) throws SQLException {
-        DisplayUtility.printTable("SUPER ADMIN DETAILS", new String[]{"SUPER ADMIN ID","NAME","PASSWORD"}, databaseTable);
+    public static void viewSuperAdminTable(List<List<String>> list) throws SQLException {
+        DisplayUtility.printTable("SUPER ADMIN DETAILS", new String[]{"SUPER ADMIN ID","NAME","PASSWORD"}, list);
     }
 
     public static int inputManageCoursePage() {
@@ -178,8 +178,8 @@ public class SuperAdminUI{
         return InputUtility.inputChoice("View Course", new String[]{"View All Courses","Search by name","Search by semester","Search by department","Search by College","Search by Degree","Search by elective","Back"});
     }
 
-    public static void viewCourseTable(String[][] databaseTable) throws SQLException {
-        DisplayUtility.printTable("COURSE DETAILS", new String[]{"COURSE ID","NAME","SEMESTER","DEPARTMENT ID","DEPARTMENT NAME","COLLEGE NAME","DEGREE","ELECTIVE"}, databaseTable);
+    public static void viewCourseTable(List<List<String>> list) throws SQLException {
+        DisplayUtility.printTable("COURSE DETAILS", new String[]{"COURSE ID","NAME","SEMESTER","DEPARTMENT ID","DEPARTMENT NAME","COLLEGE ID","COLLEGE NAME","DEGREE","ELECTIVE"}, list);
     }
 
     public static int inputManageTestPage() {
@@ -190,8 +190,8 @@ public class SuperAdminUI{
         return InputUtility.inputChoice("View Test", new String[]{"View All Test","Search by student ID","Search by course","Search by college","Search by marks","Back"});
     }
 
-    public static void viewTestTable(String[][] databaseTable) throws SQLException {
-        DisplayUtility.printTable("TEST RECORDS", new String[]{"TEST ID","STUDENT ID","COURSE ID","COURSE NAME","COLLEGE ID","COLLEGE NAME","TEST MARKS"}, databaseTable);
+    public static void viewTestTable(List<List<String>> list) throws SQLException {
+        DisplayUtility.printTable("TEST RECORDS", new String[]{"TEST ID","STUDENT ID","COURSE_ID","COURSE NAME","COLLEGE ID","COLLEGE NAME","TEST MARK"}, list);
     }
 
     public static void displayTestDeleteWarning(int testID, Test test) {
@@ -202,8 +202,8 @@ public class SuperAdminUI{
         return InputUtility.inputChoice("View Transactions", new String[]{"View Transaction All","Search by student ID","Search by College Name","Search by date","Search by amount","Back"});
     }
 
-    public static void viewTransactionTable(String[][] databaseTable) throws SQLException {
-        DisplayUtility.printTable("TRANSACTION DETAILS", new String[]{"TRANSACTION ID","STUDENT ID","COLLEGE NAME","DATE","AMOUNT"}, databaseTable);
+    public static void viewTransactionTable(List<List<String>> list) throws SQLException {
+        DisplayUtility.printTable("TRANSACTION DETAILS", new String[]{"TRANSACTION ID","STUDENT ID","COLLEGE ID","COLLEGE NAME","DATE","AMOUNT"}, list);
     }
 
     public static int inputManageRecordPage() {
@@ -287,8 +287,8 @@ public class SuperAdminUI{
         return InputUtility.inputChoice("Select property to Edit",toggleDetails ? new String[]{"Department ID","Department Name","Toggle Details","Back"} : new String[]{"Department ID - " + department.getDepartmentID(),"Department Name - "+department.getDepartmentName(),"Toggle Details","Back"});
     }
 
-    public static void viewDepartmentTable(String[][] databaseTable) throws SQLException {
-        DisplayUtility.printTable("DEPARTMENT DETAILS", new String[]{"DEPARTMENT ID","NAME","COLLEGE NAME"}, databaseTable);
+    public static void viewDepartmentTable(List<List<String>> list) throws SQLException {
+        DisplayUtility.printTable("DEPARTMENT DETAILS", new String[]{"DEPARTMENT ID","NAME","COLLEGE_ID","COLLEGE NAME"}, list);
     }
 
     public static int inputViewDepartmentPage() {
@@ -327,7 +327,7 @@ public class SuperAdminUI{
         return InputUtility.inputChoice("View Section", new String[]{"View all Section","Search by name","Search by department","Search by college","Back"});
     }
 
-    public static void viewSectionTable(String[][] databaseTable) throws SQLException {
-        DisplayUtility.printTable("SECTION DETAILS", new String[]{"SECTION ID","NAME","DEPARTMENT NAME","COLLEGE NAME"}, databaseTable);
+    public static void viewSectionTable(List<List<String>> list) throws SQLException {
+        DisplayUtility.printTable("SECTION DETAILS", new String[]{"SECTION ID","NAME","DEPARTMENT NAME","COLLEGE ID","COLLEGE NAME"}, list);
     }
 }

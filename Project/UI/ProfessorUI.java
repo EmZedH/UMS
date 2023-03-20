@@ -20,7 +20,7 @@ public class ProfessorUI{
     }
 
     public static int inputRecordsEditPage() {
-        return InputUtility.inputChoice("Edit Record", new String[]{"Attendance","Assignment","Test","View CGPA","Back"});
+        return InputUtility.inputChoice("Edit Record", new String[]{"Attendance","Assignment","View CGPA","Back"});
     }
 
     public static int inputStudentAttendancePage(Records records) {

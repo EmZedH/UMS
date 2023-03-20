@@ -5,25 +5,26 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 import Model.Connect;
 import Model.Department;
 
 public class DepartmentDAO extends Connect{
     
-    public String[][] selectAllDepartment() throws SQLException {
-        return createArrayFromTable("SELECT DEPT_ID, DEPT_NAME, C_NAME FROM DEPARTMENT LEFT JOIN COLLEGE ON DEPARTMENT.COLLEGE_ID = COLLEGE.C_ID", new String[]{"DEPT_ID","DEPT_NAME","C_NAME"});
+    public List<List<String>> selectAllDepartment() throws SQLException {
+        return createArrayFromTable("SELECT DEPT_ID, DEPT_NAME,C_ID, C_NAME FROM DEPARTMENT LEFT JOIN COLLEGE ON DEPARTMENT.COLLEGE_ID = COLLEGE.C_ID", new String[]{"DEPT_ID","DEPT_NAME","C_ID","C_NAME"});
     }
 
-    public String[][] searchAllDepartment(String column, String searchString) throws SQLException {
-        return createArrayFromTable("SELECT DEPT_ID, DEPT_NAME,C_ID, C_NAME FROM (SELECT DEPT_ID, DEPT_NAME,C_ID, C_NAME,1 AS TYPE FROM DEPARTMENT LEFT JOIN COLLEGE ON DEPARTMENT.COLLEGE_ID = COLLEGE.C_ID WHERE "+column+" LIKE '"+searchString+"%' UNION SELECT * FROM (SELECT DEPT_ID, DEPT_NAME,C_ID, C_NAME,2 AS TYPE FROM DEPARTMENT LEFT JOIN COLLEGE ON DEPARTMENT.COLLEGE_ID = COLLEGE.C_ID WHERE "+column+" LIKE '%"+searchString+"%' EXCEPT SELECT DEPT_ID, DEPT_NAME,C_ID, C_NAME,2 AS TYPE FROM DEPARTMENT LEFT JOIN COLLEGE ON DEPARTMENT.COLLEGE_ID = COLLEGE.C_ID WHERE "+column+" LIKE '"+searchString+"%')) ORDER BY TYPE", new String[]{"DEPT_ID","DEPT_NAME","C_NAME"});
+    public List<List<String>> searchAllDepartment(String column, String searchString) throws SQLException {
+        return createArrayFromTable("SELECT DEPT_ID, DEPT_NAME,C_ID, C_NAME FROM (SELECT DEPT_ID, DEPT_NAME,C_ID, C_NAME,1 AS TYPE FROM DEPARTMENT LEFT JOIN COLLEGE ON DEPARTMENT.COLLEGE_ID = COLLEGE.C_ID WHERE "+column+" LIKE '"+searchString+"%' UNION SELECT * FROM (SELECT DEPT_ID, DEPT_NAME,C_ID, C_NAME,2 AS TYPE FROM DEPARTMENT LEFT JOIN COLLEGE ON DEPARTMENT.COLLEGE_ID = COLLEGE.C_ID WHERE "+column+" LIKE '%"+searchString+"%' EXCEPT SELECT DEPT_ID, DEPT_NAME,C_ID, C_NAME,2 AS TYPE FROM DEPARTMENT LEFT JOIN COLLEGE ON DEPARTMENT.COLLEGE_ID = COLLEGE.C_ID WHERE "+column+" LIKE '"+searchString+"%')) ORDER BY TYPE", new String[]{"DEPT_ID","DEPT_NAME","C_ID","C_NAME"});
     }
 
-    public String[][] selectDepartmentInCollege(int collegeID) throws SQLException {
+    public List<List<String>> selectDepartmentInCollege(int collegeID) throws SQLException {
         return createArrayFromTable("SELECT DEPT_ID, DEPT_NAME FROM DEPARTMENT LEFT JOIN COLLEGE ON DEPARTMENT.COLLEGE_ID = COLLEGE.C_ID WHERE COLLEGE_ID = "+collegeID, new String[]{"DEPT_ID","DEPT_NAME"});
     }
 
-    public String[][] searchDepartmentInCollege(String column, String searchString, int collegeID) throws SQLException {
+    public List<List<String>> searchDepartmentInCollege(String column, String searchString, int collegeID) throws SQLException {
         return createArrayFromTable("SELECT DEPT_ID, DEPT_NAME FROM (SELECT DEPT_ID, DEPT_NAME, DEPARTMENT.COLLEGE_ID,1 AS TYPE FROM DEPARTMENT LEFT JOIN COLLEGE ON DEPARTMENT.COLLEGE_ID = COLLEGE.C_ID WHERE DEPARTMENT.COLLEGE_ID = "+collegeID+" AND "+column+" LIKE '"+searchString+"%' UNION SELECT * FROM (SELECT DEPT_ID, DEPT_NAME, DEPARTMENT.COLLEGE_ID,2 AS TYPE FROM DEPARTMENT LEFT JOIN COLLEGE ON DEPARTMENT.COLLEGE_ID = COLLEGE.C_ID WHERE DEPARTMENT.COLLEGE_ID = "+collegeID+" AND "+column+" LIKE '%"+searchString+"%' EXCEPT SELECT DEPT_ID, DEPT_NAME, DEPARTMENT.COLLEGE_ID,2 AS TYPE FROM DEPARTMENT LEFT JOIN COLLEGE ON DEPARTMENT.COLLEGE_ID = COLLEGE.C_ID WHERE DEPARTMENT.COLLEGE_ID = "+collegeID+" AND "+column+" LIKE '"+searchString+"%')) ORDER BY TYPE", new String[]{"DEPT_ID","DEPT_NAME"});
     }
 
