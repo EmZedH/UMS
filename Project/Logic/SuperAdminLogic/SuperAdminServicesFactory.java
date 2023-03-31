@@ -2,49 +2,64 @@ package Logic.SuperAdminLogic;
 
 import java.sql.SQLException;
 
+import Logic.ModuleExecutor;
+import Logic.Interfaces.ModuleInterface;
+import Logic.SuperAdminLogic.SuperAdminCollegeManage.SuperAdminCollegeManage;
+import Logic.SuperAdminLogic.SuperAdminCourseManage.SuperAdminCourseManage;
+import Logic.SuperAdminLogic.SuperAdminCourseProfManage.SuperAdminCourseProfManage;
+import Logic.SuperAdminLogic.SuperAdminDepartmentManage.SuperAdminDepartmentManage;
+import Logic.SuperAdminLogic.SuperAdminRecordsManage.SuperAdminRecordsManage;
+import Logic.SuperAdminLogic.SuperAdminSectionManage.SuperAdminSectionManage;
+import Logic.SuperAdminLogic.SuperAdminTestManage.SuperAdminTestManage;
+import Logic.SuperAdminLogic.SuperAdminTransactionManage.SuperAdminTransactionsManage;
+import Logic.SuperAdminLogic.SuperAdminUserManage.SuperAdminUserManage;
 import Model.FactoryDAO;
 import Model.SuperAdmin;
 
 public class SuperAdminServicesFactory {
-    FactoryDAO factoryDAO = new FactoryDAO();
+    public FactoryDAO factoryDAO;
 
-    public SuperAdminMainPage mainPage(SuperAdmin superAdmin) throws SQLException {
-        return new SuperAdminMainPage(superAdmin, this);
+    public SuperAdminServicesFactory(FactoryDAO factoryDAO) {
+        this.factoryDAO = factoryDAO;
     }
 
-    public SuperAdminCourseManage superAdminCourseManage(){
-        return new SuperAdminCourseManage(factoryDAO.createCourseDAO());
+    public ModuleInterface mainPage(SuperAdmin superAdmin) throws SQLException {
+        return new SuperAdminMainPage(superAdmin, this, new ModuleExecutor());
     }
 
-    public SuperAdminTestManage superAdminTestManage(){
-        return new SuperAdminTestManage(factoryDAO.createteTestDAO(), factoryDAO.createRecordsDAO());
+    public ModuleInterface superAdminCourseManage(){
+        return new SuperAdminCourseManage(factoryDAO.createCourseDAO(), factoryDAO.createDepartmentDAO(), factoryDAO.createCollegeDAO(), new ModuleExecutor());
     }
 
-    public SuperAdminTransactionsManage superAdminTransactionsManage(){
-        return new SuperAdminTransactionsManage(factoryDAO.createTransactionsDAO());
+    public ModuleInterface superAdminTestManage(){
+        return new SuperAdminTestManage(factoryDAO.createCollegeDAO(), factoryDAO.createDepartmentDAO(), factoryDAO.createStudentDAO(), factoryDAO.createCourseDAO(), factoryDAO.createteTestDAO(), factoryDAO.createRecordsDAO(), new ModuleExecutor());
     }
 
-    public SuperAdminRecordsManage superAdminRecordsManage() {
-        return new SuperAdminRecordsManage(factoryDAO.createRecordsDAO(), factoryDAO.createCourseDAO(), factoryDAO.createTransactionsDAO(), factoryDAO.createsStudentDAO(), factoryDAO.createCourseProfessorDAO());
+    public ModuleInterface superAdminTransactionsManage(){
+        return new SuperAdminTransactionsManage(factoryDAO.createStudentDAO(), factoryDAO.createTransactionsDAO(), new ModuleExecutor());
     }
 
-    public SuperAdminDepartmentManage superAdminDepartmentManage() {
-        return new SuperAdminDepartmentManage(factoryDAO.createDepartmentDAO());
+    public ModuleInterface superAdminRecordsManage() {
+        return new SuperAdminRecordsManage(factoryDAO.createRecordsDAO(), factoryDAO.createCourseDAO(), factoryDAO.createTransactionsDAO(), factoryDAO.createStudentDAO(), factoryDAO.createCourseProfessorDAO(), factoryDAO.createDepartmentDAO(), new ModuleExecutor());
     }
 
-    public SuperAdminCollegeManage superAdminCollegeManage(){
-        return new SuperAdminCollegeManage(factoryDAO.createCollegeDAO());
+    public ModuleInterface superAdminDepartmentManage() {
+        return new SuperAdminDepartmentManage(factoryDAO.createDepartmentDAO(), factoryDAO.createCollegeDAO(), new ModuleExecutor());
     }
 
-    public SuperAdminSectionManage superAdminSectionManage() {
-        return new SuperAdminSectionManage(factoryDAO.createDepartmentDAO(), factoryDAO.createSectionDAO());
+    public ModuleInterface superAdminCollegeManage(){
+        return new SuperAdminCollegeManage(factoryDAO.createCollegeDAO(), new ModuleExecutor());
     }
 
-    public SuperAdminCourseProfManage superAdminCourseProfManage(){
-        return new SuperAdminCourseProfManage(this.factoryDAO.createProfessorDAO(), this.factoryDAO.createCourseProfessorDAO());
+    public ModuleInterface superAdminSectionManage() {
+        return new SuperAdminSectionManage(factoryDAO.createDepartmentDAO(), factoryDAO.createSectionDAO(), factoryDAO.createCollegeDAO(), new ModuleExecutor());
     }
 
-    public SuperAdminUserManage superAdminUserManage(SuperAdmin superAdmin){
-        return new SuperAdminUserManage(superAdmin, factoryDAO.createUserDAO(), factoryDAO.createsStudentDAO(), factoryDAO.createProfessorDAO(), factoryDAO.createCollegeAdminDAO(), factoryDAO.createSuperAdminDAO(), factoryDAO.createDepartmentDAO(), factoryDAO.createSectionDAO(), factoryDAO.createCollegeDAO());
+    public ModuleInterface superAdminCourseProfManage(){
+        return new SuperAdminCourseProfManage(this.factoryDAO.createProfessorDAO(), factoryDAO.createCourseDAO(), this.factoryDAO.createCourseProfessorDAO(), new ModuleExecutor());
+    }
+
+    public ModuleInterface superAdminUserManage(SuperAdmin superAdmin){
+        return new SuperAdminUserManage(superAdmin, factoryDAO.createUserDAO(), factoryDAO.createStudentDAO(), factoryDAO.createProfessorDAO(), factoryDAO.createCollegeAdminDAO(), factoryDAO.createSuperAdminDAO(), factoryDAO.createDepartmentDAO(), factoryDAO.createSectionDAO(), factoryDAO.createCollegeDAO(), new ModuleExecutor());
     }
 }

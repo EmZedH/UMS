@@ -21,25 +21,10 @@ public class DisplayUtility {
             System.out.println();
         }
     }
-
-    public static String wrappedDialogDisplay(String msg) {
-        String msgCopy = msg;
-        int length = msgCopy.length();
-        while(length>=lineSize){
-            if(msgCopy.indexOf('\n')==-1){
-                length = msgCopy.indexOf(' ', length/2);
-                
-            }
-            else{
-
-            }
-        }
-        return msgCopy;
-    }
-
+    
     public static void optionDialog(String heading,String[] msg) {
         String p = "";
-        String ki="";
+        String ki= "";
         int flag=1;
         for (int i = 0; i < msg.length+8; i++) {
             if(i==1 || i==3 || i==msg.length+6){
@@ -80,14 +65,14 @@ public class DisplayUtility {
                 for (int j = 0;j< lineSize - header.length() -1; j++) {
                     header = " "  + header;
                 }
-                    System.out.print(header);
+                System.out.print(header);
                 
             }
             else if(i==5){
                 for (int j = 0;j< lineSize - msg.length() -1; j++) {
                     msg = " "  + msg;
                 }
-                    System.out.print(msg);
+                System.out.print(msg);
                 
             }
             System.out.println();

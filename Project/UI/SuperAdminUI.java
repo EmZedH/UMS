@@ -191,7 +191,7 @@ public class SuperAdminUI{
     }
 
     public static void viewTestTable(List<List<String>> list) throws SQLException {
-        DisplayUtility.printTable("TEST RECORDS", new String[]{"TEST ID","STUDENT ID","COURSE_ID","COURSE NAME","COLLEGE ID","COLLEGE NAME","TEST MARK"}, list);
+        DisplayUtility.printTable("TEST RECORDS", new String[]{"TEST ID","STUDENT ID","SEMESTER","COURSE_ID","COURSE NAME","DEPT ID","DEPT NAME","COLLEGE ID","COLLEGE NAME","TEST MARK","PROF_ID"}, list);
     }
 
     public static void displayTestDeleteWarning(int testID, Test test) {

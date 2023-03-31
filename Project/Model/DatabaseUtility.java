@@ -3,13 +3,16 @@ package Model;
 import java.sql.SQLException;
 
 import UI.CommonUI;
+import UI.Utility.DisplayUtility;
 import UI.Utility.InputUtility;
 
 public class DatabaseUtility {
 
+    private static FactoryDAO factoryDAO = new FactoryDAO();
+
     public static int inputExistingStudentID() throws SQLException {
         int studentID;
-        if (!DatabaseConnect.verifyStudent(studentID = CommonUI.inputStudentID())) {
+        if (!factoryDAO.createStudentDAO().verifyStudent(studentID = CommonUI.inputStudentID())) {
             CommonUI.displayStudentIDNotExist();
             return inputExistingStudentID();
         }
@@ -18,7 +21,7 @@ public class DatabaseUtility {
 
     public static int inputExistingStudentID(int collegeID) throws SQLException {
         int studentID = CommonUI.inputStudentID();
-        while (!DatabaseConnect.verifyUser(studentID, collegeID) || !DatabaseConnect.verifyStudent(studentID)) {
+        while (!factoryDAO.createUserDAO().verifyUser(studentID, collegeID) || !factoryDAO.createStudentDAO().verifyStudent(studentID)) {
             CommonUI.displayStudentIDNotExist();
             studentID = CommonUI.inputStudentID();
         }
@@ -71,6 +74,14 @@ public class DatabaseUtility {
         int collegeID;
         while (!DatabaseConnect.verifyCollege(collegeID = CommonUI.inputCollegeID())) {
             CommonUI.displayCollegeIDNotExist();
+        }
+        return collegeID;
+    }
+
+    public static int inputNonExistingCollegeID() throws SQLException {
+        int collegeID;
+        while (DatabaseConnect.verifyCollege(collegeID = CommonUI.inputCollegeID())) {
+            DisplayUtility.singleDialogDisplay("College ID already exists. Please try again");
         }
         return collegeID;
     }

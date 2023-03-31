@@ -47,7 +47,7 @@ public class FactoryDAO {
         return new SectionDAO();
     }
 
-    public StudentDAO createsStudentDAO() {
+    public StudentDAO createStudentDAO() {
         return new StudentDAO();
     }
 

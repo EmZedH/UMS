@@ -15,26 +15,26 @@ public class TransactionsDAO extends Connect{
         return createArrayFromTable("SELECT T_ID, TRANSACTIONS.STUDENT_ID, COLLEGE_ID, C_NAME, T_DATE, T_AMOUNT FROM TRANSACTIONS LEFT JOIN STUDENT ON (STUDENT.STUDENT_ID = TRANSACTIONS.STUDENT_ID) LEFT JOIN COLLEGE ON COLLEGE.C_ID = STUDENT.COLLEGE_ID", new String[]{"T_ID","STUDENT_ID","COLLEGE_ID","C_NAME","T_DATE","T_AMOUNT"});
     }
 
+    public List<List<String>> selectAllTransactionsInCollege(int collegeID) throws SQLException {
+        return createArrayFromTable("SELECT T_ID, TRANSACTIONS.STUDENT_ID, COLLEGE_ID, C_NAME, T_DATE, T_AMOUNT FROM TRANSACTIONS LEFT JOIN STUDENT ON (STUDENT.STUDENT_ID = TRANSACTIONS.STUDENT_ID) LEFT JOIN COLLEGE ON COLLEGE.C_ID = STUDENT.COLLEGE_ID WHERE TRANSACTIONS.COLLEGE_ID = "+collegeID, new String[]{"T_ID","STUDENT_ID","T_DATE","T_AMOUNT"});
+    }
+
+    public List<List<String>> selectTransactionBelongingToStudent(int studentID) throws SQLException {
+        return createArrayFromTable("SELECT T_ID, TRANSACTIONS.STUDENT_ID, COLLEGE_ID, C_NAME, T_DATE, T_AMOUNT FROM TRANSACTIONS LEFT JOIN STUDENT ON (STUDENT.STUDENT_ID = TRANSACTIONS.STUDENT_ID) LEFT JOIN COLLEGE ON COLLEGE.C_ID = STUDENT.COLLEGE_ID WHERE TRANSACTIONS.STUDENT_ID = "+studentID, new String[]{"T_ID","T_DATE","T_AMOUNT"});
+    }
+
     public List<List<String>> searchAllTransactions(String column, String searchString) throws SQLException {
         return createArrayFromTable("SELECT T_ID, STUDENT_ID, COLLEGE_ID, C_NAME, T_DATE, T_AMOUNT FROM (SELECT T_ID, TRANSACTIONS.STUDENT_ID, COLLEGE_ID, C_NAME, T_DATE, T_AMOUNT,1 AS TYPE FROM TRANSACTIONS LEFT JOIN STUDENT ON STUDENT.STUDENT_ID = TRANSACTIONS.STUDENT_ID LEFT JOIN COLLEGE ON COLLEGE.C_ID = STUDENT.COLLEGE_ID WHERE "+column+" LIKE '"+searchString+"%' UNION SELECT * FROM (SELECT T_ID, TRANSACTIONS.STUDENT_ID, COLLEGE_ID, C_NAME, T_DATE, T_AMOUNT,2 AS TYPE FROM TRANSACTIONS LEFT JOIN STUDENT ON STUDENT.STUDENT_ID = TRANSACTIONS.STUDENT_ID LEFT JOIN COLLEGE ON COLLEGE.C_ID = STUDENT.COLLEGE_ID WHERE "+column+" LIKE '%"+searchString+"%' EXCEPT SELECT T_ID, TRANSACTIONS.STUDENT_ID, COLLEGE_ID, C_NAME, T_DATE, T_AMOUNT,2 AS TYPE FROM TRANSACTIONS LEFT JOIN STUDENT ON STUDENT.STUDENT_ID = TRANSACTIONS.STUDENT_ID LEFT JOIN COLLEGE ON COLLEGE.C_ID = STUDENT.COLLEGE_ID WHERE "+column+" LIKE '"+searchString+"%')) ORDER BY TYPE", new String[]{"T_ID","STUDENT_ID","COLLEGE_ID","C_NAME","T_DATE","T_AMOUNT"});
     }
 
-    public List<List<String>> selectTransactionsInCollege(int collegeID) throws SQLException {
-        return createArrayFromTable("SELECT T_ID, TRANSACTIONS.STUDENT_ID, C_ID, T_DATE, T_AMOUNT FROM TRANSACTIONS LEFT JOIN STUDENT ON (STUDENT.STUDENT_ID = TRANSACTIONS.STUDENT_ID) LEFT JOIN COLLEGE ON COLLEGE.C_ID = STUDENT.COLLEGE_ID WHERE C_ID = "+collegeID, new String[]{"T_ID","STUDENT_ID","T_DATE","T_AMOUNT"});
+    public List<List<String>> searchAllTransactionsInCollege(String column, String searchString, int collegeID) throws SQLException {
+        return createArrayFromTable("SELECT T_ID, STUDENT_ID, COLLEGE_ID, C_NAME, T_DATE, T_AMOUNT FROM (SELECT T_ID, TRANSACTIONS.STUDENT_ID, COLLEGE_ID, C_NAME, T_DATE, T_AMOUNT,1 AS TYPE FROM TRANSACTIONS LEFT JOIN STUDENT ON STUDENT.STUDENT_ID = TRANSACTIONS.STUDENT_ID LEFT JOIN COLLEGE ON COLLEGE.C_ID = STUDENT.COLLEGE_ID WHERE "+column+" LIKE '"+searchString+"%' UNION SELECT * FROM (SELECT T_ID, TRANSACTIONS.STUDENT_ID, COLLEGE_ID, C_NAME, T_DATE, T_AMOUNT,2 AS TYPE FROM TRANSACTIONS LEFT JOIN STUDENT ON STUDENT.STUDENT_ID = TRANSACTIONS.STUDENT_ID LEFT JOIN COLLEGE ON COLLEGE.C_ID = STUDENT.COLLEGE_ID WHERE "+column+" LIKE '%"+searchString+"%' EXCEPT SELECT T_ID, TRANSACTIONS.STUDENT_ID, COLLEGE_ID, C_NAME, T_DATE, T_AMOUNT,2 AS TYPE FROM TRANSACTIONS LEFT JOIN STUDENT ON STUDENT.STUDENT_ID = TRANSACTIONS.STUDENT_ID LEFT JOIN COLLEGE ON COLLEGE.C_ID = STUDENT.COLLEGE_ID WHERE "+column+" LIKE '"+searchString+"%')) WHERE TRANSACTIONS.COLLEGE_ID = "+collegeID+"ORDER BY TYPE", new String[]{"T_ID","STUDENT_ID","T_DATE","T_AMOUNT"});
     }
 
-    public List<List<String>> searchTransactionsInCollege(String column, String searchString, int collegeID) throws SQLException{
-        return createArrayFromTable("SELECT T_ID, STUDENT_ID, T_DATE, T_AMOUNT FROM (SELECT T_ID, TRANSACTIONS.STUDENT_ID, COLLEGE.C_ID, T_DATE, T_AMOUNT,1 AS TYPE FROM TRANSACTIONS LEFT JOIN STUDENT ON STUDENT.STUDENT_ID = TRANSACTIONS.STUDENT_ID LEFT JOIN COLLEGE ON COLLEGE.C_ID = STUDENT.COLLEGE_ID WHERE COLLEGE.C_ID = "+collegeID+" AND "+column+" LIKE '"+searchString+"%' UNION SELECT * FROM (SELECT T_ID, TRANSACTIONS.STUDENT_ID, COLLEGE.C_ID, T_DATE, T_AMOUNT,2 AS TYPE FROM TRANSACTIONS LEFT JOIN STUDENT ON STUDENT.STUDENT_ID = TRANSACTIONS.STUDENT_ID LEFT JOIN COLLEGE ON COLLEGE.C_ID = STUDENT.COLLEGE_ID WHERE COLLEGE.C_ID = "+collegeID+" AND "+column+" LIKE '%"+searchString+"%' EXCEPT SELECT T_ID, TRANSACTIONS.STUDENT_ID, COLLEGE.C_ID, T_DATE, T_AMOUNT,2 AS TYPE FROM TRANSACTIONS LEFT JOIN STUDENT ON STUDENT.STUDENT_ID = TRANSACTIONS.STUDENT_ID LEFT JOIN COLLEGE ON COLLEGE.C_ID = STUDENT.COLLEGE_ID WHERE COLLEGE.C_ID = "+collegeID+" AND "+column+" LIKE '"+searchString+"%')) ORDER BY TYPE", new String[]{"T_ID","STUDENT_ID","T_DATE","T_AMOUNT"});
-    }
-
-    public List<List<String>> selectAllTransactionByStudent(int studentID) throws SQLException {
-        return createArrayFromTable("SELECT T_ID, T_DATE, T_AMOUNT FROM TRANSACTIONS WHERE STUDENT_ID = "+studentID, new String[]{"T_ID","T_DATE","T_AMOUNT"});
-    }
-
-    public Transactions returnTransaction(int tID) throws SQLException {
+    public Transactions returnTransaction(int transactionID) throws SQLException {
         String sql = "SELECT * FROM TRANSACTIONS WHERE T_ID = ?";
         try (Connection connection = connection(); PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1,tID);
+            pstmt.setInt(1,transactionID);
             ResultSet resultSet = pstmt.executeQuery();
             return resultSet.next() ? new Transactions(resultSet.getInt("T_ID"), resultSet.getInt("STUDENT_ID"), resultSet.getString("T_DATE"), resultSet.getInt("T_AMOUNT")) : null;
         }
@@ -51,7 +51,7 @@ public class TransactionsDAO extends Connect{
         }
     }
 
-    public void deleteTransact(int transactonID) throws SQLException {
+    public void deleteTransaction(int transactonID) throws SQLException {
         String sqlTransaction = "DELETE FROM TRANSACTIONS WHERE T_ID = ?";
         String sqlRecord = "UPDATE RECORDS SET TRANSACT_ID = 0 WHERE TRANSACT_ID = ?";
         try (Connection connection = connection(); 

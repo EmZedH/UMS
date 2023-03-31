@@ -4,26 +4,45 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import Model.Connect;
 import Model.Course;
 
 public class CourseDAO extends Connect{
+    
     public List<List<String>> selectAllCourse() throws SQLException {
         return createArrayFromTable("SELECT COURSE_ID, COURSE_NAME, COURSE_SEM, COURSE.DEPT_ID, DEPT_NAME, C_ID, C_NAME, DEGREE, ELECTIVE FROM COURSE LEFT JOIN DEPARTMENT ON (DEPARTMENT.DEPT_ID = COURSE.DEPT_ID AND DEPARTMENT.COLLEGE_ID = COURSE.COLLEGE_ID) LEFT JOIN COLLEGE ON COLLEGE.C_ID = COURSE.COLLEGE_ID", new String[]{"COURSE_ID","COURSE_NAME","COURSE_SEM","DEPT_ID","DEPT_NAME","C_ID","C_NAME","DEGREE","ELECTIVE"});
+    }
+
+    public List<List<String>> selectAllCourseInCollege(int collegeID) throws SQLException {
+        return createArrayFromTable("SELECT COURSE_ID, COURSE_NAME, COURSE_SEM, COURSE.DEPT_ID, DEPT_NAME, DEGREE, ELECTIVE FROM COURSE LEFT JOIN DEPARTMENT ON (DEPARTMENT.DEPT_ID = COURSE.DEPT_ID AND DEPARTMENT.COLLEGE_ID = COURSE.COLLEGE_ID) LEFT JOIN COLLEGE ON COLLEGE.C_ID = COURSE.COLLEGE_ID WHERE COURSE.COLLEGE_ID = "+collegeID, new String[]{"COURSE_ID","COURSE_NAME","COURSE_SEM","DEPT_ID","DEPT_NAME","DEGREE","ELECTIVE"});
     }
 
     public List<List<String>> searchAllCourse(String column, String searchString) throws SQLException{
         return createArrayFromTable("SELECT COURSE_ID, COURSE_NAME, COURSE_SEM, DEPT_ID, DEPT_NAME, C_ID, C_NAME, DEGREE, ELECTIVE FROM (SELECT COURSE_ID, COURSE_NAME, COURSE_SEM, COURSE.DEPT_ID, DEPT_NAME,C_ID, C_NAME, DEGREE, ELECTIVE,1 AS TYPE FROM COURSE LEFT JOIN DEPARTMENT ON (DEPARTMENT.DEPT_ID = COURSE.DEPT_ID AND DEPARTMENT.COLLEGE_ID = COURSE.COLLEGE_ID) LEFT JOIN COLLEGE ON COLLEGE.C_ID = COURSE.COLLEGE_ID WHERE "+column+" LIKE '"+searchString+"%' UNION SELECT * FROM (SELECT COURSE_ID, COURSE_NAME, COURSE_SEM, COURSE.DEPT_ID, DEPT_NAME,C_ID, C_NAME, DEGREE, ELECTIVE,2 AS TYPE FROM COURSE LEFT JOIN DEPARTMENT ON (DEPARTMENT.DEPT_ID = COURSE.DEPT_ID AND DEPARTMENT.COLLEGE_ID = COURSE.COLLEGE_ID) LEFT JOIN COLLEGE ON COLLEGE.C_ID = COURSE.COLLEGE_ID WHERE "+column+" LIKE '%"+searchString+"%' EXCEPT SELECT COURSE_ID, COURSE_NAME, COURSE_SEM, COURSE.DEPT_ID, DEPT_NAME,C_ID, C_NAME, DEGREE, ELECTIVE,2 AS TYPE FROM COURSE LEFT JOIN DEPARTMENT ON (DEPARTMENT.DEPT_ID = COURSE.DEPT_ID AND DEPARTMENT.COLLEGE_ID = COURSE.COLLEGE_ID) LEFT JOIN COLLEGE ON COLLEGE.C_ID = COURSE.COLLEGE_ID WHERE "+column+" LIKE '"+searchString+"%')) ORDER BY TYPE", new String[]{"COURSE_ID","COURSE_NAME","COURSE_SEM","DEPT_ID","DEPT_NAME","C_ID","C_NAME","DEGREE","ELECTIVE"});
     }
 
-    public List<List<String>> selectCourseInCollege(int collegeID) throws SQLException{
-        return createArrayFromTable("SELECT COURSE_ID, COURSE_NAME, COURSE_SEM,COURSE.DEPT_ID, DEPT_NAME, DEGREE, ELECTIVE FROM COURSE LEFT JOIN DEPARTMENT ON (DEPARTMENT.DEPT_ID = COURSE.DEPT_ID AND DEPARTMENT.COLLEGE_ID = COURSE.COLLEGE_ID) LEFT JOIN COLLEGE ON COLLEGE.C_ID = COURSE.COLLEGE_ID WHERE COURSE.COLLEGE_ID = "+collegeID,new String[]{"COURSE_ID","COURSE_NAME","COURSE_SEM","DEPT_ID","DEPT_NAME","DEGREE","ELECTIVE"});
+    public List<List<String>> searchAllCourseInCollege(String column, String searchString, int collegeID) throws SQLException{
+        return createArrayFromTable("SELECT COURSE_ID, COURSE_NAME, COURSE_SEM, DEPT_ID, DEPT_NAME, DEGREE, ELECTIVE FROM (SELECT COURSE_ID, COURSE_NAME, COURSE_SEM, COURSE.DEPT_ID, DEPT_NAME,C_ID, C_NAME, DEGREE, ELECTIVE,1 AS TYPE FROM COURSE LEFT JOIN DEPARTMENT ON (DEPARTMENT.DEPT_ID = COURSE.DEPT_ID AND DEPARTMENT.COLLEGE_ID = COURSE.COLLEGE_ID) LEFT JOIN COLLEGE ON COLLEGE.C_ID = COURSE.COLLEGE_ID WHERE "+column+" LIKE '"+searchString+"%' UNION SELECT * FROM (SELECT COURSE_ID, COURSE_NAME, COURSE_SEM, COURSE.DEPT_ID, DEPT_NAME,C_ID, C_NAME, DEGREE, ELECTIVE,2 AS TYPE FROM COURSE LEFT JOIN DEPARTMENT ON (DEPARTMENT.DEPT_ID = COURSE.DEPT_ID AND DEPARTMENT.COLLEGE_ID = COURSE.COLLEGE_ID) LEFT JOIN COLLEGE ON COLLEGE.C_ID = COURSE.COLLEGE_ID WHERE "+column+" LIKE '%"+searchString+"%' EXCEPT SELECT COURSE_ID, COURSE_NAME, COURSE_SEM, COURSE.DEPT_ID, DEPT_NAME,C_ID, C_NAME, DEGREE, ELECTIVE,2 AS TYPE FROM COURSE LEFT JOIN DEPARTMENT ON (DEPARTMENT.DEPT_ID = COURSE.DEPT_ID AND DEPARTMENT.COLLEGE_ID = COURSE.COLLEGE_ID) LEFT JOIN COLLEGE ON COLLEGE.C_ID = COURSE.COLLEGE_ID WHERE "+column+" LIKE '"+searchString+"%')) WHERE COURSE.COLLEGE_ID = "+collegeID+"ORDER BY TYPE", new String[]{"COURSE_ID","COURSE_NAME","COURSE_SEM","DEPT_ID","DEPT_NAME","DEGREE","ELECTIVE"});
     }
 
-    public List<List<String>> searchCourseInCollege(String column, String searchString, int collegeID) throws SQLException {
-        return createArrayFromTable("SELECT COURSE_ID, COURSE_NAME, COURSE_SEM,COURSE.DEPT_ID, DEPT_NAME, C_NAME, DEGREE, ELECTIVE FROM (SELECT COURSE_ID, COURSE_NAME, COURSE_SEM,COURSE.DEPT_ID, DEPT_NAME, C_NAME, DEGREE, ELECTIVE,COURSE.COLLEGE_ID,1 AS TYPE FROM COURSE LEFT JOIN DEPARTMENT ON (DEPARTMENT.DEPT_ID = COURSE.DEPT_ID AND DEPARTMENT.COLLEGE_ID = COURSE.COLLEGE_ID) LEFT JOIN COLLEGE ON COLLEGE.C_ID = COURSE.COLLEGE_ID WHERE COURSE.COLLEGE_ID = "+collegeID+" AND "+column+" LIKE '"+searchString+"%' UNION SELECT * FROM (SELECT COURSE_ID, COURSE_NAME, COURSE_SEM,COURSE.DEPT_ID, DEPT_NAME, C_NAME, DEGREE, ELECTIVE,COURSE.COLLEGE_ID,2 AS TYPE FROM COURSE LEFT JOIN DEPARTMENT ON (DEPARTMENT.DEPT_ID = COURSE.DEPT_ID AND DEPARTMENT.COLLEGE_ID = COURSE.COLLEGE_ID) LEFT JOIN COLLEGE ON COLLEGE.C_ID = COURSE.COLLEGE_ID WHERE COURSE.COLLEGE_ID = "+collegeID+" AND "+column+" LIKE '%"+searchString+"%' EXCEPT SELECT COURSE_ID, COURSE_NAME, COURSE_SEM,COURSE.DEPT_ID, DEPT_NAME, C_NAME, DEGREE, ELECTIVE,COURSE.COLLEGE_ID,2 AS TYPE FROM COURSE LEFT JOIN DEPARTMENT ON (DEPARTMENT.DEPT_ID = COURSE.DEPT_ID AND DEPARTMENT.COLLEGE_ID = COURSE.COLLEGE_ID) LEFT JOIN COLLEGE ON COLLEGE.C_ID = COURSE.COLLEGE_ID WHERE COURSE.COLLEGE_ID = "+collegeID+" AND "+column+" LIKE '"+searchString+"%')) ORDER BY TYPE", new String[]{"COURSE_ID","COURSE_NAME","COURSE_SEM","DEPT_ID","DEPT_NAME","DEGREE","ELECTIVE"});
+    public List<Integer> selectAllProfessionalElectiveCourseOfStudent(String degree, String elective, int semester, int departmentID, int collegeiD) throws SQLException{
+        String sql = "SELECT COURSE_ID FROM COURSE WHERE COURSE.DEGREE = ? AND COURSE.ELECTIVE = ? AND COURSE.COURSE_SEM = ? AND COURSE.DEPT_ID = ? AND COURSE.COLLEGE_ID = ?";
+        List<Integer> returnIntegerList = new ArrayList<>();
+        try (Connection connection = connection(); PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, degree);
+            pstmt.setString(2, elective);
+            pstmt.setInt(3, semester);
+            pstmt.setInt(4, departmentID);
+            pstmt.setInt(5, collegeiD);
+            ResultSet resultSet = pstmt.executeQuery();
+            while (resultSet.next()) {
+                returnIntegerList.add(resultSet.getInt("COURSE_ID"));
+            }
+            return returnIntegerList;
+        }    
     }
 
     public Course returnCourse(int courseID, int departmentID ,int collegeID) throws SQLException {
@@ -66,6 +85,7 @@ public class CourseDAO extends Connect{
                 pstmtCourse.setInt(2, departmentID);
                 pstmtCourse.setInt(3, collegeID);
                 pstmtCourse.execute();
+
                 pstmtCourseProfessor.setInt(1, courseID);
                 pstmtCourseProfessor.setInt(2, departmentID);
                 pstmtCourseProfessor.setInt(3, collegeID);
@@ -123,6 +143,7 @@ public class CourseDAO extends Connect{
                 pstmtTest.setInt(4, collegeID);
                 pstmtTest.executeUpdate();
                 connection.commit();
+
             } catch (SQLException e) {
                 connection.rollback();
                 throw new SQLException();
@@ -131,7 +152,7 @@ public class CourseDAO extends Connect{
     }
     
     public boolean verifyCourse(int courseID, int departmentID, int collegeID) throws SQLException {
-        String sql = "SELECT * FROM COURSE WHERE COURSE_ID = ? AND DEPT_ID = ? AND COLLEGE_ID = ?";
+        String sql = "SELECT COURSE_ID FROM COURSE WHERE COURSE_ID = ? AND DEPT_ID = ? AND COLLEGE_ID = ?";
         try (Connection connection = connection(); PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1,courseID);
             pstmt.setInt(2, departmentID);
@@ -139,4 +160,21 @@ public class CourseDAO extends Connect{
             return pstmt.executeQuery().next();
         }
     }
+    
+
+    public List<Course> returnCourseList(int courseID, int departmentID ,int collegeID) throws SQLException {
+        List<Course> courseList = new ArrayList<>();
+        String sql = "SELECT * FROM COURSE WHERE COURSE_ID = ? AND DEPT_ID = ? AND COLLEGE_ID = ?";
+        try (Connection connection = connection(); PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, courseID);
+            pstmt.setInt(2, departmentID);
+            pstmt.setInt(3, collegeID);
+            ResultSet resultSet = pstmt.executeQuery();
+            while (resultSet.next()) {
+                courseList.add(new Course(resultSet.getInt("COURSE_ID"), resultSet.getString("COURSE_NAME"), resultSet.getInt("COURSE_SEM"), resultSet.getString("DEGREE"), resultSet.getInt("DEPT_ID"), resultSet.getInt("COLLEGE_ID"), resultSet.getString("ELECTIVE")));
+            } 
+            return courseList;
+        }
+    }
+
 }

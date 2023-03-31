@@ -261,7 +261,7 @@ public class CommonUI {
     }
 
     public static String inputContactNumber() {
-        return inputPhoneNumber("Enter the Contact number");
+        return CommonUI.inputPhoneNumber("Enter the Contact number");
     }
 
     public static String inputDateOfBirth() {
@@ -336,7 +336,7 @@ public class CommonUI {
     }
 
     public static String inputCollegeTelephone() {
-        return inputPhoneNumber("Enter the College Telephone");
+        return CommonUI.inputPhoneNumber("Enter the College Telephone");
     }
 
     public static String inputCollegeAddress() {

@@ -19,22 +19,34 @@ public class RecordsDAO extends Connect{
         return createArrayFromTable("SELECT * FROM RECORDS", new String[]{"STUDENT_ID","COURSE_ID","DEPT_ID","PROF_ID","COLLEGE_ID","TRANSACT_ID","EXT_MARK","ATTENDANCE","ASSIGNMENT","STATUS","SEM_COMPLETED"});
     }
 
+    public List<List<String>> selectAllSemesterRecordsByStudent(int studentID) throws SQLException{
+        return createArrayFromTable("SELECT * FROM RECORDS WHERE STUDENT_ID = "+studentID, new String[]{"COURSE_ID","DEPT_ID","PROF_ID","COLLEGE_ID","TRANSACT_ID","EXT_MARK","ATTENDANCE","ASSIGNMENT","STATUS","SEM_COMPLETED"});
+    }
+
+    public List<List<String>> selectCurrentSemesterRecordsByStudent(int studentID) throws SQLException{
+        return createArrayFromTable("SELECT * FROM RECORDS WHERE STUDENT_ID = "+studentID+" AND SEM_COMPLETED IS NULL", new String[]{"COURSE_ID","DEPT_ID","PROF_ID","COLLEGE_ID","TRANSACT_ID","EXT_MARK","ATTENDANCE","ASSIGNMENT","STATUS","SEM_COMPLETED"});
+    }
+
     public List<List<String>> selectRecordsInCollege(int collegeID) throws SQLException {
         return createArrayFromTable("SELECT * FROM RECORDS WHERE COLLEGE_ID = "+collegeID, new String[]{"STUDENT_ID","COURSE_ID","DEPT_ID","PROF_ID","TRANSACT_ID","EXT_MARK","ATTENDANCE","ASSIGNMENT","STATUS","SEM_COMPLETED"});
     }
 
-    public List<List<String>> selectRecordsByProfessor(int professorID) throws SQLException {
-        return createArrayFromTable("SELECT STUDENT_ID, U_NAME, COURSE_ID, EXT_MARK, ATTENDANCE, ASSIGNMENT FROM RECORDS INNER JOIN USER ON USER.U_ID = STUDENT_ID WHERE PROF_ID = "+professorID, new String[]{"STUDENT_ID","U_NAME","COURSE_ID","EXT_MARK","ATTENDANCE","ASSIGNMENT"});
-    }
-    
-    public List<List<String>> selectCurrentSemesterRecordsByStudent(int studentID) throws SQLException {
-        return createArrayFromTable("SELECT RECORDS.COURSE_ID, COURSE_NAME, PROF_ID, USER.U_NAME, EXT_MARK, ATTENDANCE, ASSIGNMENT FROM RECORDS INNER JOIN COURSE ON (COURSE.COURSE_ID = RECORDS.COURSE_ID AND COURSE.DEPT_ID = RECORDS.DEPT_ID AND COURSE.COLLEGE_ID = RECORDS.COLLEGE_ID) INNER JOIN USER ON USER.U_ID = RECORDS.PROF_ID WHERE STATUS = \"NC\" AND STUDENT_ID = "+studentID, new String[]{"COURSE_ID","COURSE_NAME","PROF_ID","U_NAME","EXT_MARK","ATTENDANCE","ASSIGNMENT"});
+    public List<List<String>> selectRecordsUnderProfessor(int professorID) throws SQLException{
+        return createArrayFromTable("SELECT * FROM RECORDS WHERE PROF_ID = "+professorID, new String[]{"STUDENT ID","COURSE ID","EXT MARK","ATTENDANCE","ASSIGNMENT"});
     }
 
     public boolean verifyCurrentSemesterRecord(int studentID) throws SQLException {
         ResultSet resultSet;
         try(Connection connection = connection();Statement stmt = connection.createStatement()){
             resultSet = stmt.executeQuery("SELECT RECORDS.COURSE_ID, COURSE_NAME, PROF_ID, USER.U_NAME FROM RECORDS INNER JOIN COURSE ON COURSE.COURSE_ID = RECORDS.COURSE_ID INNER JOIN USER ON USER.U_ID = RECORDS.PROF_ID WHERE STATUS = \"NC\" AND STUDENT_ID = "+studentID);
+            return resultSet.next();
+        }
+    }
+
+    public boolean verifyTransactionInRecords(int transactionID) throws SQLException{
+        ResultSet resultSet;
+        try(Connection connection = connection();Statement stmt = connection.createStatement()){
+            resultSet = stmt.executeQuery("SELECT RECORDS.COURSE_ID, COURSE_NAME, PROF_ID, USER.U_NAME FROM RECORDS INNER JOIN COURSE ON COURSE.COURSE_ID = RECORDS.COURSE_ID INNER JOIN USER ON USER.U_ID = RECORDS.PROF_ID WHERE TRANSACT_ID = "+transactionID); 
             return resultSet.next();
         }
     }
@@ -55,7 +67,7 @@ public class RecordsDAO extends Connect{
             pstmt.setInt(3, departmentID);
             pstmt.setInt(4, collegeID);
             ResultSet resultSet = pstmt.executeQuery();
-            return resultSet.next() ? new Records(resultSet.getInt("STUDENT_ID"), new CourseProfessor(resultSet.getInt("COURSE_ID"), resultSet.getInt("DEPT_ID"), resultSet.getInt("PROF_ID"), resultSet.getInt("COLLEGE_ID")), resultSet.getInt("TRANSACT_ID"), resultSet.getInt("EXT_MARK"), resultSet.getInt("ATTENDANCE"), resultSet.getInt("ASSIGNMENT"), resultSet.getString("STATUS"), resultSet.getInt("SEM_COMPLETED")) : null;
+            return resultSet.next() ? new Records(resultSet.getInt("STUDENT_ID"), new CourseProfessor(resultSet.getInt("PROF_ID"), resultSet.getInt("COURSE_ID"), resultSet.getInt("DEPT_ID"), resultSet.getInt("COLLEGE_ID")), resultSet.getInt("TRANSACT_ID"), resultSet.getInt("EXT_MARK"), resultSet.getInt("ATTENDANCE"), resultSet.getInt("ASSIGNMENT"), resultSet.getString("STATUS"), resultSet.getInt("SEM_COMPLETED")) : null;
         } 
     }
 
@@ -105,7 +117,7 @@ public class RecordsDAO extends Connect{
     }
     
     public void editRecord(int studentID, int courseID, Records record) throws SQLException {
-        String sqlRecord = "UPDATE RECORDS SET PROF_ID = ?, EXT_MARK = ? , ATTENDANCE = ?, ASSIGNMENT = ? , STATUS = ? , SEM_COMPLETED = ? WHERE STUDENT_ID = ? AND COURSE_ID = ?";
+        String sqlRecord = "UPDATE RECORDS SET PROF_ID = ?, EXT_MARK = ? , ATTENDANCE = ?, ASSIGNMENT = ? , STATUS = ? , SEM_COMPLETED = ? WHERE STUDENT_ID = ? AND COURSE_ID = ? AND DEPT_ID = ? AND COLLEGE_ID = ?";
         try (Connection connection = connection(); PreparedStatement pstmt = connection.prepareStatement(sqlRecord)) {
             pstmt.setInt(1, record.getCourseProfessor().getProfessorID());
             pstmt.setInt(2, record.getExternalMarks());
@@ -115,6 +127,8 @@ public class RecordsDAO extends Connect{
             pstmt.setInt(6, record.getSemCompleted());
             pstmt.setInt(7, studentID);
             pstmt.setInt(8, courseID);
+            pstmt.setInt(9, record.getCourseProfessor().getDepartmentID());
+            pstmt.setInt(10, record.getCourseProfessor().getCollegeID());
             pstmt.executeUpdate();
         } 
     }
@@ -129,4 +143,5 @@ public class RecordsDAO extends Connect{
             return pstmt.executeQuery().next();
         }
     }
+    
 }

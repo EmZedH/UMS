@@ -3,9 +3,8 @@ package Logic.StudentLogic;
 import java.sql.SQLException;
 import java.util.List;
 
-import Logic.Interfaces.UserInterfaceable;
+import Logic.Interfaces.ModuleInterface;
 import Model.DatabaseUtility;
-import Model.Records;
 import Model.Student;
 import Model.DatabaseAccessObject.RecordsDAO;
 import Model.DatabaseAccessObject.TestDAO;
@@ -14,11 +13,14 @@ import UI.StudentUI;
 import UI.Utility.DisplayUtility;
 import UI.Utility.InputUtility;
 
-public class StudentPerformanceManage implements UserInterfaceable{
+public class StudentPerformanceManage implements ModuleInterface{
 
-    Student student;
-    TestDAO testDAO;
-    RecordsDAO recordsDAO;
+    private Student student;
+    private TestDAO testDAO;
+    private RecordsDAO recordsDAO;
+
+    private boolean exitStatus = false;
+    private int userChoice;
 
     public StudentPerformanceManage(Student student, TestDAO testDAO, RecordsDAO recordsDAO) {
         this.student = student;
@@ -27,13 +29,19 @@ public class StudentPerformanceManage implements UserInterfaceable{
     }
 
     @Override
-    public int inputUserChoice() {
-        return InputUtility.inputChoiceWithBack("Select the Option", new String[]{"View Course CGPA","View Test Results","Back"});
+    public boolean getExitStatus() {
+        return this.exitStatus;
     }
 
+    // @Override
+    // public void runUserInterface() throws SQLException {
+    //     this.userChoice = InputUtility.inputChoice("Select the Option", new String[]{"View Course CGPA","View Test Results","Back"});
+    // }
+
     @Override
-    public void operationSelect(int choice) throws SQLException {
-        switch (choice) {
+    public void runLogic() throws SQLException {
+        this.userChoice = InputUtility.inputChoice("Select the Option", new String[]{"View Course CGPA","View Test Results","Back"});
+        switch (this.userChoice) {
 
             //VIEW COURSE CGPA
             case 1:
@@ -46,13 +54,13 @@ public class StudentPerformanceManage implements UserInterfaceable{
 
             //GO BACK
             case 3:
-                return;
+                this.exitStatus = true;
+                break;
         }
     }
 
     private void viewTestResults() throws SQLException {
-        int inputChoice;
-        inputChoice = StudentUI.inputTestResultsPage();
+        int inputChoice = StudentUI.inputTestResultsPage();
         switch(inputChoice){
 
             //SELECT COURSE
@@ -62,19 +70,23 @@ public class StudentPerformanceManage implements UserInterfaceable{
 
             //VIEW ALL TESTS
             case 2:
-                DisplayUtility.printTable("ALL TESTS", new String[]{"TEST ID","TEST MARKS"}, this.testDAO.selectStudentTest(this.student.getUser().getID(), this.student.getSemester()));
+                displayAllTest();
                 break;
-
+            
             //GO BACK
             case 3:
                 return;
         }
         viewTestResults();
     }
+    
+    public void displayAllTest() throws SQLException{
+        List<List<String>> testCopyTable = this.testDAO.selectAllTestBelongingToAStudent(this.student.getUser().getID());
+        DisplayUtility.printTable("ALL TESTS", new String[]{"TEST ID","TEST MARKS"}, testCopyTable);
+    }
 
     public void selectCourseToViewTest() throws SQLException {
-        int inputChoice;
-        inputChoice = StudentUI.inputCourseToViewTestPage();
+        int inputChoice = StudentUI.inputCourseToViewTestPage();
         switch (inputChoice) {
 
             //PROFESSIONAL ELECTIVE
@@ -86,24 +98,26 @@ public class StudentPerformanceManage implements UserInterfaceable{
             case 2:
                 viewOpenElectiveTestList();
                 break;
-            }
+        }
     }
 
     public void viewOpenElectiveTestList() throws SQLException {
         int departmentID = DatabaseUtility.inputOtherDepartment(this.student.getSection().getDepartmentID(), this.student.getSection().getCollegeID());
-
         int courseID = DatabaseUtility.inputExistingCourseID(departmentID, this.student.getSection().getCollegeID());
-        DisplayUtility.printTable("TEST LIST", new String[]{"TEST ID","TEST MARKS"}, this.testDAO.selectAllCourseTestOfStudent(this.student.getUser().getID(), courseID, departmentID, this.student.getSection().getCollegeID()));
+        
+        List<List<String>> testCopyTable = this.testDAO.selectCourseTestInCurrentSemester("O", this.student.getUser().getID(), courseID, departmentID, this.student.getSection().getCollegeID());
+        DisplayUtility.printTable("TEST LIST", new String[]{"TEST ID","TEST MARKS"}, testCopyTable);
     }
 
     public void viewProfessionalElectiveTestList() throws SQLException {
         int courseID = DatabaseUtility.inputExistingCourseID(this.student.getSection().getDepartmentID(), this.student.getSection().getCollegeID());
-        DisplayUtility.printTable("TEST LIST", new String[]{"TEST ID","TEST MARKS"}, this.testDAO.selectAllCourseTestOfStudent(this.student.getUser().getID(), courseID, this.student.getSection().getDepartmentID(), this.student.getSection().getCollegeID()));
+        
+        List<List<String>> testCopyTable = this.testDAO.selectCourseTestInCurrentSemester("P", this.student.getUser().getID(), courseID, this.student.getSection().getDepartmentID(), this.student.getSection().getCollegeID());
+        DisplayUtility.printTable("TEST LIST", new String[]{"TEST ID","TEST MARKS"}, testCopyTable);
     }
 
     private void viewCourseCGPA() throws SQLException {
-        int inputChoice;
-        inputChoice = StudentUI.inputCourseToViewTestPage();
+        int inputChoice = StudentUI.inputCourseToViewTestPage();
         switch (inputChoice) {
 
             //PROFESSIONAL ELECTIVE
@@ -119,21 +133,14 @@ public class StudentPerformanceManage implements UserInterfaceable{
     }
     
     public void viewProfessionalElectiveCGPA() throws SQLException {
-        int courseID = DatabaseUtility.inputExistingCourseID(this.student.getSection().getDepartmentID(), this.student.getSection().getCollegeID());
-        List<List<String>> test = this.testDAO.selectAllCourseTestOfStudent(this.student.getUser().getID(), courseID, this.student.getSection().getDepartmentID(), this.student.getSection().getCollegeID());
-        int testMark = 0, count = 0;
-        for (List<String> strings : test) {
-            // if(Integer.parseInt(strings[1]) == studentID){
-            testMark += Integer.parseInt(strings.get(1));
-            count++;
-            // }
-        }
-        if(count==0){
-            count = 1;
-        }
-        if(this.recordsDAO.verifyRecord(this.student.getUser().getID(), courseID, this.student.getSection().getDepartmentID(), this.student.getSection().getCollegeID())){
-            Records records = this.recordsDAO.returnRecords(this.student.getUser().getID(), courseID, student.getSection().getDepartmentID(), student.getSection().getCollegeID());
-            float cgpa = (1.0f*records.getAssignmentMarks()+(records.getAttendance()/20) + (testMark/count) + records.getExternalMarks())/10;
+
+        int collegeID = this.student.getSection().getCollegeID();
+        int departmentID = this.student.getSection().getDepartmentID();
+        int courseID = DatabaseUtility.inputExistingCourseID(departmentID, collegeID);
+        int studentID = this.student.getUser().getID();
+        
+        if(this.recordsDAO.verifyRecord(studentID, courseID, departmentID, collegeID)){
+            float cgpa = this.testDAO.getAverageTestMarkOfStudentForCourse(studentID, courseID, departmentID, collegeID);
             StudentUI.displayStudentCGPA(cgpa);
         }else{
             CommonUI.displayCourseIDNotExist();
@@ -142,23 +149,14 @@ public class StudentPerformanceManage implements UserInterfaceable{
     }
 
     public void viewOpenElectiveCGPA() throws SQLException {
-        int departmentID = DatabaseUtility.inputOtherDepartment(this.student.getSection().getDepartmentID(), this.student.getSection().getCollegeID());
         
-        int courseID = DatabaseUtility.inputExistingCourseID(departmentID, this.student.getSection().getCollegeID());
-        List<List<String>> test = this.testDAO.selectAllCourseTestOfStudent(this.student.getUser().getID(), courseID, this.student.getSection().getDepartmentID(), this.student.getSection().getCollegeID());
-        int testMark = 0, count = 0;
-        for (List<String> strings : test) {
-            // if(Integer.parseInt(strings[1]) == studentID){
-            testMark += Integer.parseInt(strings.get(1));
-            count++;
-            // }
-        }
-        if(count==0){
-            count = 1;
-        }
-        if(this.recordsDAO.verifyRecord(this.student.getUser().getID(), courseID, this.student.getSection().getDepartmentID(), this.student.getSection().getCollegeID())){
-            Records records = this.recordsDAO.returnRecords(this.student.getUser().getID(), courseID, student.getSection().getDepartmentID(), student.getSection().getCollegeID());
-            double cgpa = (1.0*records.getAssignmentMarks()+(records.getAttendance()/20) + (testMark/count) + records.getExternalMarks())/10;
+        int collegeID = this.student.getSection().getCollegeID();
+        int studentID = this.student.getUser().getID();
+        int departmentID = DatabaseUtility.inputOtherDepartment(this.student.getSection().getDepartmentID(), collegeID);
+        int courseID = DatabaseUtility.inputExistingCourseID(departmentID, collegeID);
+
+        if(this.recordsDAO.verifyRecord(studentID, courseID, departmentID, collegeID)){
+            float cgpa = this.testDAO.getAverageTestMarkOfStudentForCourse(studentID, courseID, departmentID, collegeID);
             StudentUI.displayStudentCGPA(cgpa);
         }else{
             CommonUI.displayCourseIDNotExist();

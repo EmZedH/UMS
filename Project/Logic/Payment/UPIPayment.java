@@ -1,8 +1,9 @@
 package Logic.Payment;
 
+import Logic.Interfaces.PaymentInterface;
 import UI.Utility.DisplayUtility;
 
-public class UPIPayment implements Payable{
+public class UPIPayment implements PaymentInterface{
     boolean status = true;
 
     @Override

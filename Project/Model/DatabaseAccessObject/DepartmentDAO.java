@@ -16,16 +16,16 @@ public class DepartmentDAO extends Connect{
         return createArrayFromTable("SELECT DEPT_ID, DEPT_NAME,C_ID, C_NAME FROM DEPARTMENT LEFT JOIN COLLEGE ON DEPARTMENT.COLLEGE_ID = COLLEGE.C_ID", new String[]{"DEPT_ID","DEPT_NAME","C_ID","C_NAME"});
     }
 
+    public List<List<String>> selectAllDepartmentInCollege(int collegeID) throws SQLException {
+        return createArrayFromTable("SELECT DEPT_ID, DEPT_NAME,C_ID, C_NAME FROM DEPARTMENT LEFT JOIN COLLEGE ON DEPARTMENT.COLLEGE_ID = COLLEGE.C_ID AND COLLEGE_ID = "+collegeID, new String[]{"DEPT_ID","DEPT_NAME"});
+    }
+
     public List<List<String>> searchAllDepartment(String column, String searchString) throws SQLException {
         return createArrayFromTable("SELECT DEPT_ID, DEPT_NAME,C_ID, C_NAME FROM (SELECT DEPT_ID, DEPT_NAME,C_ID, C_NAME,1 AS TYPE FROM DEPARTMENT LEFT JOIN COLLEGE ON DEPARTMENT.COLLEGE_ID = COLLEGE.C_ID WHERE "+column+" LIKE '"+searchString+"%' UNION SELECT * FROM (SELECT DEPT_ID, DEPT_NAME,C_ID, C_NAME,2 AS TYPE FROM DEPARTMENT LEFT JOIN COLLEGE ON DEPARTMENT.COLLEGE_ID = COLLEGE.C_ID WHERE "+column+" LIKE '%"+searchString+"%' EXCEPT SELECT DEPT_ID, DEPT_NAME,C_ID, C_NAME,2 AS TYPE FROM DEPARTMENT LEFT JOIN COLLEGE ON DEPARTMENT.COLLEGE_ID = COLLEGE.C_ID WHERE "+column+" LIKE '"+searchString+"%')) ORDER BY TYPE", new String[]{"DEPT_ID","DEPT_NAME","C_ID","C_NAME"});
     }
 
-    public List<List<String>> selectDepartmentInCollege(int collegeID) throws SQLException {
-        return createArrayFromTable("SELECT DEPT_ID, DEPT_NAME FROM DEPARTMENT LEFT JOIN COLLEGE ON DEPARTMENT.COLLEGE_ID = COLLEGE.C_ID WHERE COLLEGE_ID = "+collegeID, new String[]{"DEPT_ID","DEPT_NAME"});
-    }
-
-    public List<List<String>> searchDepartmentInCollege(String column, String searchString, int collegeID) throws SQLException {
-        return createArrayFromTable("SELECT DEPT_ID, DEPT_NAME FROM (SELECT DEPT_ID, DEPT_NAME, DEPARTMENT.COLLEGE_ID,1 AS TYPE FROM DEPARTMENT LEFT JOIN COLLEGE ON DEPARTMENT.COLLEGE_ID = COLLEGE.C_ID WHERE DEPARTMENT.COLLEGE_ID = "+collegeID+" AND "+column+" LIKE '"+searchString+"%' UNION SELECT * FROM (SELECT DEPT_ID, DEPT_NAME, DEPARTMENT.COLLEGE_ID,2 AS TYPE FROM DEPARTMENT LEFT JOIN COLLEGE ON DEPARTMENT.COLLEGE_ID = COLLEGE.C_ID WHERE DEPARTMENT.COLLEGE_ID = "+collegeID+" AND "+column+" LIKE '%"+searchString+"%' EXCEPT SELECT DEPT_ID, DEPT_NAME, DEPARTMENT.COLLEGE_ID,2 AS TYPE FROM DEPARTMENT LEFT JOIN COLLEGE ON DEPARTMENT.COLLEGE_ID = COLLEGE.C_ID WHERE DEPARTMENT.COLLEGE_ID = "+collegeID+" AND "+column+" LIKE '"+searchString+"%')) ORDER BY TYPE", new String[]{"DEPT_ID","DEPT_NAME"});
+    public List<List<String>> searchAllDepartmentInCollege(String column, String searchString, int collegeID) throws SQLException {
+        return createArrayFromTable("SELECT DEPT_ID, DEPT_NAME,C_ID, C_NAME FROM (SELECT DEPT_ID, DEPT_NAME,C_ID, C_NAME,1 AS TYPE FROM DEPARTMENT LEFT JOIN COLLEGE ON DEPARTMENT.COLLEGE_ID = COLLEGE.C_ID WHERE "+column+" LIKE '"+searchString+"%' UNION SELECT * FROM (SELECT DEPT_ID, DEPT_NAME,C_ID, C_NAME,2 AS TYPE FROM DEPARTMENT LEFT JOIN COLLEGE ON DEPARTMENT.COLLEGE_ID = COLLEGE.C_ID WHERE "+column+" LIKE '%"+searchString+"%' EXCEPT SELECT DEPT_ID, DEPT_NAME,C_ID, C_NAME,2 AS TYPE FROM DEPARTMENT LEFT JOIN COLLEGE ON DEPARTMENT.COLLEGE_ID = COLLEGE.C_ID WHERE "+column+" LIKE '"+searchString+"%')) WHERE COLLEGE_ID = "+collegeID+"ORDER BY TYPE", new String[]{"DEPT_ID","DEPT_NAME"});
     }
 
     public Department returnDepartment(int deptID, int collegeID) throws SQLException {
@@ -51,7 +51,7 @@ public class DepartmentDAO extends Connect{
         }
     }
 
-    public void deleteDepartment(int deptID, int collegeID) throws SQLException{
+    public void deleteDepartment(int departmentID, int collegeID) throws SQLException{
         String sqlDept = "DELETE FROM DEPARTMENT WHERE DEPT_ID = ? AND COLLEGE_ID = ?";
         String sqlSec = "DELETE FROM SECTION WHERE DEPT_ID = ? AND COLLEGE_ID = ?";
         String sqlStudent = "UPDATE STUDENT SET SEC_ID = 0 AND DEPT_ID = 0 WHERE DEPT ID = ? AND COLLEGE_ID = ?";
@@ -70,26 +70,26 @@ public class DepartmentDAO extends Connect{
         PreparedStatement pstmtRecords = connection.prepareStatement(sqlRecords)){
             try{
                 connection.setAutoCommit(false);
-                pstmtDept.setInt(1,deptID);
+                pstmtDept.setInt(1,departmentID);
                 pstmtDept.setInt(2,collegeID);
                 pstmtDept.execute();
-                pstmtSec.setInt(1,deptID);
+                pstmtSec.setInt(1,departmentID);
                 pstmtSec.setInt(2,collegeID);
                 pstmtSec.executeUpdate();
-                pstmtStudent.setInt(1,deptID);
+                pstmtStudent.setInt(1,departmentID);
                 pstmtStudent.setInt(2,collegeID);
                 pstmtStudent.executeUpdate();
-                pstmtProfessor.setInt(1,deptID);
+                pstmtProfessor.setInt(1,departmentID);
                 pstmtProfessor.setInt(2,collegeID);
                 pstmtProfessor.executeUpdate();
                 
-                pstmtCourse.setInt(1,deptID);
+                pstmtCourse.setInt(1,departmentID);
                 pstmtCourse.setInt(2,collegeID);
                 pstmtCourse.executeUpdate();
-                pstmtCourseProfessor.setInt(1,deptID);
+                pstmtCourseProfessor.setInt(1,departmentID);
                 pstmtCourseProfessor.setInt(2,collegeID);
                 pstmtCourseProfessor.executeUpdate();
-                pstmtRecords.setInt(1,deptID);
+                pstmtRecords.setInt(1,departmentID);
                 pstmtRecords.setInt(2,collegeID);
                 pstmtRecords.executeUpdate();
                 connection.commit();

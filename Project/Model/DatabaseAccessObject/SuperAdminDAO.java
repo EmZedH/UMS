@@ -6,13 +6,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import Logic.Interfaces.UserVerifiable;
 import Model.Connect;
 import Model.SuperAdmin;
 import Model.User;
 
-public class SuperAdminDAO extends Connect{
+public class SuperAdminDAO extends Connect implements UserVerifiable{
 
-    public boolean verifySuperAdminIDPassword(int userID, String password) throws SQLException {
+    public boolean verifyUserIDPassword(int userID, String password) throws SQLException {
         try(Connection connection = connection();
         PreparedStatement pstmt = connection.prepareStatement("SELECT SA_ID, U_PASSWORD FROM USER INNER JOIN SUPER_ADMIN ON USER.U_ID = SUPER_ADMIN.SA_ID WHERE SA_ID = ? AND U_PASSWORD = ?")){
             pstmt.setInt(1, userID);

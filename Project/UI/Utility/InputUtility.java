@@ -90,24 +90,24 @@ public class InputUtility {
         }
     }
 
-    public static int inputChoiceWithBack(String heading, String[] choices){
-        try{
-        DisplayUtility.optionDialog(heading, choices);
-        in = new Scanner(System.in);
-        inputNumber = in.nextInt();
-        if(inputNumber>0 && inputNumber<choices.length){
-            return inputNumber;
-        }
-        else if(inputNumber==choices.length){
-            return 0;
-        }
-        CommonUI.properPage();
-        return inputChoice(heading, choices);}
-        catch(InputMismatchException e){
-            CommonUI.properPage();
-            return inputChoice(heading, choices);
-        }
-    }
+    // public static int inputChoiceWithBack(String heading, String[] choices){
+    //     try{
+    //     DisplayUtility.optionDialog(heading, choices);
+    //     in = new Scanner(System.in);
+    //     inputNumber = in.nextInt();
+    //     if(inputNumber>0 && inputNumber<choices.length){
+    //         return inputNumber;
+    //     }
+    //     else if(inputNumber==choices.length){
+    //         return 0;
+    //     }
+    //     CommonUI.properPage();
+    //     return inputChoice(heading, choices);}
+    //     catch(InputMismatchException e){
+    //         CommonUI.properPage();
+    //         return inputChoice(heading, choices);
+    //     }
+    // }
     public static int inputChoice(String heading, String[] choices,String msg){
         try{
         DisplayUtility.userPageDialog(heading, msg, choices);
@@ -138,40 +138,49 @@ public class InputUtility {
             return inputChoice(heading, choices, left, right);
         }
     }
-    public static int inputChoiceWithBack(String heading, String[] choices,String msg){
-        try{
-        DisplayUtility.userPageDialog(heading, msg, choices);
-        in = new Scanner(System.in);
-        inputNumber = in.nextInt();
-        if(inputNumber>0 && inputNumber<choices.length){
-            return inputNumber;
-        }
-        else if(inputNumber==choices.length){
-            return 0;
-        }
-        CommonUI.properPage();
-        return inputChoice(heading, choices,msg);}
-        catch(InputMismatchException e){
-            CommonUI.properPage();
-            return inputChoice(heading, choices, msg);
-        }
-    }
-    public static int inputChoiceWithBack(String heading, String[] choices,String left, String right){
-        try{
-        DisplayUtility.userPageDialog(heading, left, right, choices);
-        in = new Scanner(System.in);
-        inputNumber = in.nextInt();
-        if(inputNumber>0 && inputNumber<choices.length){
-            return inputNumber;
-        }
-        else if(inputNumber==choices.length){
-            return 0;
-        }
-        CommonUI.properPage();
-        return inputChoice(heading, choices,left,right);}
-        catch(InputMismatchException e){
-            CommonUI.properPage();
-            return inputChoice(heading, choices, left, right);
+    // public static int inputChoiceWithBack(String heading, String[] choices,String msg){
+    //     try{
+    //     DisplayUtility.userPageDialog(heading, msg, choices);
+    //     in = new Scanner(System.in);
+    //     inputNumber = in.nextInt();
+    //     if(inputNumber>0 && inputNumber<choices.length){
+    //         return inputNumber;
+    //     }
+    //     else if(inputNumber==choices.length){
+    //         return 0;
+    //     }
+    //     CommonUI.properPage();
+    //     return inputChoice(heading, choices,msg);}
+    //     catch(InputMismatchException e){
+    //         CommonUI.properPage();
+    //         return inputChoice(heading, choices, msg);
+    //     }
+    // }
+    // public static int inputChoiceWithBack(String heading, String[] choices,String left, String right){
+    //     try{
+    //     DisplayUtility.userPageDialog(heading, left, right, choices);
+    //     in = new Scanner(System.in);
+    //     inputNumber = in.nextInt();
+    //     if(inputNumber>0 && inputNumber<choices.length){
+    //         return inputNumber;
+    //     }
+    //     else if(inputNumber==choices.length){
+    //         return 0;
+    //     }
+    //     CommonUI.properPage();
+    //     return inputChoice(heading, choices,left,right);}
+    //     catch(InputMismatchException e){
+    //         CommonUI.properPage();
+    //         return inputChoice(heading, choices, left, right);
+    //     }
+    // }
+
+    public static boolean checkIfStringIsInteger(String integer){
+        try {
+            Integer.parseInt(integer);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
         }
     }
 

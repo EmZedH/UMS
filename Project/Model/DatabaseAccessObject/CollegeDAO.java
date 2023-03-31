@@ -4,18 +4,20 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import Model.College;
 import Model.Connect;
 
 public class CollegeDAO extends Connect{
+    
     public List<List<String>> selectAllCollege() throws SQLException {
         return createArrayFromTable("SELECT * FROM COLLEGE", new String[]{"C_ID","C_NAME","C_ADDRESS","C_TELEPHONE"});
     }
 
     public List<List<String>> searchAllCollege(String column, String searchString) throws SQLException {
-        return createArrayFromTable("SELECT C_ID, C_NAME, C_ADDRESS, C_TELEPHONE FROM (SELECT C_ID, C_NAME, C_ADDRESS, C_TELEPHONE,1 AS TYPE FROM COLLEGE WHERE "+column+" LIKE '"+searchString+"%' UNION SELECT * FROM (SELECT C_ID, C_NAME, C_ADDRESS, C_TELEPHONE,2 AS TYPE FROM COLLEGE WHERE "+column+" LIKE '%"+searchString+"%' EXCEPT SELECT C_ID, C_NAME, C_ADDRESS, C_TELEPHONE,2 AS TYPE FROM COLLEGE WHERE"+column+" LIKE '"+searchString+"%')) ORDER BY TYPE;", new String[]{"C_ID","C_NAME","C_ADDRESS","C_TELEPHONE"});
+        return createArrayFromTable("SELECT C_ID, C_NAME, C_ADDRESS, C_TELEPHONE FROM (SELECT C_ID, C_NAME, C_ADDRESS, C_TELEPHONE,1 AS TYPE FROM COLLEGE WHERE "+column+" LIKE '"+searchString+"%' UNION SELECT * FROM (SELECT C_ID, C_NAME, C_ADDRESS, C_TELEPHONE,2 AS TYPE FROM COLLEGE WHERE "+column+" LIKE '%"+searchString+"%' EXCEPT SELECT C_ID, C_NAME, C_ADDRESS, C_TELEPHONE,2 AS TYPE FROM COLLEGE WHERE "+column+" LIKE '"+searchString+"%')) ORDER BY TYPE;", new String[]{"C_ID","C_NAME","C_ADDRESS","C_TELEPHONE"});
     }
 
     public College returnCollege(int collegeID) throws SQLException {
@@ -111,5 +113,18 @@ public class CollegeDAO extends Connect{
             ResultSet resultSet = pstmt.executeQuery();
             return resultSet.next();
         }
+    }
+
+    public List<College> returnCollegeList(int collegeID) throws SQLException{
+        String sqlCollege = "SELECT * FROM COLLEGE WHERE C_ID = ?";
+        List<College> collegeList = new ArrayList<>();
+        try (Connection connection = connection();PreparedStatement pstmt = connection.prepareStatement(sqlCollege)) {
+            pstmt.setInt(1, collegeID);
+            ResultSet resultSet = pstmt.executeQuery();
+            while (resultSet.next()) {
+                collegeList.add(new College(resultSet.getInt("C_ID"), resultSet.getString("C_NAME"), resultSet.getString("C_ADDRESS"), resultSet.getString("C_TELEPHONE")));
+            }
+            return collegeList;
+        } 
     }
 }

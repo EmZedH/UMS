@@ -1,8 +1,9 @@
 package Logic.Payment;
 
+import Logic.Interfaces.PaymentInterface;
 import UI.Utility.DisplayUtility;
 
-public class DebitCard implements Payable{
+public class DebitCard implements PaymentInterface{
     boolean status = false;
     @Override
     public void pay() {

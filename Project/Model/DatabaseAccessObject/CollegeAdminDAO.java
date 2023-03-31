@@ -4,16 +4,19 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
+import Logic.Interfaces.UserVerifiable;
 import Model.College;
 import Model.CollegeAdmin;
 import Model.Connect;
 import Model.User;
 
-public class CollegeAdminDAO extends Connect{
+public class CollegeAdminDAO extends Connect implements UserVerifiable{
     
-    public boolean verifyCollegeAdminIDPassword(int userID, String password) throws SQLException {
+    @Override
+    public boolean verifyUserIDPassword(int userID, String password) throws SQLException {
         try(Connection connection = connection();
         PreparedStatement pstmt = connection.prepareStatement("SELECT CA_ID, U_PASSWORD FROM USER INNER JOIN COLLEGE_ADMIN ON USER.U_ID = COLLEGE_ADMIN.CA_ID WHERE CA_ID = ? AND U_PASSWORD = ?")){
             pstmt.setInt(1, userID);
@@ -31,12 +34,12 @@ public class CollegeAdminDAO extends Connect{
         return createArrayFromTable("SELECT CA_ID,U_NAME,COLLEGE_ID,C_NAME,U_PASSWORD FROM (SELECT CA_ID,U_NAME,COLLEGE_ADMIN.COLLEGE_ID,C_NAME,U_PASSWORD,1 AS TYPE FROM COLLEGE_ADMIN LEFT JOIN COLLEGE ON COLLEGE.C_ID = COLLEGE_ADMIN.COLLEGE_ID LEFT JOIN USER ON USER.U_ID = COLLEGE_ADMIN.CA_ID WHERE "+column+" LIKE '"+searchString+"%' UNION SELECT * FROM (SELECT CA_ID,U_NAME,COLLEGE_ADMIN.COLLEGE_ID,C_NAME,U_PASSWORD,2 AS TYPE FROM COLLEGE_ADMIN LEFT JOIN COLLEGE ON COLLEGE.C_ID = COLLEGE_ADMIN.COLLEGE_ID LEFT JOIN USER ON USER.U_ID = COLLEGE_ADMIN.CA_ID WHERE "+column+" LIKE '%"+searchString+"%' EXCEPT SELECT CA_ID,U_NAME,COLLEGE_ADMIN.COLLEGE_ID,C_NAME,U_PASSWORD,2 AS TYPE FROM COLLEGE_ADMIN LEFT JOIN COLLEGE ON COLLEGE.C_ID = COLLEGE_ADMIN.COLLEGE_ID LEFT JOIN USER ON USER.U_ID = COLLEGE_ADMIN.CA_ID WHERE "+column+" LIKE '"+searchString+"%')) ORDER BY TYPE", new String[]{"CA_ID","U_NAME","COLLEGE_ID","C_NAME","U_PASSWORD"});
     }
 
-    public List<List<String>> selectCollegeAdminInCollege(int collegeID) throws SQLException {
-        return createArrayFromTable("SELECT CA_ID,U_NAME,U_PASSWORD FROM COLLEGE_ADMIN LEFT JOIN COLLEGE ON COLLEGE.C_ID = COLLEGE_ADMIN.COLLEGE_ID LEFT JOIN USER ON USER.U_ID = COLLEGE_ADMIN.CA_ID WHERE C_ID = "+collegeID, new String[]{"CA_ID","U_NAME","U_PASSWORD"});
+    public List<List<String>> selectAllCollegeAdminInCollege(int collegeID) throws SQLException {
+        return createArrayFromTable("SELECT CA_ID,U_NAME,COLLEGE_ADMIN.COLLEGE_ID,C_NAME,U_PASSWORD FROM COLLEGE_ADMIN LEFT JOIN COLLEGE ON COLLEGE.C_ID = COLLEGE_ADMIN.COLLEGE_ID LEFT JOIN USER ON USER.U_ID = COLLEGE_ADMIN.CA_ID WHERE COLLEGE_ADMIN.COLLEGE_ID = "+collegeID, new String[]{"CA_ID","U_NAME","U_PASSWORD"});
     }
 
-    public List<List<String>> searchCollegeAdminInCollege(String column, String searchString, int collegeID) throws SQLException {
-        return createArrayFromTable("SELECT CA_ID,U_NAME,U_PASSWORD FROM (SELECT CA_ID,U_NAME,U_PASSWORD,1 AS TYPE FROM COLLEGE_ADMIN LEFT JOIN COLLEGE ON COLLEGE.C_ID = COLLEGE_ADMIN.COLLEGE_ID LEFT JOIN USER ON USER.U_ID = COLLEGE_ADMIN.CA_ID WHERE COLLEGE_ADMIN.COLLEGE_ID = "+collegeID+" AND "+column+" LIKE '"+searchString+"%' UNION SELECT * FROM (SELECT CA_ID,U_NAME,U_PASSWORD,2 AS TYPE FROM COLLEGE_ADMIN LEFT JOIN COLLEGE ON COLLEGE.C_ID = COLLEGE_ADMIN.COLLEGE_ID LEFT JOIN USER ON USER.U_ID = COLLEGE_ADMIN.CA_ID WHERE COLLEGE_ADMIN.COLLEGE_ID = "+collegeID+" AND "+column+" LIKE '%"+searchString+"%' EXCEPT SELECT CA_ID,U_NAME,U_PASSWORD,2 AS TYPE FROM COLLEGE_ADMIN LEFT JOIN COLLEGE ON COLLEGE.C_ID = COLLEGE_ADMIN.COLLEGE_ID LEFT JOIN USER ON USER.U_ID = COLLEGE_ADMIN.CA_ID WHERE COLLEGE_ADMIN.COLLEGE_ID = "+collegeID+" AND "+column+" LIKE '"+searchString+"%')) ORDER BY TYPE", new String[]{"CA_ID","U_NAME","U_PASSWORD"});
+    public List<List<String>> searchAllCollegeAdminInCollege(String column, String searchString, int collegeID) throws SQLException {
+        return createArrayFromTable("SELECT CA_ID,U_NAME,COLLEGE_ID,C_NAME,U_PASSWORD FROM (SELECT CA_ID,U_NAME,COLLEGE_ADMIN.COLLEGE_ID,C_NAME,U_PASSWORD,1 AS TYPE FROM COLLEGE_ADMIN LEFT JOIN COLLEGE ON COLLEGE.C_ID = COLLEGE_ADMIN.COLLEGE_ID LEFT JOIN USER ON USER.U_ID = COLLEGE_ADMIN.CA_ID WHERE "+column+" LIKE '"+searchString+"%' UNION SELECT * FROM (SELECT CA_ID,U_NAME,COLLEGE_ADMIN.COLLEGE_ID,C_NAME,U_PASSWORD,2 AS TYPE FROM COLLEGE_ADMIN LEFT JOIN COLLEGE ON COLLEGE.C_ID = COLLEGE_ADMIN.COLLEGE_ID LEFT JOIN USER ON USER.U_ID = COLLEGE_ADMIN.CA_ID WHERE "+column+" LIKE '%"+searchString+"%' EXCEPT SELECT CA_ID,U_NAME,COLLEGE_ADMIN.COLLEGE_ID,C_NAME,U_PASSWORD,2 AS TYPE FROM COLLEGE_ADMIN LEFT JOIN COLLEGE ON COLLEGE.C_ID = COLLEGE_ADMIN.COLLEGE_ID LEFT JOIN USER ON USER.U_ID = COLLEGE_ADMIN.CA_ID WHERE "+column+" LIKE '"+searchString+"%')) WHERE COLLEGE_ADMIN.COLLEGE_ID = "+collegeID+" ORDER BY TYPE", new String[]{"CA_ID","U_NAME","U_PASSWORD"});
     }
 
     public CollegeAdmin returnCollegeAdmin(int collegeAdminID) throws SQLException{
@@ -95,7 +98,6 @@ public class CollegeAdminDAO extends Connect{
         PreparedStatement pstmtUser = connection.prepareStatement(sqlUser);
         PreparedStatement pstmtCollegeAdmin = connection.prepareStatement(sqlCollegeAdmin)) {
             try {
-
                 User user = collegeAdmin.getUser();
                 College college = collegeAdmin.getCollege();
                 connection.setAutoCommit(false);
@@ -129,5 +131,20 @@ public class CollegeAdminDAO extends Connect{
             ResultSet resultSet = pstmt.executeQuery();
             return resultSet.next();
         }
+    }
+
+    public List<CollegeAdmin> returnCollegeAdminList(int collegeAdminID) throws SQLException{
+        String sqlCollegeAdmin = "SELECT CA_ID, COLLEGE_ADMIN.COLLEGE_ID, C_NAME, C_ADDRESS, C_TELEPHONE, U_NAME, U_AADHAR, U_DOB, U_GENDER, U_ADDRESS, U_PASSWORD FROM COLLEGE_ADMIN INNER JOIN USER ON (USER.U_ID = COLLEGE_ADMIN.CA_ID) LEFT JOIN COLLEGE ON (COLLEGE_ADMIN.COLLEGE_ID = COLLEGE.C_ID) WHERE CA_ID = ?";
+        List<CollegeAdmin> collegeAdminList = new ArrayList<>();
+        try(Connection connection = connection();PreparedStatement pstmt = connection.prepareStatement(sqlCollegeAdmin)) {
+            pstmt.setInt(1, collegeAdminID);
+            ResultSet resultSet = pstmt.executeQuery();
+            while (resultSet.next()) {
+                User user = new User(resultSet.getInt("CA_ID"), resultSet.getString("U_NAME"), resultSet.getString("U_AADHAR"), resultSet.getString("U_DOB"), resultSet.getString("U_GENDER"), resultSet.getString("U_ADDRESS"), resultSet.getString("U_PASSWORD"));
+                College college = new College(resultSet.getInt("COLLEGE_ID"), resultSet.getString("C_NAME"), resultSet.getString("C_ADDRESS"), resultSet.getString("C_TELEPHONE"));
+                collegeAdminList.add(new CollegeAdmin(user, college));
+            }
+            return collegeAdminList;
+        } 
     }
 }

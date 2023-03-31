@@ -44,8 +44,8 @@ public class StudentUI {
         DisplayUtility.singleDialogDisplay("Student CGPA - "+cgpa);
     }
 
-    public static void displayCourseRegistrationSuccessful() {
-        DisplayUtility.singleDialogDisplay("Course Registration Successful");
+    public static void displayCourseRegistrationSuccessful(int transactionID) {
+        DisplayUtility.dialogWithHeaderDisplay("Course Registration Successful","Transaction ID - "+transactionID);
     }
 
     public static int displayOpenElectiveRegistrationPage() {
