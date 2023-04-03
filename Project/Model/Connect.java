@@ -11,10 +11,6 @@ import java.util.List;
 public class Connect {
 
     static String url = "jdbc:sqlite:db/ums.db"; //"jdbc:sqlite:E:Github/Internship/UMS/db/ums.db"
-<<<<<<< Updated upstream
-=======
-    // static String url = "jdbc:sqlite:/Users/muhamed-pt7045/Desktop/UMS/UMS/db/ums.db"; //"jdbc:sqlite:E:Github/Internship/UMS/db/ums.db"
->>>>>>> Stashed changes
 /*
  * Don't forget to add sqlite-jdbc-3.40.0.0.jar into Referenced Libraries folder
  */
