@@ -26,7 +26,7 @@ public class StudentManageProfile implements UserInterfaceable{
     }
 
     @Override
-    public void selectOperation(int choice) throws SQLException {
+    public void operationSelect(int choice) throws SQLException {
         int userID = this.student.getUser().getID();
         switch (choice) {
 

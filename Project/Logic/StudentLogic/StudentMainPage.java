@@ -22,7 +22,7 @@ public class StudentMainPage implements UserInterfaceable{
     }
 
     @Override
-    public void selectOperation(int choice) throws SQLException {
+    public void operationSelect(int choice) throws SQLException {
 
         UserInterface userInterface = new UserInterface();
         UserInterfaceable manageClass = this;

@@ -32,7 +32,7 @@ public class CollegeAdminSectionManage implements UserInterfaceable, Addable, Ed
     }
 
     @Override
-    public void selectOperation(int choice) throws SQLException {
+    public void operationSelect(int choice) throws SQLException {
         String searchString;
         List<List<String>> sectionTable = new ArrayList<>();
         switch(choice){

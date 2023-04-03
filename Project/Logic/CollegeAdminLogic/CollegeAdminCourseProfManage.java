@@ -31,7 +31,7 @@ public class CollegeAdminCourseProfManage implements UserInterfaceable, Addable,
     }
 
     @Override
-    public void selectOperation(int choice) throws SQLException {
+    public void operationSelect(int choice) throws SQLException {
         switch (choice) {
 
             //ADD COURSE TO PROFESSOR

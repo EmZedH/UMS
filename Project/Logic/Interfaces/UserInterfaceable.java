@@ -6,5 +6,5 @@ public interface UserInterfaceable {
 
     public int inputUserChoice();
 
-    public void selectOperation(int choice) throws SQLException;
+    public void operationSelect(int choice) throws SQLException;
 }

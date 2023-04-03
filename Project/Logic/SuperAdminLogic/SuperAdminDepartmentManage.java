@@ -30,7 +30,7 @@ public class SuperAdminDepartmentManage implements UserInterfaceable, Addable, E
     }
 
     @Override
-    public void selectOperation(int choice) throws SQLException {
+    public void operationSelect(int choice) throws SQLException {
         switch (choice) {
 
             //ADD DEPARTMENT

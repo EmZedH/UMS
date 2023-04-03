@@ -40,7 +40,7 @@ public class StudentTransactionManage implements UserInterfaceable{
     }
 
     @Override
-    public void selectOperation(int choice) throws SQLException {
+    public void operationSelect(int choice) throws SQLException {
         switch (choice) {
 
             //VIEW ALL TRANSACTIONS

@@ -11,7 +11,7 @@ public class UserInterface {
 
         while (choice!=0) {
 
-            manageClass.selectOperation(choice);
+            manageClass.operationSelect(choice);
             choice = manageClass.inputUserChoice();
         }
     }

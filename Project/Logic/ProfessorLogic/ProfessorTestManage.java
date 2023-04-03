@@ -40,7 +40,7 @@ public class ProfessorTestManage implements UserInterfaceable, Addable, Editable
     }
 
     @Override
-    public void selectOperation(int choice) throws SQLException {
+    public void operationSelect(int choice) throws SQLException {
         switch (choice) {
 
             //ADD TEST
