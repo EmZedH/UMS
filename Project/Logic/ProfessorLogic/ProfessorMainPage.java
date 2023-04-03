@@ -1,32 +1,42 @@
 package Logic.ProfessorLogic;
 
 import java.sql.SQLException;
-import Logic.StartupLogic;
-import Logic.UserInterface;
-import Logic.Interfaces.UserInterfaceable;
+import Logic.ModuleExecutor;
+import Logic.Interfaces.ModuleInterface;
 import Model.Professor;
 import UI.Utility.InputUtility;
 
-public class ProfessorMainPage implements UserInterfaceable{
+public class ProfessorMainPage implements ModuleInterface{
 
-    ProfessorServicesFactory professorServicesFactory;
-    Professor professor;
-    public ProfessorMainPage(ProfessorServicesFactory professorServicesFactory,Professor professor) {
+    private ProfessorServicesFactory professorServicesFactory;
+    private Professor professor;
+    private ModuleExecutor module;
+
+    private boolean exitStatus = false;
+    private int userChoice;
+
+    public ProfessorMainPage(ProfessorServicesFactory professorServicesFactory,Professor professor, ModuleExecutor module) {
 
         this.professorServicesFactory = professorServicesFactory;
         this.professor = professor;
+        this.module = module;
     }
 
     @Override
-    public int inputUserChoice() {
-        return InputUtility.inputChoice("Professor Page", new String[]{"Manage Profile","Student Records","Manage Tests","Log Out"},"ID: "+ professor.getUser().getID(), "Name: "+ professor.getUser().getName());
+    public boolean getExitStatus() {
+        return this.exitStatus;
     }
 
+    // @Override
+    // public void runUserInterface() throws SQLException {
+    //     this.userChoice = InputUtility.inputChoice("Professor Page", new String[]{"Manage Profile","Student Records","Manage Tests","Log Out"},"ID: "+ professor.getUser().getID(), "Name: "+ professor.getUser().getName());
+    // }
+
     @Override
-    public void selectOperation(int choice) throws SQLException {
-        UserInterfaceable manageClass = this;
-        UserInterface userInterface = new UserInterface();
-        switch (choice) {
+    public void runLogic() throws SQLException {
+        this.userChoice = InputUtility.inputChoice("Professor Page", new String[]{"Manage Profile","Student Records","Manage Tests","Log Out"},"ID: "+ professor.getUser().getID(), "Name: "+ professor.getUser().getName());
+        ModuleInterface manageClass = this;
+        switch (this.userChoice) {
 
             //MANAGE PROFILE
             case 1:
@@ -43,12 +53,12 @@ public class ProfessorMainPage implements UserInterfaceable{
                 manageClass = professorServicesFactory.professorTestManage(this.professor);
                 break;
 
-            //LOG OUT
+            //GO BACK
             case 4:
-                StartupLogic.userSelect();
+                this.exitStatus = true;
                 return;
+
         }
-        userInterface.userInterface(manageClass);
-        userInterface.userInterface(this);
+        this.module.executeModule(manageClass);
     }
 }

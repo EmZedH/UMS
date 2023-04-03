@@ -1,63 +1,76 @@
 package Logic.StudentLogic;
 
 import java.sql.SQLException;
-import Logic.StartupLogic;
-import Logic.UserInterface;
-import Logic.Interfaces.UserInterfaceable;
+import Logic.ModuleExecutor;
+import Logic.Interfaces.ModuleInterface;
 import Model.Student;
 import UI.Utility.InputUtility;
 
-public class StudentMainPage implements UserInterfaceable{
-    Student student;
-    StudentServicesFactory studentServicesFactory;
+public class StudentMainPage implements ModuleInterface{
+    private Student student;
+    private StudentServicesFactory studentServicesFactory;
+    private ModuleExecutor module;
 
-    public StudentMainPage(StudentServicesFactory studentServicesFactory, Student student) throws SQLException{
+    private boolean exitStatus = false;
+    private int userChoice;
+
+    public StudentMainPage(StudentServicesFactory studentServicesFactory, Student student, ModuleExecutor module) throws SQLException{
         this.studentServicesFactory = studentServicesFactory;        
         this.student = student;
+        this.module = module;
     }
 
+
     @Override
-    public int inputUserChoice() {
-        return InputUtility.inputChoice("Student Page",new String[]{"Manage Profile","My Records","Transactions","My Performance","Log Out"},"ID: "+student.getUser().getID(), "Name: "+student.getUser().getName());
+    public boolean getExitStatus() {
+        return this.exitStatus;
     }
 
-    @Override
-    public void selectOperation(int choice) throws SQLException {
 
-        UserInterface userInterface = new UserInterface();
-        UserInterfaceable manageClass = this;
-        switch (choice) {
+    // @Override
+    // public void runUserInterface() throws SQLException {
+    //     this.userChoice = InputUtility.inputChoice("Student Page",new String[]{"Manage Profile","My Records","Transactions","My Performance","Course Registration","Log Out"},"ID: "+student.getUser().getID(), "Name: "+student.getUser().getName());
+    // }
+
+
+    @Override
+    public void runLogic() throws SQLException {
+        this.userChoice = InputUtility.inputChoice("Student Page",new String[]{"Manage Profile","My Records","Transactions","My Performance","Course Registration","Log Out"},"ID: "+student.getUser().getID(), "Name: "+student.getUser().getName());
+
+        ModuleInterface manageClass = this;
+        switch (userChoice) {
 
             //MANAGE PROFILE
             case 1:
-                // manageProfile(true);
-                manageClass = studentServicesFactory.studentManageProfile(this.student);
+                manageClass = studentServicesFactory.studentManageProfile(student);
                 break;
         
             //MY RECORDS
             case 2:
-                // viewStudentRecords();
-                manageClass = studentServicesFactory.studentRecordsManage(this.student);
+                manageClass = studentServicesFactory.studentRecordsManage(student);
                 break;
 
             //TRANSACTIONS
             case 3:
-                manageClass = studentServicesFactory.studentTransactionManage(this.student);
+                manageClass = studentServicesFactory.studentTransactionManage(student, this.module);
                 break;
 
             //PERFORMANCE
             case 4:
-                // studentPerformance();
-                manageClass = studentServicesFactory.studentPerformanceManage(this.student);
+                manageClass = studentServicesFactory.studentPerformanceManage(student);
                 break;
 
-            //LOG OUT
+            //COURSE REGISTRATION:
             case 5:
-                StartupLogic.userSelect();
+                manageClass = studentServicesFactory.studentCourseRegistrationManage(student, this.module); 
                 break;
+            
+            //GO BACK
+            case 6:
+                this.exitStatus = true;
+                return;
         }
-        userInterface.userInterface(manageClass);
-        userInterface.userInterface(this);
+        this.module.executeModule(manageClass);
     }
 }
 

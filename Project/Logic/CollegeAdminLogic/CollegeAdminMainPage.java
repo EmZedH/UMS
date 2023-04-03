@@ -1,34 +1,46 @@
 package Logic.CollegeAdminLogic;
 
 import java.sql.SQLException;
-import Logic.StartupLogic;
-import Logic.UserInterface;
-import Logic.Interfaces.UserInterfaceable;
+import Logic.ModuleExecutor;
+import Logic.Interfaces.ModuleInterface;
 import Model.CollegeAdmin;
 import UI.Utility.InputUtility;
 
-public class CollegeAdminMainPage implements UserInterfaceable{
+public class CollegeAdminMainPage implements ModuleInterface{
 
-    CollegeAdminServicesFactory collegeAdminServicesFactory;
-    CollegeAdmin collegeAdmin;
+    private CollegeAdminServicesFactory collegeAdminServicesFactory;
+    private CollegeAdmin collegeAdmin;
+    private ModuleExecutor module;
 
+    private boolean exitStatus = false;
+    private int userChoice;
+    
     public CollegeAdminMainPage(
 
-    CollegeAdminServicesFactory collegeAdminServicesFactory,CollegeAdmin collegeAdmin) throws SQLException {
+    CollegeAdminServicesFactory collegeAdminServicesFactory,CollegeAdmin collegeAdmin, ModuleExecutor module) throws SQLException {
         this.collegeAdmin = collegeAdmin;
         this.collegeAdminServicesFactory = collegeAdminServicesFactory;
+        this.module = module;
     }
 
-    @Override
-    public int inputUserChoice() {
-        return InputUtility.inputChoice("College Admin Page", new String[]{"User","Course","Department","Students Record","Professor Course List","Section","Test Records","Transactions","College","Log Out"},"Name: "+ collegeAdmin.getUser().getName(),"ID: "+ collegeAdmin.getUser().getID());
-    }
 
     @Override
-    public void selectOperation(int choice) throws SQLException {
-        UserInterfaceable manageClass = this;
-        UserInterface userInterface = new Logic.UserInterface();
-        switch(choice){
+    public boolean getExitStatus() {
+        return this.exitStatus;
+    }
+
+
+    // @Override
+    // public void runUserInterface() throws SQLException {
+    //     this.userChoice = InputUtility.inputChoice("College Admin Page", new String[]{"User","Course","Department","Students Record","Professor Course List","Section","Test Records","Transactions","College","Log Out"},"Name: "+ collegeAdmin.getUser().getName(),"ID: "+ collegeAdmin.getUser().getID());
+    // }
+
+
+    @Override
+    public void runLogic() throws SQLException {
+        this.userChoice = InputUtility.inputChoice("College Admin Page", new String[]{"User","Course","Department","Students Record","Professor Course List","Section","Test Records","Transactions","College","Log Out"},"Name: "+ collegeAdmin.getUser().getName(),"ID: "+ collegeAdmin.getUser().getID());
+        ModuleInterface manageClass = this;
+        switch(this.userChoice){
 
             //MANAGE USER
             case 1:
@@ -74,12 +86,11 @@ public class CollegeAdminMainPage implements UserInterfaceable{
                 manageClass = this.collegeAdminServicesFactory.collegeAdminCollegeManage(this.collegeAdmin);
                 break;
 
-            //LOG OUT
+            //GO BACK
             case 10:
-                StartupLogic.userSelect();
-                break;
+                this.exitStatus = true;
+                return;
         }
-        userInterface.userInterface(manageClass);
-        userInterface.userInterface(this);
+        this.module.executeModule(manageClass);
     }
 }

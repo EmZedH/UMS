@@ -2,93 +2,103 @@ package Logic.SuperAdminLogic;
 
 import java.sql.SQLException;
 
-import Logic.StartupLogic;
-import Logic.UserInterface;
-import Logic.Interfaces.UserInterfaceable;
+import Logic.ModuleExecutor;
+import Logic.Interfaces.ModuleInterface;
 import Model.SuperAdmin;
+import UI.Utility.DisplayUtility;
 import UI.Utility.InputUtility;
 
-public class SuperAdminMainPage implements UserInterfaceable{
+public class SuperAdminMainPage implements ModuleInterface{
 
-    SuperAdmin superAdmin;
-    SuperAdminServicesFactory superAdminServicesFactory;
+    private SuperAdmin superAdmin;
+    private SuperAdminServicesFactory superAdminServicesFactory;
+    private ModuleExecutor moduleExecutor;
+
+    private boolean exitStatus = false;
+    private int userChoice;
     
-    public SuperAdminMainPage(SuperAdmin superAdmin, SuperAdminServicesFactory superAdminServicesFactory) throws SQLException {
-        
+    public SuperAdminMainPage(SuperAdmin superAdmin, SuperAdminServicesFactory superAdminServicesFactory, ModuleExecutor moduleExecutor) throws SQLException {
         this.superAdmin = superAdmin;
         this.superAdminServicesFactory = superAdminServicesFactory;
+        this.moduleExecutor = moduleExecutor;
     }
 
     @Override
-    public int inputUserChoice() {
-        return InputUtility.inputChoice("Super Admin Page",new String[]{"User","Course","Department","Students Record","Professor Course List","Section","Test Records","Transactions","Colleges","Log Out"},"Name: " + superAdmin.getUser().getName(),"ID: " + superAdmin.getUser().getID());
+    public boolean getExitStatus() {
+        return this.exitStatus;
     }
 
+    // @Override
+    // public void runUserInterface() throws SQLException {
+    //     this.userChoice = InputUtility.inputChoice("Super Admin Page",new String[]{"User","Course","Department","Students Record","Professor Course List","Section","Test Records","Transactions","Colleges","Log Out"},"Name: " + superAdmin.getUser().getName(),"ID: " + superAdmin.getUser().getID());
+    // }
+
     @Override
-    public void selectOperation(int choice) throws SQLException {
-        UserInterface userInterface = new UserInterface();
-        UserInterfaceable manageClass = this;
-        switch(choice){
+    public void runLogic() throws SQLException {
+
+        this.userChoice = InputUtility.inputChoice("Super Admin Page",new String[]{"User","Course","Department","Students Record","Professor Course List","Section","Test Records","Transactions","Colleges","Log Out"},"Name: " + superAdmin.getUser().getName(),"ID: " + superAdmin.getUser().getID());
+        ModuleInterface module = this;
+
+        switch(this.userChoice){
 
             //MANAGE USER
             case 1:
-                // manageUser();
-                manageClass = this.superAdminServicesFactory.superAdminUserManage(this.superAdmin);
+                module = this.superAdminServicesFactory.superAdminUserManage(this.superAdmin);
                 break;
 
             //MANAGE COURSE
             case 2:
-                // manageCourse(this.superAdminServicesFactory.superAdminCourseManage());
-                manageClass = this.superAdminServicesFactory.superAdminCourseManage();
+                module = this.superAdminServicesFactory.superAdminCourseManage();
                 break;
 
             //MANAGE DEPARTMENT
             case 3:
-                // manageDepartment(this.superAdminServicesFactory.superAdminDepartmentManage());
-                manageClass = this.superAdminServicesFactory.superAdminDepartmentManage();
+                module = this.superAdminServicesFactory.superAdminDepartmentManage();
                 break;
 
             //MANAGE RECORD
             case 4:
-                // manageRecord(this.superAdminServicesFactory.superAdminRecordsManage());
-                manageClass = this.superAdminServicesFactory.superAdminRecordsManage();
+                module = this.superAdminServicesFactory.superAdminRecordsManage();
                 break;
 
             //MANAGE PROFESSOR COURSE TABLE
             case 5:
-                // manageProfessorCourseTable();
-                manageClass = this.superAdminServicesFactory.superAdminCourseProfManage();
+                module = this.superAdminServicesFactory.superAdminCourseProfManage();
                 break;
 
             //MANAGE SECTION
             case 6:
-                // manageSection(this.superAdminServicesFactory.superAdminSectionManage());
-                manageClass = this.superAdminServicesFactory.superAdminSectionManage();
+                module = this.superAdminServicesFactory.superAdminSectionManage();
                 break;
 
             //MANAGE TEST
             case 7:
-                manageClass = this.superAdminServicesFactory.superAdminTestManage();
+                module = this.superAdminServicesFactory.superAdminTestManage();
                 break;
 
             //MANAGE TRANSACTION
             case 8:
-                // manageTransaction(this.superAdminServicesFactory.superAdminTransactionsManage());
-                manageClass = this.superAdminServicesFactory.superAdminTransactionsManage();
+                module = this.superAdminServicesFactory.superAdminTransactionsManage();
                 break;
 
             //MANAGE COLLEGE
             case 9:
-                // manageCollege(this.superAdminServicesFactory.superAdminCollegeManage());
-                manageClass = this.superAdminServicesFactory.superAdminCollegeManage();
+                module = this.superAdminServicesFactory.superAdminCollegeManage();
                 break;
 
             //GO BACK TO USER LOGIN
             case 10:
-                StartupLogic.userSelect();
+                this.exitStatus = true;
+                return;
 
         }
-        userInterface.userInterface(manageClass);
-        userInterface.userInterface(this);
+
+        this.moduleExecutor.executeModule(module);
+        this.superAdmin = this.superAdminServicesFactory.factoryDAO.createSuperAdminDAO().returnSuperAdmin(superAdmin.getUser().getID());
+        
+        if(this.superAdmin==null){
+            DisplayUtility.singleDialogDisplay("User Doesn't exist. Please try again");
+            this.exitStatus = true;
+        }
     }
 }
