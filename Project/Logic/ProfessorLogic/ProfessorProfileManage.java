@@ -2,20 +2,18 @@ package Logic.ProfessorLogic;
 
 import java.sql.SQLException;
 
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.UserInterfaceable;
+import Model.DatabaseUtility;
 import Model.Professor;
 import Model.DatabaseAccessObject.ProfessorDAO;
 import UI.CommonUI;
 import UI.Utility.InputUtility;
 
-public class ProfessorProfileManage implements ModuleInterface{
+public class ProfessorProfileManage implements UserInterfaceable{
 
-    private ProfessorDAO professorDAO;
-    private Professor professor;
-    private boolean toggleDetails = true;
-
-    private boolean exitStatus = false;
-    private int userChoice;
+    ProfessorDAO professorDAO;
+    Professor professor;
+    boolean toggleDetails = true;
 
     public ProfessorProfileManage(ProfessorDAO professorDAO, Professor professor) {
         this.professorDAO = professorDAO;
@@ -23,55 +21,48 @@ public class ProfessorProfileManage implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public int inputUserChoice() {
+        return InputUtility.inputChoiceWithBack("Select the Option to Edit", toggleDetails ? new String[]{"User ID","User Name","Aadhar","Date of Birth","Address","Password","Toggle Details","Back"} : new String[]{"User ID - "+professor.getUser().getID(),"User Name - "+professor.getUser().getName(),"Aadhar - "+professor.getUser().getContactNumber(),"Date of Birth - "+professor.getUser().getDOB(),"Address - "+professor.getUser().getAddress(),"Password - "+professor.getUser().getPassword(),"Toggle Details","Back"});
     }
 
-    // @Override
-    // public void runUserInterface() throws SQLException {
-    //     this.userChoice = InputUtility.inputChoice("Select the Option to Edit", this.toggleDetails ? new String[]{"User Name","Aadhar","Date of Birth","Address","Password","Toggle Details","Back"} : new String[]{"User ID - "+professor.getUser().getID(),"User Name - "+professor.getUser().getName(),"Aadhar - "+professor.getUser().getContactNumber(),"Date of Birth - "+professor.getUser().getDOB(),"Address - "+professor.getUser().getAddress(),"Password - "+professor.getUser().getPassword(),"Toggle Details","Back"});
-    // }
-
     @Override
-    public void runLogic() throws SQLException {
-        this.userChoice = InputUtility.inputChoice("Select the Option to Edit", this.toggleDetails ? new String[]{"User Name","Aadhar","Date of Birth","Address","Password","Toggle Details","Back"} : new String[]{"User ID - "+professor.getUser().getID(),"User Name - "+professor.getUser().getName(),"Aadhar - "+professor.getUser().getContactNumber(),"Date of Birth - "+professor.getUser().getDOB(),"Address - "+professor.getUser().getAddress(),"Password - "+professor.getUser().getPassword(),"Toggle Details","Back"});
+    public void selectOperation(int choice) throws SQLException {
         int userID = this.professor.getUser().getID();
-        switch (this.userChoice) {
-            
-            //USER NAME
+        switch (choice) {
+
+            //USER ID
             case 1:
+                this.professor.getUser().setID(DatabaseUtility.inputNonExistingUserID());
+                break;
+        
+            //USER NAME
+            case 2:
                 this.professor.getUser().setName(CommonUI.inputUserName());
                 break;
 
             //AADHAR
-            case 2:
+            case 3:
                 this.professor.getUser().setContactNumber(CommonUI.inputContactNumber());
                 break;
 
             //DATE OF BIRTH
-            case 3:
+            case 4:
                 this.professor.getUser().setDOB(CommonUI.inputDateOfBirth());
                 break;
 
             //ADDRESS
-            case 4:
+            case 5:
                 this.professor.getUser().setAddress(CommonUI.inputUserAddress());
                 break;
 
             //PASSWORD
-            case 5:
+            case 6:
                 this.professor.getUser().setPassword(CommonUI.inputUserPassword());
                 break;
 
             //TOGGLE DETAILS
-            case 6:
-                this.toggleDetails^=true;
-                break;
-
-            //GO BACK
             case 7:
-                this.exitStatus = true;
-                return;
+                this.toggleDetails^=true;
         }
         this.professorDAO.editProfessor(userID,this.professor);
     }

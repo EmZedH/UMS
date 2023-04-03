@@ -1,48 +1,40 @@
 package Logic.ProfessorLogic;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.Editable;
+import Logic.Interfaces.UserInterfaceable;
+import Logic.Interfaces.Viewable;
+import Model.DatabaseConnect;
 import Model.DatabaseUtility;
 import Model.Professor;
 import Model.Records;
 import Model.DatabaseAccessObject.RecordsDAO;
-import Model.DatabaseAccessObject.TestDAO;
 import UI.CommonUI;
 import UI.ProfessorUI;
 import UI.Utility.DisplayUtility;
 import UI.Utility.InputUtility;
 
-public class ProfessorRecordsManage implements ModuleInterface{
+public class ProfessorRecordsManage implements UserInterfaceable, Editable, Viewable{
 
-    private TestDAO testDAO;
-    private RecordsDAO recordsDAO;
-    private Professor professor;
+    RecordsDAO recordsDAO;
+    Professor professor;
 
-    private boolean exitStatus = false;
-    private int userChoice;
-
-    public ProfessorRecordsManage(RecordsDAO recordsDAO, TestDAO testDAO, Professor professor) {
+    public ProfessorRecordsManage(RecordsDAO recordsDAO, Professor professor) {
         this.recordsDAO = recordsDAO;
         this.professor = professor;
-        this.testDAO = testDAO;
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public int inputUserChoice() {
+        return InputUtility.inputChoiceWithBack("Students Record",new String[]{"View Student Records","Edit Student Record","Back"});
     }
 
-    // @Override
-    // public void runUserInterface() throws SQLException {
-    //     this.userChoice = InputUtility.inputChoice("Students Record",new String[]{"View Student Records","Edit Student Record","Back"});
-    // }
-
     @Override
-    public void runLogic() throws SQLException {
-        this.userChoice = InputUtility.inputChoice("Students Record",new String[]{"View Student Records","Edit Student Record","Back"});
-        switch(this.userChoice){
+    public void selectOperation(int choice) throws SQLException {
+        switch(choice){
 
             //VIEW STUDENT RECORDS
             case 1:
@@ -53,23 +45,34 @@ public class ProfessorRecordsManage implements ModuleInterface{
             case 2:
                 edit();
                 break;
-
-            //GO BACK
-            case 3:
-                this.exitStatus = true;
-                break;
         }
     }
 
+    @Override
     public void view() throws SQLException {
-        List<List<String>> professorRecordCopyTable = this.recordsDAO.selectRecordByProfessor(this.professor.getUser().getID());
-        DisplayUtility.printTable("STUDENTS UNDER YOU", new String[]{"STUDENT ID","COURSE ID","EXT MARK","ATTENDANCE","ASSIGNMENT"}, professorRecordCopyTable);
+        List<List<String>> recordsCopyTable = new ArrayList<>();
+        List<String> listCopy;
+        for (List<String> list : this.recordsDAO.selectAllRecords()) {
+            if(Integer.parseInt(list.get(4)) == this.professor.getDepartment().getCollegeID() && Integer.parseInt(list.get(2)) == this.professor.getDepartment().getDepartmentID()){
+                listCopy = new ArrayList<>();
+                for (int i = 0; i < list.size(); i++) {
+                    if(i==2 || i==3 || i==4 || i==5 || i==9 || i==10){
+                        continue;
+                    }
+                    // listCopy.add(list.get(i) + " ");
+                    listCopy.add(list.get(i));
+                }
+                recordsCopyTable.add(listCopy);
+            }
+        }
+        DisplayUtility.printTable("STUDENTS UNDER YOU", new String[]{"STUDENT ID","COURSE ID","EXT MARK","ATTENDANCE","ASSIGNMENT"}, recordsCopyTable);
     }
 
+    @Override
     public void edit() throws SQLException {
         int collegeID = this.professor.getDepartment().getCollegeID();
         int departmentID = this.professor.getDepartment().getDepartmentID();
-        int studentID = DatabaseUtility.inputExistingStudentID(collegeID);
+        int studentID = DatabaseUtility.inputExistingStudentID(departmentID, collegeID);
         int courseID = DatabaseUtility.inputExistingCourseID(this.professor.getDepartment().getDepartmentID(), this.professor.getDepartment().getCollegeID());
 
         if(!this.recordsDAO.verifyRecord(studentID, courseID, departmentID, collegeID)){
@@ -78,11 +81,6 @@ public class ProfessorRecordsManage implements ModuleInterface{
             return;
         }
         Records records = this.recordsDAO.returnRecords(studentID, courseID, departmentID, collegeID);
-        if(!(records.getCourseProfessor().getProfessorID()==this.professor.getUser().getID())){
-            CommonUI.displayStudentRecordsNotExist();
-            edit();
-            return;
-        }
         int inputChoice;
         while ((inputChoice = ProfessorUI.inputRecordsEditPage())!=5) {
             switch (inputChoice) {
@@ -98,13 +96,9 @@ public class ProfessorRecordsManage implements ModuleInterface{
                     break;
 
                 //VIEW CGPA
-                case 3:
-                    viewStudentCGPA(studentID, records);
-                    continue;
-
-                //GO BACK
                 case 4:
-                    return;
+                    viewStudentCGPA(studentID, records);
+                    break;
             }
             this.recordsDAO.editRecord(studentID, courseID, records);
             CommonUI.processSuccessDisplay();
@@ -112,7 +106,18 @@ public class ProfessorRecordsManage implements ModuleInterface{
     }
 
     public void viewStudentCGPA(int studentID, Records records) throws SQLException {
-        float cgpa = this.testDAO.getAverageTestMarkOfStudentForCourse(studentID, records.getCourseProfessor().getCourseID(), records.getCourseProfessor().getDepartmentID(), records.getCourseProfessor().getCollegeID());
+        List<String[]> test = DatabaseConnect.selectAllTestByProfessor(this.professor.getUser().getID());
+        int testMark = 0, count = 0;
+        for (String[] strings : test) {
+            if(Integer.parseInt(strings[1]) == studentID){
+                testMark += Integer.parseInt(strings[2]);
+                count++;
+            }
+        }
+        if(count==0){
+            count = 1;
+        }
+        double cgpa = (1.0 * records.getAssignmentMarks()+(records.getAttendance()/20) + (testMark/count) + records.getExternalMarks())/10;
         DisplayUtility.singleDialogDisplay("Student CGPA - "+cgpa);
     }
 

@@ -1,76 +1,63 @@
 package Logic.StudentLogic;
 
 import java.sql.SQLException;
-import Logic.ModuleExecutor;
-import Logic.Interfaces.ModuleInterface;
+import Logic.StartupLogic;
+import Logic.UserInterface;
+import Logic.Interfaces.UserInterfaceable;
 import Model.Student;
 import UI.Utility.InputUtility;
 
-public class StudentMainPage implements ModuleInterface{
-    private Student student;
-    private StudentServicesFactory studentServicesFactory;
-    private ModuleExecutor module;
+public class StudentMainPage implements UserInterfaceable{
+    Student student;
+    StudentServicesFactory studentServicesFactory;
 
-    private boolean exitStatus = false;
-    private int userChoice;
-
-    public StudentMainPage(StudentServicesFactory studentServicesFactory, Student student, ModuleExecutor module) throws SQLException{
+    public StudentMainPage(StudentServicesFactory studentServicesFactory, Student student) throws SQLException{
         this.studentServicesFactory = studentServicesFactory;        
         this.student = student;
-        this.module = module;
     }
 
-
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public int inputUserChoice() {
+        return InputUtility.inputChoice("Student Page",new String[]{"Manage Profile","My Records","Transactions","My Performance","Log Out"},"ID: "+student.getUser().getID(), "Name: "+student.getUser().getName());
     }
 
-
-    // @Override
-    // public void runUserInterface() throws SQLException {
-    //     this.userChoice = InputUtility.inputChoice("Student Page",new String[]{"Manage Profile","My Records","Transactions","My Performance","Course Registration","Log Out"},"ID: "+student.getUser().getID(), "Name: "+student.getUser().getName());
-    // }
-
-
     @Override
-    public void runLogic() throws SQLException {
-        this.userChoice = InputUtility.inputChoice("Student Page",new String[]{"Manage Profile","My Records","Transactions","My Performance","Course Registration","Log Out"},"ID: "+student.getUser().getID(), "Name: "+student.getUser().getName());
+    public void selectOperation(int choice) throws SQLException {
 
-        ModuleInterface manageClass = this;
-        switch (userChoice) {
+        UserInterface userInterface = new UserInterface();
+        UserInterfaceable manageClass = this;
+        switch (choice) {
 
             //MANAGE PROFILE
             case 1:
-                manageClass = studentServicesFactory.studentManageProfile(student);
+                // manageProfile(true);
+                manageClass = studentServicesFactory.studentManageProfile(this.student);
                 break;
         
             //MY RECORDS
             case 2:
-                manageClass = studentServicesFactory.studentRecordsManage(student);
+                // viewStudentRecords();
+                manageClass = studentServicesFactory.studentRecordsManage(this.student);
                 break;
 
             //TRANSACTIONS
             case 3:
-                manageClass = studentServicesFactory.studentTransactionManage(student, this.module);
+                manageClass = studentServicesFactory.studentTransactionManage(this.student);
                 break;
 
             //PERFORMANCE
             case 4:
-                manageClass = studentServicesFactory.studentPerformanceManage(student);
+                // studentPerformance();
+                manageClass = studentServicesFactory.studentPerformanceManage(this.student);
                 break;
 
-            //COURSE REGISTRATION:
+            //LOG OUT
             case 5:
-                manageClass = studentServicesFactory.studentCourseRegistrationManage(student, this.module); 
+                StartupLogic.userSelect();
                 break;
-            
-            //GO BACK
-            case 6:
-                this.exitStatus = true;
-                return;
         }
-        this.module.executeModule(manageClass);
+        userInterface.userInterface(manageClass);
+        userInterface.userInterface(this);
     }
 }
 

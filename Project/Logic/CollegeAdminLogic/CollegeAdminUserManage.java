@@ -4,14 +4,16 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import Logic.UserStartPage;
-import Logic.ModuleExecutor;
-import Logic.Interfaces.ModuleInterface;
+import Logic.StartupLogic;
+import Logic.Interfaces.Addable;
+import Logic.Interfaces.Deletable;
+import Logic.Interfaces.Editable;
+import Logic.Interfaces.UserInterfaceable;
+import Logic.Interfaces.Viewable;
 import Model.College;
 import Model.CollegeAdmin;
 import Model.DatabaseUtility;
 import Model.Department;
-import Model.FactoryDAO;
 import Model.Professor;
 import Model.Section;
 import Model.Student;
@@ -26,22 +28,18 @@ import UI.CollegeAdminUI;
 import UI.CommonUI;
 import UI.Utility.InputUtility;
 
-public class CollegeAdminUserManage implements ModuleInterface{
+public class CollegeAdminUserManage implements UserInterfaceable, Addable, Editable, Deletable, Viewable{
 
-    private CollegeAdmin collegeAdmin;
-    private CollegeAdminDAO collegeAdminDAO;
-    private ProfessorDAO professorDAO;
-    private StudentDAO studentDAO;
-    private UserDAO userDAO;
-    private DepartmentDAO departmentDAO;
-    private SectionDAO sectionDAO;
-    private ModuleExecutor module;
-
-    private boolean exitStatus = false;
-    private int userChoice;
+    CollegeAdmin collegeAdmin;
+    CollegeAdminDAO collegeAdminDAO;
+    ProfessorDAO professorDAO;
+    StudentDAO studentDAO;
+    UserDAO userDAO;
+    DepartmentDAO departmentDAO;
+    SectionDAO sectionDAO;
 
     public CollegeAdminUserManage(CollegeAdmin collegeAdmin, CollegeAdminDAO collegeAdminDAO, ProfessorDAO professorDAO,
-            StudentDAO studentDAO, UserDAO userDAO, DepartmentDAO departmentDAO, SectionDAO sectionDAO, ModuleExecutor module) {
+            StudentDAO studentDAO, UserDAO userDAO, DepartmentDAO departmentDAO, SectionDAO sectionDAO) {
         this.collegeAdmin = collegeAdmin;
         this.collegeAdminDAO = collegeAdminDAO;
         this.professorDAO = professorDAO;
@@ -49,23 +47,16 @@ public class CollegeAdminUserManage implements ModuleInterface{
         this.userDAO = userDAO;
         this.departmentDAO = departmentDAO;
         this.sectionDAO = sectionDAO;
-        this.module = module;
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public int inputUserChoice() {
+        return InputUtility.inputChoiceWithBack("Select Option", new String[]{"Add User","Edit User","Delete User","View User","Back"});
     }
 
-    // @Override
-    // public void runUserInterface() throws SQLException {
-    //     this.userChoice = InputUtility.inputChoice("Select Option", new String[]{"Add User","Edit User","Delete User","View User","Back"});
-    // }
-
     @Override
-    public void runLogic() throws SQLException {
-        this.userChoice = InputUtility.inputChoice("Select Option", new String[]{"Add User","Edit User","Delete User","View User","Back"});
-        switch (this.userChoice) {
+    public void selectOperation(int choice) throws SQLException {
+        switch (choice) {
 
             //ADD USER
             case 1:
@@ -86,14 +77,10 @@ public class CollegeAdminUserManage implements ModuleInterface{
             case 4:
                 view();
                 break;
-
-            //GO BACK
-            case 5:
-                this.exitStatus = true;
-                break;
         }
     }
 
+    @Override
     public void view() throws SQLException {
         int inputChoice;
         String searchString;
@@ -158,6 +145,7 @@ public class CollegeAdminUserManage implements ModuleInterface{
         }
     }
 
+    @Override
     public void delete() throws SQLException {
         int userID;
         int collegeID = this.collegeAdmin.getCollege().getCollegeID();
@@ -180,13 +168,13 @@ public class CollegeAdminUserManage implements ModuleInterface{
             if(CollegeAdminUI.inputLoggedInUserDeleteConfirmation() == 1){
                 this.userDAO.deleteUser(userID);
                 CommonUI.processSuccessDisplay();
-                module.executeModule(new UserStartPage(new FactoryDAO(), module));
-                this.exitStatus = true;
+                StartupLogic.userSelect();
                 return;
             }
         }
     }
 
+    @Override
     public void edit() throws SQLException {
         int collegeID = this.collegeAdmin.getCollege().getCollegeID();
         int userID  = CommonUI.userIDInput();
@@ -206,6 +194,7 @@ public class CollegeAdminUserManage implements ModuleInterface{
         }
     }
 
+    @Override
     public void add() throws SQLException {
         int userID = DatabaseUtility.inputNonExistingUserID();
         String userName = CommonUI.inputUserName();
@@ -231,8 +220,6 @@ public class CollegeAdminUserManage implements ModuleInterface{
         }
         CommonUI.processSuccessDisplay();
     }
-
-
     public void addStudent(User user) throws SQLException{
         int collegeID = this.collegeAdmin.getCollege().getCollegeID();
         int[] sectionKeyList = DatabaseUtility.inputExistingSection(collegeID);
@@ -407,6 +394,7 @@ public class CollegeAdminUserManage implements ModuleInterface{
 
             case 1:
                 userVar.setID(DatabaseUtility.inputNonExistingUserID());
+                // collegeAdmin.setCollegeAdminID(userVar.getID());
                 break;
 
             case 2:
@@ -455,15 +443,29 @@ public class CollegeAdminUserManage implements ModuleInterface{
         while ((inputChoice = CollegeAdminUI.inputViewCollegeAdminTablePage())!=3) {
             switch(inputChoice){
                 case 1:
-                    collegeAdminTable = this.collegeAdminDAO.selectAllCollegeAdminInCollege(this.collegeAdmin.getCollege().getCollegeID());
+                    collegeAdminTable = this.collegeAdminDAO.selectAllCollegeAdmin();
                     break;
 
                 case 2:
                     searchString = CommonUI.inputUserName();
-                    collegeAdminTable = this.collegeAdminDAO.searchAllCollegeAdminInCollege("U_NAME", searchString, this.collegeAdmin.getCollege().getCollegeID());
+                    collegeAdminTable = this.collegeAdminDAO.searchAllCollegeAdmin("U_NAME", searchString);
                     break;
             }
-            CollegeAdminUI.viewCollegeAdminTable(collegeAdminTable);
+            List<List<String>> collegeAdminCopyTable = new ArrayList<>();
+            List<String> listCopy;
+            for (List<String> list : collegeAdminTable) {
+                if(Integer.parseInt(list.get(2)) == this.collegeAdmin.getCollege().getCollegeID()){
+                    listCopy = new ArrayList<>();
+                    for (int i = 0; i < list.size(); i++) {
+                        if(i==2 || i==3){
+                            continue;
+                        }
+                        listCopy.add(list.get(i));
+                    }
+                    collegeAdminCopyTable.add(listCopy);
+                }
+            }
+            CollegeAdminUI.viewCollegeAdminTable(collegeAdminCopyTable);
         }
     }
 
@@ -474,20 +476,34 @@ public class CollegeAdminUserManage implements ModuleInterface{
         while((inputChoice = CollegeAdminUI.inputViewProfessorPage())!=4){
             switch(inputChoice){
                 case 1:
-                    professorTable = this.professorDAO.selectAllProfessorInCollege(this.collegeAdmin.getCollege().getCollegeID());
+                    professorTable = this.professorDAO.selectAllProfessor();
                     break;
 
                 case 2:
                     searchString = CommonUI.inputUserName();
-                    professorTable = this.professorDAO.searchAllProfessorInCollege("U_NAME", searchString, this.collegeAdmin.getCollege().getCollegeID());
+                    professorTable = this.professorDAO.searchAllProfessor("U_NAME", searchString);
                     break;
 
                 case 3:
                     searchString = CommonUI.inputDepartmentName();
-                    professorTable = this.professorDAO.searchAllProfessorInCollege("DEPT_NAME", searchString, this.collegeAdmin.getCollege().getCollegeID());
+                    professorTable = this.professorDAO.searchAllProfessor("DEPT_NAME", searchString);
                     break;
             }
-            CollegeAdminUI.viewProfessorTable(professorTable);
+            List<List<String>> professorCopyTable = new ArrayList<>();
+            List<String> listCopy;
+            for (List<String> list : professorTable) {
+                if(Integer.parseInt(list.get(3)) == this.collegeAdmin.getCollege().getCollegeID()){
+                    listCopy = new ArrayList<>();
+                    for (int i = 0; i < list.size(); i++) {
+                        if(i==3 || i==4){
+                            continue;
+                        }
+                        listCopy.add(list.get(i));
+                    }
+                    professorCopyTable.add(listCopy);
+                }
+            }
+            CollegeAdminUI.viewProfessorTable(professorCopyTable);
         }
     }
 
@@ -499,35 +515,57 @@ public class CollegeAdminUserManage implements ModuleInterface{
         while ((inputChoice = CollegeAdminUI.inputViewStudentPage())!=7) {
             switch(inputChoice){
                 case 1:
-                    studentTable = this.studentDAO.selectAllStudentInCollege(this.collegeAdmin.getCollege().getCollegeID());
+                    studentTable = this.studentDAO.selectAllStudent();
+                    // CollegeAdminUI.viewStudentTable(this.studentDAO.selectStudentInCollege(collegeID));
                     break;
 
                 case 2:
                     searchString = CommonUI.inputUserName();
-                    studentTable = this.studentDAO.searchAllStudent("U_NAME", searchString, this.collegeAdmin.getCollege().getCollegeID());
+                    studentTable = this.studentDAO.searchAllStudent("U_NAME", searchString);
+                    // CollegeAdminUI.viewStudentTable(this.studentDAO.searchStudentInCollege("U_NAME",searchString,collegeID));
                     break;
 
                 case 3:
                     searchString = CommonUI.inputSectionName();
-                    studentTable = this.studentDAO.searchAllStudent("SEC_NAME", searchString, this.collegeAdmin.getCollege().getCollegeID());
+                    studentTable = this.studentDAO.searchAllStudent("SEC_NAME", searchString);
+                    // CollegeAdminUI.viewStudentTable(this.studentDAO.searchStudentInCollege("SEC_NAME",searchString,collegeID));
                     break;
 
                 case 4:
                     searchString = CommonUI.inputSemesterString();
-                    studentTable = this.studentDAO.searchAllStudent("S_SEM", searchString, this.collegeAdmin.getCollege().getCollegeID());
+                    studentTable = this.studentDAO.searchAllStudent("S_SEM", searchString);
+                    // CollegeAdminUI.viewStudentTable(this.studentDAO.searchStudentInCollege("S_SEM",searchString,collegeID));
                     break;
 
                 case 5:
                     searchString = CommonUI.inputDepartmentName();
-                    studentTable = this.studentDAO.searchAllStudent("DEPT_NAME", searchString, this.collegeAdmin.getCollege().getCollegeID());
+                    studentTable = this.studentDAO.searchAllStudent("DEPT_NAME", searchString);
+                    // CollegeAdminUI.viewStudentTable(this.studentDAO.searchStudentInCollege("DEPT_NAME",searchString,collegeID));
                     break;
 
                 case 6:
                     searchString = CommonUI.inputDegree();
-                    studentTable = this.studentDAO.searchAllStudent("DEGREE", searchString, this.collegeAdmin.getCollege().getCollegeID());
+                    studentTable = this.studentDAO.searchAllStudent("DEGREE", searchString);
+                    // CollegeAdminUI.viewStudentTable(this.studentDAO.searchStudentInCollege("DEGREE",searchString,collegeID));
                     break;
             }
-            CollegeAdminUI.viewStudentTable(studentTable);
+            
+            List<List<String>> studentCopyTable = new ArrayList<>();
+            List<String> listCopy;
+            for (List<String> list : studentTable) {
+                if(Integer.parseInt(list.get(6)) == this.collegeAdmin.getCollege().getCollegeID()){
+                    listCopy = new ArrayList<>();
+                    for (int i = 0; i < list.size(); i++) {
+                        if(i==6 || i==7){
+                            continue;
+                        }
+                        listCopy.add(list.get(i));
+                    }
+                    studentCopyTable.add(listCopy);
+                }
+            }
+            CollegeAdminUI.viewStudentTable(studentCopyTable);
         }
     }
+    
 }

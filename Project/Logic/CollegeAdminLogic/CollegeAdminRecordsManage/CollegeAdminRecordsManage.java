@@ -1,72 +1,55 @@
-package Logic.CollegeAdminLogic.CollegeAdminRecordsManage;
+package Logic.CollegeAdminLogic;
 
 import java.sql.SQLException;
 
-import Logic.ModuleExecutor;
-import Logic.Interfaces.InitializableModuleInterface;
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.Addable;
+import Logic.Interfaces.Deletable;
+import Logic.Interfaces.Editable;
+import Logic.Interfaces.UserInterfaceable;
+import Logic.Interfaces.Viewable;
+import Model.Course;
 import Model.DatabaseUtility;
 import Model.Records;
 import Model.Student;
-import Model.DatabaseAccessObject.CollegeDAO;
+import Model.Transactions;
 import Model.DatabaseAccessObject.CourseDAO;
 import Model.DatabaseAccessObject.CourseProfessorDAO;
-import Model.DatabaseAccessObject.DepartmentDAO;
-import Model.DatabaseAccessObject.ProfessorDAO;
 import Model.DatabaseAccessObject.RecordsDAO;
 import Model.DatabaseAccessObject.StudentDAO;
 import Model.DatabaseAccessObject.TransactionsDAO;
-import Model.DatabaseAccessObject.UserDAO;
 import UI.CollegeAdminUI;
 import UI.CommonUI;
 import UI.SuperAdminUI;
 import UI.Utility.DisplayUtility;
 import UI.Utility.InputUtility;
 
-public class CollegeAdminRecordsManage implements ModuleInterface{
+public class CollegeAdminRecordsManage implements UserInterfaceable, Addable, Editable, Deletable, Viewable{
 
-    private RecordsDAO recordsDAO;
-    private StudentDAO studentDAO;
-    private CourseDAO courseDAO;
-    private ProfessorDAO professorDAO;
-    private CollegeDAO collegeDAO;
-    private TransactionsDAO transactionsDAO;
-    private CourseProfessorDAO courseProfessorDAO;
-    private DepartmentDAO departmentDAO;
-    private UserDAO userDAO;
-    private ModuleExecutor moduleExecutor;
-    private int collegeID;
+    RecordsDAO recordsDAO;
+    StudentDAO studentDAO;
+    CourseDAO courseDAO;
+    TransactionsDAO transactionsDAO;
+    CourseProfessorDAO courseProfessorDAO;
+    int collegeID;
 
-    private boolean exitStatus = false;
-    private int userChoice;
-
-    public CollegeAdminRecordsManage(RecordsDAO recordsDAO, StudentDAO studentDAO, CourseDAO courseDAO, UserDAO userDAO, DepartmentDAO departmentDAO,
-            TransactionsDAO transactionsDAO, CourseProfessorDAO courseProfessorDAO, ProfessorDAO professorDAO, CollegeDAO collegeDAO, ModuleExecutor moduleExecutor, int collegeID) {
+    public CollegeAdminRecordsManage(RecordsDAO recordsDAO, StudentDAO studentDAO, CourseDAO courseDAO,
+            TransactionsDAO transactionsDAO, CourseProfessorDAO courseProfessorDAO, int collegeID) {
         this.recordsDAO = recordsDAO;
         this.studentDAO = studentDAO;
         this.courseDAO = courseDAO;
-        this.moduleExecutor = moduleExecutor;
-        this.professorDAO = professorDAO;
-        this.collegeDAO = collegeDAO;
         this.transactionsDAO = transactionsDAO;
         this.courseProfessorDAO = courseProfessorDAO;
         this.collegeID = collegeID;
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public int inputUserChoice() {
+        return InputUtility.inputChoiceWithBack("Select Option", new String[]{"Add Record","Edit Record","Delete Record","View Record","Back"});
     }
 
-    // @Override
-    // public void runUserInterface() throws SQLException {
-    //     this.userChoice = InputUtility.inputChoice("Select Option", new String[]{"Add Record","Edit Record","Delete Record","View Record","Back"});
-    // }
-
     @Override
-    public void runLogic() throws SQLException {
-        this.userChoice = InputUtility.inputChoice("Select Option", new String[]{"Add Record","Edit Record","Delete Record","View Record","Back"});
-        switch (this.userChoice) {
+    public void selectOperation(int choice) throws SQLException {
+        switch (choice) {
 
             //ADD RECORD
             case 1:
@@ -87,28 +70,31 @@ public class CollegeAdminRecordsManage implements ModuleInterface{
             case 4:
                 view();
                 break;
-
-            //GO BACK
-            case 5:
-                this.exitStatus = true;
-                break;
         }
     }
 
+    @Override
     public void view() throws SQLException {
-
-        moduleExecutor.executeModule(new CollegeAdminRecordsView(this.recordsDAO, this.collegeID));
-    
+        DisplayUtility.printTable("REGISTERED STUDENTS DETAILS", new String[]{"S ID","C ID","SEC ID","DEPT ID","PROF ID","T ID","EXTERNALS","ATTND","STATUS","SEM DONE"}, this.recordsDAO.selectRecordsInCollege(this.collegeID));
     }
 
+    @Override
     public void delete() throws SQLException {
+        int collegeID = this.collegeID;
+        int departmentID = DatabaseUtility.inputExistingDepartmentID(collegeID);
 
-        InitializableModuleInterface recordsDeleteModule = new CollegeAdminRecordsDelete(this.collegeID, this.recordsDAO,this.departmentDAO, courseDAO, studentDAO, this.userDAO, moduleExecutor);
-        recordsDeleteModule.initializeModule();
-
-        moduleExecutor.executeModule(recordsDeleteModule);
+        
+        int courseID = DatabaseUtility.inputExistingCourseID(departmentID, collegeID);
+        int studentID = DatabaseUtility.inputExistingStudentID(collegeID);
+        if(!this.recordsDAO.verifyRecord(studentID, courseID, departmentID, collegeID)){
+            CommonUI.displayStudentRecordsNotExist();
+            return;
+        }
+        this.recordsDAO.deleteRecord(studentID, courseID, departmentID, collegeID);
+        CommonUI.processSuccessDisplay();
     }
 
+    @Override
     public void edit() throws SQLException {
         int inputChoice;
         int collegeID = this.collegeID;
@@ -184,11 +170,55 @@ public class CollegeAdminRecordsManage implements ModuleInterface{
             }
     }
 
+    @Override
     public void add() throws SQLException {
 
-        InitializableModuleInterface recordsAddModule = new CollegeAdminRecordsAdd(this.collegeID, this.transactionsDAO, studentDAO, departmentDAO, courseDAO, recordsDAO, courseProfessorDAO,this.professorDAO, userDAO, this.collegeDAO, moduleExecutor);
-        recordsAddModule.initializeModule();
+        int collegeID = this.collegeID;
+        int transactionID = DatabaseUtility.inputExistingTransaction();
 
-        moduleExecutor.executeModule(recordsAddModule);
+        Transactions transactions = this.transactionsDAO.returnTransaction(transactionID);
+
+        int studentID = transactions.getStudentID();
+        Student student = this.studentDAO.returnStudent(studentID);
+        int studentDepartmentID = student.getSection().getDepartmentID();
+
+            
+        int[] recordsKeyList = InputUtility.keyListInput("Enter Course Details", new String[]{"Enter Course Department ID","Enter the Course ID"});
+        int courseDepartmentID = recordsKeyList[1];
+        int courseID = recordsKeyList[2];
+        Course course = this.courseDAO.returnCourse(courseID, courseDepartmentID, student.getSection().getCollegeID());
+
+        if((course.getCourseSemester()<=student.getSemester()) || ((course.getCourseElective())=="P" && (studentDepartmentID==courseDepartmentID)) || ((course.getCourseElective()=="O") && (studentDepartmentID!=courseDepartmentID))){
+            DisplayUtility.singleDialogDisplay("Student and Course Department/Elective/Semester conflict");
+            add();
+        }
+
+        if(this.recordsDAO.verifyRecord(studentID, courseID, courseDepartmentID, collegeID)){
+            CommonUI.displayStudentRecordsAlreadyExist();
+            add();
+        }
+
+
+        int professorID;
+        while (!this.courseProfessorDAO.verifyCourseProfessor(professorID = CommonUI.inputProfessorID(), courseID, courseDepartmentID, collegeID)) {
+            SuperAdminUI.displayProfessorNotTakeCourse(courseID);
+        }
+        int assignment = 0;
+        int externalMark = 0;
+        int attendance = 0;
+        String status = "NC";
+        int semesterCompleted = 0;
+        if(student.getSemester()!=1){
+            if(SuperAdminUI.inputRecordValueEntryPage()==2){
+                externalMark = CommonUI.inputExternalMark();
+                attendance = CommonUI.inputAttendance();
+                assignment = CommonUI.inputAssignmentMark();
+                status = SuperAdminUI.inputCourseCompletionStatus();
+                String choiceArray[] = SuperAdminUI.inputStudentCompletionSemester(student.getDegree(), student.getSemester());
+                semesterCompleted = SuperAdminUI.inputCourseCompletionSemester(choiceArray);
+            }
+        }
+        this.recordsDAO.addRecord(student.getUser().getID(), courseID, courseDepartmentID, professorID, collegeID, transactionID, externalMark, attendance, assignment, status, semesterCompleted);
+        CommonUI.processSuccessDisplay();
     }
 }

@@ -2,79 +2,67 @@ package Logic.StudentLogic;
 
 import java.sql.SQLException;
 
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.UserInterfaceable;
+import Model.DatabaseUtility;
 import Model.Student;
 import Model.DatabaseAccessObject.StudentDAO;
 import UI.CommonUI;
 import UI.Utility.InputUtility;
 
-public class StudentManageProfile implements ModuleInterface{
+public class StudentManageProfile implements UserInterfaceable{
 
-    private Student student;
-    private StudentDAO studentDAO;
-    private boolean toggleDetails = true;
-
-    private boolean exitStatus = false;
-    private int userChoice;
+    Student student;
+    StudentDAO studentDAO;
+    boolean toggleDetails = true;
 
     public StudentManageProfile(Student student, StudentDAO studentDAO) {
         this.student = student;
         this.studentDAO = studentDAO;
     }
 
-
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public int inputUserChoice() {
+        return InputUtility.inputChoiceWithBack("Select the Option to Edit", toggleDetails ? new String[]{"User ID","User Name","Contact","Date of Birth","Address","Password","Toggle Details","Back"} : new String[]{"User ID - "+student.getUser().getID(),"User Name - "+student.getUser().getName(),"Contact - "+student.getUser().getContactNumber(),"Date of Birth - "+student.getUser().getDOB(),"Address - "+student.getUser().getAddress(),"Password - "+student.getUser().getPassword(),"Toggle Details","Back"});
     }
 
-
-    // @Override
-    // public void runUserInterface() throws SQLException {
-    //     this.userChoice = InputUtility.inputChoice("Select the Option to Edit", toggleDetails ? new String[]{"User Name","Contact","Date of Birth","Address","Password","Toggle Details","Back"} : new String[]{"User ID - "+student.getUser().getID(),"User Name - "+student.getUser().getName(),"Contact - "+student.getUser().getContactNumber(),"Date of Birth - "+student.getUser().getDOB(),"Address - "+student.getUser().getAddress(),"Password - "+student.getUser().getPassword(),"Toggle Details","Back"});
-    // }
-
-
     @Override
-    public void runLogic() throws SQLException {
-        this.userChoice = InputUtility.inputChoice("Select the Option to Edit", toggleDetails ? new String[]{"User Name","Contact","Date of Birth","Address","Password","Toggle Details","Back"} : new String[]{"User ID - "+student.getUser().getID(),"User Name - "+student.getUser().getName(),"Contact - "+student.getUser().getContactNumber(),"Date of Birth - "+student.getUser().getDOB(),"Address - "+student.getUser().getAddress(),"Password - "+student.getUser().getPassword(),"Toggle Details","Back"});
+    public void selectOperation(int choice) throws SQLException {
         int userID = this.student.getUser().getID();
-        switch (this.userChoice) {
-            
-            //USER NAME
+        switch (choice) {
+
+            //USER ID
             case 1:
+                this.student.getUser().setID(DatabaseUtility.inputNonExistingUserID());
+                break;
+        
+            //USER NAME
+            case 2:
                 this.student.getUser().setName(CommonUI.inputUserName());
                 break;
 
             //CONTACT NUMBER
-            case 2:
+            case 3:
                 this.student.getUser().setContactNumber(CommonUI.inputContactNumber());
                 break;
 
             //DATE OF BIRTH
-            case 3:
+            case 4:
                 this.student.getUser().setDOB(CommonUI.inputDateOfBirth());
                 break;
 
             //ADDRESS
-            case 4:
+            case 5:
                 this.student.getUser().setAddress(CommonUI.inputUserAddress());
                 break;
 
             //PASSWORD
-            case 5:
+            case 6:
                 this.student.getUser().setPassword(CommonUI.inputUserPassword());
                 break;
 
             //TOGGLE DETAILS
-            case 6:
-                this.toggleDetails^=true;
-                break;
-
-            //GO BACK
             case 7:
-                this.exitStatus = true;
-                return;
+                this.toggleDetails^=true;
         }
         this.studentDAO.editStudent(userID,this.student);
     }

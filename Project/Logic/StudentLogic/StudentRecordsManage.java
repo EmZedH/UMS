@@ -1,71 +1,39 @@
 package Logic.StudentLogic;
 
 import java.sql.SQLException;
-import java.util.List;
 
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.UserInterfaceable;
 import Model.Student;
 import Model.DatabaseAccessObject.RecordsDAO;
 import UI.Utility.DisplayUtility;
 import UI.Utility.InputUtility;
 
-public class StudentRecordsManage implements ModuleInterface{
+public class StudentRecordsManage implements UserInterfaceable{
 
-    private Student student;
-    private RecordsDAO recordsDAO;
-
-    private boolean exitStatus = false;
-    private int userChoice;
-
+    Student student;
+    RecordsDAO recordsDAO;
     public StudentRecordsManage(Student student, RecordsDAO recordsDAO) {
         this.student = student;
         this.recordsDAO = recordsDAO;
     }
-
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public int inputUserChoice() {
+        return InputUtility.inputChoiceWithBack("Select the Option", new String[]{"View All Semester Records","Current Semester Records","Back"});
     }
-
-    // @Override
-    // public void runUserInterface() throws SQLException {
-    //     this.userChoice = InputUtility.inputChoice("Select the Option", new String[]{"View All Semester Records","Current Semester Records","Back"});
-    // }
-
     @Override
-    public void runLogic() throws SQLException {
-        this.userChoice = InputUtility.inputChoice("Select the Option", new String[]{"View All Semester Records","Current Semester Records","Back"});
-        switch(this.userChoice){
+    public void selectOperation(int choice) throws SQLException {
+        switch(choice){
             
             //VIEW ALL SEMESTER RECORDS
             case 1:
-                displayAllRecords();
+                DisplayUtility.printTable("ALL SEMESTER RECORD", new String[]{"COURSE ID","COURSE NAME","STATUS","SEMESTER COMPLETED","PROF ID","PROF NAME","EXT MARK","ATTENDANCE","ASSIGNMENT"}, this.recordsDAO.selectAllRecordByStudent(this.student.getUser().getID()));
                 break;
             
             //VIEW CURRENT SEMESTER RECORDS
             case 2:
-                displayCurrentSemesterRecords();
+                DisplayUtility.printTable("CURRENT SEMESTER RECORD", new String[]{"COURSE ID", "COURSE NAME","PROF ID","PROF NAME","EXT MARK","ATTENDANCE","ASSIGNMENT"}, this.recordsDAO.selectCurrentSemesterRecordsByStudent(this.student.getUser().getID()));
                 break;
 
-            //GO BACK
-            case 3:
-                this.exitStatus = true;
-                break;
-            
         }
-    }
-    
-    public void displayAllRecords() throws SQLException{
-
-        List<List<String>> recordsCopyTable = this.recordsDAO.selectAllSemesterRecordsByStudent(this.student.getUser().getID());
-        DisplayUtility.printTable("ALL SEMESTER RECORD", new String[]{"COURSE ID","DEPT ID","PROF ID","EXT MARK","ATTENDANCE","ASSIGNMENT","STATUS","SEMESTER COMPLETED"}, recordsCopyTable);
-
-    }
-    
-    public void displayCurrentSemesterRecords() throws SQLException{
-
-        List<List<String>> recordsCopyTable = this.recordsDAO.selectCurrentSemesterRecordsByStudent(this.student.getUser().getID());
-        DisplayUtility.printTable("CURRENT SEMESTER RECORD", new String[]{"COURSE ID","DEPT ID","PROF ID","EXT MARK","ATTENDANCE","ASSIGNMENT","STATUS"}, recordsCopyTable);
-        
     }
 }
