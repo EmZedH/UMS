@@ -48,7 +48,7 @@ public class CollegeAdminRecordsManage implements UserInterfaceable, Addable, Ed
     }
 
     @Override
-    public void operationSelect(int choice) throws SQLException {
+    public void selectOperation(int choice) throws SQLException {
         switch (choice) {
 
             //ADD RECORD

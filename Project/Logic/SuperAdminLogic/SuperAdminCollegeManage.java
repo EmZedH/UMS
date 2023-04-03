@@ -28,7 +28,7 @@ public class SuperAdminCollegeManage implements UserInterfaceable ,Addable, Edit
     }
 
     @Override
-    public void operationSelect(int choice) throws SQLException {
+    public void selectOperation(int choice) throws SQLException {
         switch(choice){
 
             //ADD COLLEGE

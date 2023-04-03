@@ -25,7 +25,7 @@ public class SuperAdminMainPage implements UserInterfaceable{
     }
 
     @Override
-    public void operationSelect(int choice) throws SQLException {
+    public void selectOperation(int choice) throws SQLException {
         UserInterface userInterface = new UserInterface();
         UserInterfaceable manageClass = this;
         switch(choice){
