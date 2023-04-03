@@ -32,7 +32,7 @@ public class CollegeAdminTransactionManage implements UserInterfaceable, Addable
     }
 
     @Override
-    public void operationSelect(int choice) throws SQLException {
+    public void selectOperation(int choice) throws SQLException {
         switch (choice) {
 
             //ADD TRANSACTION

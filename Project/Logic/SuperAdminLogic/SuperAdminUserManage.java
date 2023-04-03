@@ -61,7 +61,7 @@ public class SuperAdminUserManage implements UserInterfaceable ,Addable, Editabl
         }
 
         @Override
-        public void operationSelect(int choice) throws SQLException {
+        public void selectOperation(int choice) throws SQLException {
             switch(choice){
                 
                 //Adding User

@@ -21,7 +21,7 @@ public class StudentRecordsManage implements UserInterfaceable{
         return InputUtility.inputChoiceWithBack("Select the Option", new String[]{"View All Semester Records","Current Semester Records","Back"});
     }
     @Override
-    public void operationSelect(int choice) throws SQLException {
+    public void selectOperation(int choice) throws SQLException {
         switch(choice){
             
             //VIEW ALL SEMESTER RECORDS
