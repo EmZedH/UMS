@@ -118,6 +118,46 @@ public class DisplayUtility {
         }
     }
 
+    public static void mainPageDialog(String heading,String left, String right, String[] msg) {
+        String p = "";
+        String ki= "";
+        int flag=1;
+        for (int i = 0; i < msg.length+10; i++) {
+            if(i==1 || i==3 || i==5 || i==msg.length+8){
+                for (int j = 0; j < lineSize; j++) {
+                    System.out.print("-");
+                }
+            }
+            else if(i==2){
+                for (int j = 0;j< lineSize - heading.length() -1; j++) {
+                    heading = " "  + heading;
+                }
+                    System.out.print(heading);
+            }
+            else if(i>6 && i<msg.length+8){
+                for(int k=0;k<msg.length && flag==1;k++){
+                    if(ki.length()<msg[k].length()){
+                        ki = msg[k];
+                    }
+                }
+                for (int j = 0;j+3< lineSize - (p+ki).length() -1 && flag==1; j++) {
+                    p = " "+p;
+                }
+                flag=0;
+                System.out.print(p+(i-7) + ". " + msg[i-8]);
+            }
+            else if(i==4){
+                int len = left.length();
+                for(int j=len;j<lineSize-(right).length();j++){
+                    left=left+" ";
+                }
+                System.out.print(left+right);
+            }
+            System.out.println();
+        }
+    }
+
+
     public static void userPageDialog(String heading,String msg, String[] option) {
         String p = "";
         String ki= "";
