@@ -2,16 +2,16 @@ package Logic.StudentLogic;
 
 import java.sql.SQLException;
 import Logic.ModuleExecutor;
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.Module;
 import Model.Student;
 import UI.Utility.InputUtility;
 
-public class StudentMainPage implements ModuleInterface{
+public class StudentMainPage implements Module{
     private Student student;
     private StudentServicesFactory studentServicesFactory;
     private ModuleExecutor module;
 
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
     private int userChoice;
 
     public StudentMainPage(StudentServicesFactory studentServicesFactory, Student student, ModuleExecutor module) throws SQLException{
@@ -22,8 +22,8 @@ public class StudentMainPage implements ModuleInterface{
 
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
 
@@ -35,9 +35,9 @@ public class StudentMainPage implements ModuleInterface{
 
     @Override
     public void runLogic() throws SQLException {
-        this.userChoice = InputUtility.inputChoice("Student Page",new String[]{"Manage Profile","My Records","Transactions","My Performance","Course Registration","Log Out"},"ID: "+student.getUser().getID(), "Name: "+student.getUser().getName());
+        this.userChoice = InputUtility.inputChoice("Student Page",new String[]{"Manage Your Profile","My Records","Transactions","My Performance","Course Registration","Log Out"},"ID: "+student.getUser().getID(), "Name: "+student.getUser().getName());
 
-        ModuleInterface manageClass = this;
+        Module manageClass = this;
         switch (userChoice) {
 
             //MANAGE PROFILE
@@ -67,7 +67,7 @@ public class StudentMainPage implements ModuleInterface{
             
             //GO BACK
             case 6:
-                this.exitStatus = true;
+                this.canModuleExit = true;
                 return;
         }
         this.module.executeModule(manageClass);

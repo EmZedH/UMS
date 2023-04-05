@@ -2,8 +2,8 @@ package Logic.CollegeAdminLogic.CollegeAdminTestManage;
 
 import java.sql.SQLException;
 import Logic.ModuleExecutor;
-import Logic.Interfaces.InitializableModuleInterface;
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.InitializableModule;
+import Logic.Interfaces.Module;
 import Model.DatabaseAccessObject.CourseDAO;
 import Model.DatabaseAccessObject.DepartmentDAO;
 import Model.DatabaseAccessObject.RecordsDAO;
@@ -12,7 +12,7 @@ import Model.DatabaseAccessObject.TestDAO;
 import Model.DatabaseAccessObject.UserDAO;
 import UI.Utility.InputUtility;
 
-public class CollegeAdminTestManage implements ModuleInterface{
+public class CollegeAdminTestManage implements Module{
 
     private RecordsDAO recordsDAO;
     private ModuleExecutor moduleExecutor;
@@ -23,7 +23,7 @@ public class CollegeAdminTestManage implements ModuleInterface{
     private TestDAO testDAO;
     private int collegeID;
 
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
     private int userChoice;
 
     public CollegeAdminTestManage(RecordsDAO recordsDAO, TestDAO testDAO, DepartmentDAO departmentDAO, StudentDAO studentDAO, UserDAO userDAO, CourseDAO courseDAO, int collegeID, ModuleExecutor moduleExecutor) {
@@ -38,8 +38,8 @@ public class CollegeAdminTestManage implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     // @Override
@@ -74,7 +74,7 @@ public class CollegeAdminTestManage implements ModuleInterface{
 
             //GO BACK
             case 5:
-                this.exitStatus = true;
+                this.canModuleExit = true;
                 break;
         }
     }
@@ -87,27 +87,27 @@ public class CollegeAdminTestManage implements ModuleInterface{
 
     public void delete() throws SQLException {
 
-        InitializableModuleInterface testDeleteModule = new CollegeAdminTestDelete(this.departmentDAO, this.courseDAO, this.studentDAO, this.userDAO, this.testDAO, this.collegeID, this.moduleExecutor);
+        InitializableModule testDeleteModule = new CollegeAdminTestDelete(this.departmentDAO, this.courseDAO, this.studentDAO, this.userDAO, this.testDAO, this.collegeID, this.moduleExecutor);
         testDeleteModule.initializeModule();
 
-        moduleExecutor.executeModule(testDeleteModule);
+        moduleExecutor.returnInitializedModule(testDeleteModule);
     }
 
     public void edit() throws SQLException {
 
-        InitializableModuleInterface testEditModule = new CollegeAdminTestEdit(this.collegeID, this.testDAO, this.departmentDAO, this.courseDAO, this.studentDAO, this.userDAO, this.moduleExecutor);
+        InitializableModule testEditModule = new CollegeAdminTestEdit(this.collegeID, this.testDAO, this.departmentDAO, this.courseDAO, this.studentDAO, this.userDAO, this.moduleExecutor);
         testEditModule.initializeModule();
 
-        moduleExecutor.executeModule(testEditModule);
+        moduleExecutor.returnInitializedModule(testEditModule);
     
     }
 
     public void add() throws SQLException {
 
-        InitializableModuleInterface testAddModule = new CollegeAdminTestAdd(this.collegeID, this.recordsDAO, this.testDAO, this.courseDAO, this.departmentDAO, this.studentDAO, this.userDAO, this.moduleExecutor);
+        InitializableModule testAddModule = new CollegeAdminTestAdd(this.collegeID, this.recordsDAO, this.testDAO, this.courseDAO, this.departmentDAO, this.studentDAO, this.userDAO, this.moduleExecutor);
         testAddModule.initializeModule();
 
-        moduleExecutor.executeModule(testAddModule);
+        moduleExecutor.returnInitializedModule(testAddModule);
     }
     
 }

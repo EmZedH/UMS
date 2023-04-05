@@ -2,18 +2,18 @@ package Logic.UserInput.DepartmentInput;
 
 import java.sql.SQLException;
 
-import Logic.Interfaces.ReturnableModuleInterface;
+import Logic.Interfaces.ReturnableModule;
 import Model.DatabaseAccessObject.DepartmentDAO;
 import UI.Utility.DisplayUtility;
 import UI.Utility.InputUtility;
 
-public class NonExistingDepartmentInput implements ReturnableModuleInterface{
+public class NonExistingDepartmentInput implements ReturnableModule{
 
     private int collegeID;
     private DepartmentDAO departmentDAO;
 
     private int returnDepartmentID;
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
 
 
     public NonExistingDepartmentInput(int collegeID, DepartmentDAO departmentDAO) {
@@ -22,8 +22,8 @@ public class NonExistingDepartmentInput implements ReturnableModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     // @Override
@@ -35,14 +35,14 @@ public class NonExistingDepartmentInput implements ReturnableModuleInterface{
     public void runLogic() throws SQLException {
         this.returnDepartmentID = InputUtility.posInput("Enter the New Department ID");
         if(!this.departmentDAO.verifyDepartment(returnDepartmentID, collegeID)){
-            this.exitStatus = true;
+            this.canModuleExit = true;
             return;
         }
         DisplayUtility.singleDialogDisplay("Department ID already exists. Please try again");
     }
 
     @Override
-    public int returnValue() {
+    public Integer returnValue() {
         return this.returnDepartmentID;
     }
 

@@ -4,15 +4,15 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.Module;
 import Model.DatabaseAccessObject.TestDAO;
 import UI.Utility.DisplayUtility;
 import UI.Utility.InputUtility;
 
-public class SuperAdminTestView implements ModuleInterface{
+public class SuperAdminTestView implements Module{
 
     private int userChoice;
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
 
     private TestDAO testDAO;
 
@@ -21,8 +21,8 @@ public class SuperAdminTestView implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     // @Override
@@ -73,7 +73,7 @@ public class SuperAdminTestView implements ModuleInterface{
 
             //TEST MARKS
             case 6:
-                this.exitStatus = true;
+                this.canModuleExit = true;
                 return;
         }
         DisplayUtility.printTable(heading, tableHeadings, table);

@@ -3,8 +3,8 @@ package Logic.CollegeAdminLogic.CollegeAdminTestManage;
 import java.sql.SQLException;
 
 import Logic.ModuleExecutor;
-import Logic.Interfaces.InitializableModuleInterface;
-import Logic.Interfaces.ReturnableModuleInterface;
+import Logic.Interfaces.InitializableModule;
+import Logic.Interfaces.ReturnableModule;
 import Logic.UserInput.CourseInput.ExistingCourseInput;
 import Logic.UserInput.DepartmentInput.ExistingDepartmentInput;
 import Logic.UserInput.TestInput.NonExistingTestInput;
@@ -18,7 +18,7 @@ import Model.DatabaseAccessObject.UserDAO;
 import UI.CommonUI;
 import UI.Utility.DisplayUtility;
 
-public class CollegeAdminTestAdd implements InitializableModuleInterface{
+public class CollegeAdminTestAdd implements InitializableModule{
 
     private int collegeID;
     private RecordsDAO recordsDAO;
@@ -49,7 +49,7 @@ public class CollegeAdminTestAdd implements InitializableModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
+    public boolean canModuleExit() {
         return true;
     }
 
@@ -65,15 +65,15 @@ public class CollegeAdminTestAdd implements InitializableModuleInterface{
     @Override
     public void initializeModule() throws SQLException {
         
-        ReturnableModuleInterface departmentIDInputModule = new ExistingDepartmentInput(this.collegeID, this.departmentDAO);
+        ReturnableModule departmentIDInputModule = new ExistingDepartmentInput(this.collegeID, this.departmentDAO);
         moduleExecutor.executeModule(departmentIDInputModule);
         this.departmentID = departmentIDInputModule.returnValue();
 
-        ReturnableModuleInterface courseIDInputModule = new ExistingCourseInput(this.collegeID, this.departmentID, this.courseDAO);
+        ReturnableModule courseIDInputModule = new ExistingCourseInput(this.collegeID, this.departmentID, this.courseDAO);
         moduleExecutor.executeModule(courseIDInputModule);
         this.courseID = courseIDInputModule.returnValue();
 
-        ReturnableModuleInterface studentIDInputModule = new ExistingStudentInput(this.studentDAO, this.userDAO, this.collegeID);
+        ReturnableModule studentIDInputModule = new ExistingStudentInput(this.studentDAO, this.userDAO, this.collegeID);
         moduleExecutor.executeModule(studentIDInputModule);
         this.studentID = studentIDInputModule.returnValue();
 
@@ -82,7 +82,7 @@ public class CollegeAdminTestAdd implements InitializableModuleInterface{
             initializeModule();
         }
 
-        ReturnableModuleInterface testIDInputModule = new NonExistingTestInput(this.testDAO, this.studentID, this.courseID, this.departmentID, this.collegeID);
+        ReturnableModule testIDInputModule = new NonExistingTestInput(this.testDAO, this.studentID, this.courseID, this.departmentID, this.collegeID);
         moduleExecutor.executeModule(testIDInputModule);
         this.testID = testIDInputModule.returnValue();
     }

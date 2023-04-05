@@ -2,14 +2,14 @@ package Logic.SuperAdminLogic.SuperAdminUserManage.SuperAdminUserAdd;
 
 import java.sql.SQLException;
 
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.Module;
 import Model.SuperAdmin;
 import Model.User;
 import Model.DatabaseAccessObject.SuperAdminDAO;
 import UI.CommonUI;
 import UI.Utility.InputUtility;
 
-public class SuperAdminSuperAdminAdd implements ModuleInterface{
+public class SuperAdminSuperAdminAdd implements Module{
 
     private SuperAdminDAO superAdminDAO;
     private int userID;
@@ -27,7 +27,7 @@ public class SuperAdminSuperAdminAdd implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
+    public boolean canModuleExit() {
         return true;
     }
 

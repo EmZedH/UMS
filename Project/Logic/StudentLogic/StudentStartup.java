@@ -4,14 +4,14 @@ import java.sql.SQLException;
 
 import Logic.UserCredentialsWrongWindow;
 import Logic.ModuleExecutor;
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.Module;
 import Model.Student;
 import Model.DatabaseAccessObject.StudentDAO;
 import UI.CommonUI;
 
-public class StudentStartup implements ModuleInterface{
+public class StudentStartup implements Module{
 
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
 
     private StudentDAO studentDAO;
     private ModuleExecutor module;
@@ -27,8 +27,8 @@ public class StudentStartup implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     // @Override
@@ -65,7 +65,7 @@ public class StudentStartup implements ModuleInterface{
             Student student = this.studentDAO.returnStudent(this.userID);
             module.executeModule(new StudentMainPage(this.studentServicesFactory, student, this.module));
         }
-        this.exitStatus = true;
+        this.canModuleExit = true;
     }
     
 }

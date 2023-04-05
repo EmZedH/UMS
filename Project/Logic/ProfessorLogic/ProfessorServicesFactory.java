@@ -1,6 +1,6 @@
 package Logic.ProfessorLogic;
 
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.Module;
 import Model.FactoryDAO;
 import Model.Professor;
 
@@ -11,15 +11,15 @@ public class ProfessorServicesFactory {
         this.factoryDAO = factoryDAO;
     }
 
-    public ModuleInterface professorProfileManage(Professor professor){
+    public Module professorProfileManage(Professor professor){
         return new ProfessorProfileManage(factoryDAO.createProfessorDAO(), professor);
     }
 
-    public ModuleInterface professorTestManage(Professor professor){
+    public Module professorTestManage(Professor professor){
         return new ProfessorTestManage(professor, factoryDAO.createRecordsDAO(), factoryDAO.createteTestDAO());
     }
 
-    public ModuleInterface professorRecordsManage(Professor professor) {
+    public Module professorRecordsManage(Professor professor) {
         return new ProfessorRecordsManage(factoryDAO.createRecordsDAO(), factoryDAO.createteTestDAO(), professor);
     }
 }

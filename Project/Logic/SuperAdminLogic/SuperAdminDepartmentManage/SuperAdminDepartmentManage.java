@@ -3,19 +3,18 @@ package Logic.SuperAdminLogic.SuperAdminDepartmentManage;
 import java.sql.SQLException;
 
 import Logic.ModuleExecutor;
-import Logic.Interfaces.InitializableModuleInterface;
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.Module;
 import Model.DatabaseAccessObject.CollegeDAO;
 import Model.DatabaseAccessObject.DepartmentDAO;
 import UI.Utility.InputUtility;
 
-public class SuperAdminDepartmentManage implements ModuleInterface{
+public class SuperAdminDepartmentManage implements Module{
 
     private DepartmentDAO departmentDAO;
     private CollegeDAO collegeDAO;
     private ModuleExecutor moduleExecutor;
 
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
     private int userChoice;
 
     public SuperAdminDepartmentManage(DepartmentDAO departmentDAO, CollegeDAO collegeDAO, ModuleExecutor moduleExecutor) {
@@ -25,8 +24,8 @@ public class SuperAdminDepartmentManage implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     // @Override
@@ -36,70 +35,35 @@ public class SuperAdminDepartmentManage implements ModuleInterface{
 
     @Override
     public void runLogic() throws SQLException {
+        Module module = null;
         this.userChoice = InputUtility.inputChoice("Select Option to Manage Department", new String[]{"Add Department","Edit Department","Delete Department","View Department","Back"});
         switch (this.userChoice) {
 
             //ADD DEPARTMENT
             case 1:
-                add();
+                module = moduleExecutor.returnInitializedModule(new SuperAdminDepartmentAdd(collegeDAO, departmentDAO, moduleExecutor));
                 break;
 
             //EDIT DEPARTMENT
             case 2:
-                edit();
+                module = moduleExecutor.returnInitializedModule(new SuperAdminDepartmentEdit(departmentDAO, collegeDAO, moduleExecutor));
                 break;
 
             //DELETE DEPARTMENT
             case 3:
-                delete();
+                module = moduleExecutor.returnInitializedModule(new SuperAdminDepartmentDelete(departmentDAO, collegeDAO, moduleExecutor));
                 break;
 
             //VIEW DEPARTMENT
             case 4:
-                view();
+                module = new SuperAdminDepartmentView(departmentDAO);
                 break;
 
             //BACK
             case 5:
-                this.exitStatus = true;
-                break;
+                this.canModuleExit = true;
+                return;
         }
+        moduleExecutor.executeModule(module);
     }
-
-    public void add() throws SQLException {
-        
-        InitializableModuleInterface departmentAddModule = new SuperAdminDepartmentAdd(this.collegeDAO, this.departmentDAO, this.moduleExecutor);
-        departmentAddModule.initializeModule();
-
-        //GO TO DEPARTMENT ADD MODULE
-        moduleExecutor.executeModule(departmentAddModule);
-        
-    }
-
-    public void edit() throws SQLException {
-
-        InitializableModuleInterface departmentEditModule = new SuperAdminDepartmentEdit(this.departmentDAO, this.collegeDAO, this.moduleExecutor);
-        departmentEditModule.initializeModule();
-
-        //GO TO DEPARTMENT EDIT MODULE
-        moduleExecutor.executeModule(departmentEditModule);
-
-    }
-
-    public void delete() throws SQLException {
-        
-        InitializableModuleInterface departmentDeleteModule = new SuperAdminDepartmentDelete(this.departmentDAO, this.collegeDAO, this.moduleExecutor);
-        departmentDeleteModule.initializeModule();
-
-        //GO TO DEPARTMENT DELETE MODULE
-        moduleExecutor.executeModule(departmentDeleteModule);
-    }
-
-    public void view() throws SQLException {
-         
-        //GO TO DEPARTMENT VIEW MODULE
-        moduleExecutor.executeModule(new SuperAdminDepartmentView(this.departmentDAO));
-
-    }
-    
 }

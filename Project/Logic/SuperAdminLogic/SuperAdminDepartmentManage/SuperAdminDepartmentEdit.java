@@ -3,8 +3,8 @@ package Logic.SuperAdminLogic.SuperAdminDepartmentManage;
 import java.sql.SQLException;
 
 import Logic.ModuleExecutor;
-import Logic.Interfaces.InitializableModuleInterface;
-import Logic.Interfaces.ReturnableModuleInterface;
+import Logic.Interfaces.InitializableModule;
+import Logic.Interfaces.ReturnableModule;
 import Logic.UserInput.CollegeInput.ExistingCollegeInput;
 import Logic.UserInput.DepartmentInput.ExistingDepartmentInput;
 import Logic.UserInput.DepartmentInput.NonExistingDepartmentInput;
@@ -14,9 +14,9 @@ import Model.DatabaseAccessObject.DepartmentDAO;
 import UI.CommonUI;
 import UI.Utility.InputUtility;
 
-public class SuperAdminDepartmentEdit implements InitializableModuleInterface{
+public class SuperAdminDepartmentEdit implements InitializableModule{
 
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
     private boolean toggleDetails = true;
     private int userChoice;
 
@@ -32,8 +32,8 @@ public class SuperAdminDepartmentEdit implements InitializableModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     // @Override
@@ -46,11 +46,11 @@ public class SuperAdminDepartmentEdit implements InitializableModuleInterface{
     public void initializeModule() throws SQLException {
 
         //INPUT COLLEGE ID
-        ReturnableModuleInterface collegeInputModule = new ExistingCollegeInput(this.collegeDAO);
+        ReturnableModule collegeInputModule = new ExistingCollegeInput(this.collegeDAO);
         moduleExecutor.executeModule(collegeInputModule);
 
         //INPUT DEPARTMENT ID
-        ReturnableModuleInterface departmentInputModule = new ExistingDepartmentInput(collegeInputModule.returnValue(), this.departmentDAO);
+        ReturnableModule departmentInputModule = new ExistingDepartmentInput(collegeInputModule.returnValue(), this.departmentDAO);
         moduleExecutor.executeModule(departmentInputModule);
 
         this.department = this.departmentDAO.returnDepartment(collegeInputModule.returnValue(), departmentInputModule.returnValue());
@@ -68,7 +68,7 @@ public class SuperAdminDepartmentEdit implements InitializableModuleInterface{
 
             //EDIT DEPARTMENT ID
             case 1:
-                ReturnableModuleInterface newDepartmentIDInputModule = new NonExistingDepartmentInput(department.getCollegeID(), this.departmentDAO);
+                ReturnableModule newDepartmentIDInputModule = new NonExistingDepartmentInput(department.getCollegeID(), this.departmentDAO);
                 this.moduleExecutor.executeModule(newDepartmentIDInputModule);
 
                 this.department.setDepartmentID(newDepartmentIDInputModule.returnValue());
@@ -86,7 +86,7 @@ public class SuperAdminDepartmentEdit implements InitializableModuleInterface{
 
             //GO BACK
             case 4:
-                this.exitStatus = true;
+                this.canModuleExit = true;
                 return;
         }
         this.departmentDAO.editDepartment(departmentID, department.getCollegeID(), department);

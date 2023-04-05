@@ -3,8 +3,8 @@ package Logic.SuperAdminLogic.SuperAdminUserManage.SuperAdminUserAdd;
 import java.sql.SQLException;
 
 import Logic.ModuleExecutor;
-import Logic.Interfaces.ReturnableModuleInterface;
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.ReturnableModule;
+import Logic.Interfaces.Module;
 import Logic.UserInput.CollegeInput.ExistingCollegeInput;
 import Model.College;
 import Model.CollegeAdmin;
@@ -14,7 +14,7 @@ import Model.DatabaseAccessObject.CollegeDAO;
 import UI.CommonUI;
 import UI.Utility.InputUtility;
 
-public class SuperAdminCollegeAdminAdd implements ModuleInterface{
+public class SuperAdminCollegeAdminAdd implements Module{
 
     private ModuleExecutor moduleExecutor;
     private CollegeDAO collegeDAO;
@@ -37,7 +37,7 @@ public class SuperAdminCollegeAdminAdd implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
+    public boolean canModuleExit() {
         return true;
     }
 
@@ -61,7 +61,7 @@ public class SuperAdminCollegeAdminAdd implements ModuleInterface{
         this.userPassword = InputUtility.inputString("Enter the password");
 
         //EXISTING COLLEGE ID INPUT MODULE
-        ReturnableModuleInterface collegeIDInputModule = new ExistingCollegeInput(this.collegeDAO);
+        ReturnableModule collegeIDInputModule = new ExistingCollegeInput(this.collegeDAO);
         moduleExecutor.executeModule(collegeIDInputModule);
     
         //GET COLLEGE OBJECT

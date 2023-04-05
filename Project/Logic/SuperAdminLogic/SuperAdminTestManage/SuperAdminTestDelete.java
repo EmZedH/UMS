@@ -3,8 +3,8 @@ package Logic.SuperAdminLogic.SuperAdminTestManage;
 import java.sql.SQLException;
 
 import Logic.ModuleExecutor;
-import Logic.Interfaces.InitializableModuleInterface;
-import Logic.Interfaces.ReturnableModuleInterface;
+import Logic.Interfaces.InitializableModule;
+import Logic.Interfaces.ReturnableModule;
 import Logic.UserInput.CollegeInput.ExistingCollegeInput;
 import Logic.UserInput.CourseInput.ExistingCourseInput;
 import Logic.UserInput.DepartmentInput.ExistingDepartmentInput;
@@ -18,7 +18,7 @@ import Model.DatabaseAccessObject.TestDAO;
 import UI.CommonUI;
 import UI.Utility.InputUtility;
 
-public class SuperAdminTestDelete implements InitializableModuleInterface{
+public class SuperAdminTestDelete implements InitializableModule{
     
     private int userChoice;
     
@@ -46,7 +46,7 @@ public class SuperAdminTestDelete implements InitializableModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
+    public boolean canModuleExit() {
         return true;
     }
 
@@ -59,27 +59,27 @@ public class SuperAdminTestDelete implements InitializableModuleInterface{
     public void initializeModule() throws SQLException {
 
         //COLLEGE ID INPUT MODULE
-        ReturnableModuleInterface collegeIDInputModule = new ExistingCollegeInput(this.collegeDAO);
+        ReturnableModule collegeIDInputModule = new ExistingCollegeInput(this.collegeDAO);
         moduleExecutor.executeModule(collegeIDInputModule);
         this.collegeID = collegeIDInputModule.returnValue();
 
         //DEPARTMENT ID INPUT MODULE
-        ReturnableModuleInterface departmentIDInputModule = new ExistingDepartmentInput(collegeIDInputModule.returnValue(), this.departmentDAO);
+        ReturnableModule departmentIDInputModule = new ExistingDepartmentInput(collegeIDInputModule.returnValue(), this.departmentDAO);
         moduleExecutor.executeModule(departmentIDInputModule);
         this.departmentID = departmentIDInputModule.returnValue();
 
         //COURSE ID INPUT MODULE
-        ReturnableModuleInterface courseIDInputModule = new ExistingCourseInput(collegeIDInputModule.returnValue(), departmentIDInputModule.returnValue(), this.courseDAO);
+        ReturnableModule courseIDInputModule = new ExistingCourseInput(collegeIDInputModule.returnValue(), departmentIDInputModule.returnValue(), this.courseDAO);
         moduleExecutor.executeModule(courseIDInputModule);
         this.courseID = courseIDInputModule.returnValue();
 
         //STUDENT ID INPUT MODULE
-        ReturnableModuleInterface studentIDInputModule = new ExistingStudentInput(this.studentDAO);
+        ReturnableModule studentIDInputModule = new ExistingStudentInput(this.studentDAO);
         moduleExecutor.executeModule(studentIDInputModule);
         this.studentID = studentIDInputModule.returnValue();
 
         //TEST ID INPUT MODULE
-        ReturnableModuleInterface testIDInputModule = new ExistingTestInput(this.testDAO, studentIDInputModule.returnValue(), courseIDInputModule.returnValue(), departmentIDInputModule.returnValue(), collegeIDInputModule.returnValue());
+        ReturnableModule testIDInputModule = new ExistingTestInput(this.testDAO, studentIDInputModule.returnValue(), courseIDInputModule.returnValue(), departmentIDInputModule.returnValue(), collegeIDInputModule.returnValue());
         moduleExecutor.executeModule(testIDInputModule);
         this.testID = testIDInputModule.returnValue();
     }

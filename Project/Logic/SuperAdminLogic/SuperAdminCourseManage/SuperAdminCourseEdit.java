@@ -3,8 +3,8 @@ package Logic.SuperAdminLogic.SuperAdminCourseManage;
 import java.sql.SQLException;
 
 import Logic.ModuleExecutor;
-import Logic.Interfaces.ReturnableModuleInterface;
-import Logic.Interfaces.InitializableModuleInterface;
+import Logic.Interfaces.ReturnableModule;
+import Logic.Interfaces.InitializableModule;
 import Logic.UserInput.CollegeInput.ExistingCollegeInput;
 import Logic.UserInput.CourseInput.ExistingCourseInput;
 import Logic.UserInput.CourseInput.NonExistingCourseInput;
@@ -16,9 +16,9 @@ import Model.DatabaseAccessObject.DepartmentDAO;
 import UI.CommonUI;
 import UI.Utility.InputUtility;
 
-public class SuperAdminCourseEdit implements InitializableModuleInterface{
+public class SuperAdminCourseEdit implements InitializableModule{
 
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
     private boolean toggleDetails = true;
     private int userChoice;
 
@@ -36,8 +36,8 @@ public class SuperAdminCourseEdit implements InitializableModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     // @Override
@@ -49,15 +49,15 @@ public class SuperAdminCourseEdit implements InitializableModuleInterface{
     public void initializeModule() throws SQLException {
 
         //INPUT COLLEGE ID
-        ReturnableModuleInterface collegeInputModule = new ExistingCollegeInput(this.collegeDAO);
+        ReturnableModule collegeInputModule = new ExistingCollegeInput(this.collegeDAO);
         moduleExecutor.executeModule(collegeInputModule);
 
         //INPUT DEPARTMENT ID
-        ReturnableModuleInterface departmentInputModule = new ExistingDepartmentInput(collegeInputModule.returnValue(), this.departmentDAO);
+        ReturnableModule departmentInputModule = new ExistingDepartmentInput(collegeInputModule.returnValue(), this.departmentDAO);
         moduleExecutor.executeModule(departmentInputModule);
 
         //INPUT NEW COURSE ID
-        ReturnableModuleInterface courseInputModule = new ExistingCourseInput(collegeInputModule.returnValue(), departmentInputModule.returnValue(), this.courseDAO);
+        ReturnableModule courseInputModule = new ExistingCourseInput(collegeInputModule.returnValue(), departmentInputModule.returnValue(), this.courseDAO);
         moduleExecutor.executeModule(courseInputModule);
 
         this.course = this.courseDAO.returnCourse(courseInputModule.returnValue(), departmentInputModule.returnValue(), collegeInputModule.returnValue());
@@ -72,7 +72,7 @@ public class SuperAdminCourseEdit implements InitializableModuleInterface{
         switch(this.userChoice){
 
             case 1:
-                ReturnableModuleInterface newCourseIDInputModule = new NonExistingCourseInput(this.course.getCollegeID(), this.course.getDepartmentID(), this.courseDAO);
+                ReturnableModule newCourseIDInputModule = new NonExistingCourseInput(this.course.getCollegeID(), this.course.getDepartmentID(), this.courseDAO);
                 moduleExecutor.executeModule(newCourseIDInputModule);
 
                 course.setCourseID(newCourseIDInputModule.returnValue());

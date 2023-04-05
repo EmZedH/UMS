@@ -3,16 +3,15 @@ package Logic.SuperAdminLogic.SuperAdminCollegeManage;
 import java.sql.SQLException;
 
 import Logic.ModuleExecutor;
-import Logic.Interfaces.InitializableModuleInterface;
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.Module;
 import Model.DatabaseAccessObject.CollegeDAO;
 import UI.Utility.InputUtility;
 
-public class SuperAdminCollegeManage implements ModuleInterface{
+public class SuperAdminCollegeManage implements Module{
     private CollegeDAO collegeDAO;
     private ModuleExecutor moduleExecutor;
 
-    private boolean exitStatus = false;
+    private boolean shouldModuleExit = false;
     private int userChoice;
 
     public SuperAdminCollegeManage(CollegeDAO collegeDAO, ModuleExecutor moduleExecutor) {
@@ -21,78 +20,42 @@ public class SuperAdminCollegeManage implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.shouldModuleExit;
     }
-
-    // @Override
-    // public void runUserInterface() throws SQLException {
-    //     this.userChoice = InputUtility.inputChoice("Select the Option", new String[]{"Add College","Edit College","Delete College","View College","Back"});
-    // }
 
     @Override
     public void runLogic() throws SQLException {
         this.userChoice = InputUtility.inputChoice("Select the Option", new String[]{"Add College","Edit College","Delete College","View College","Back"});
+        Module module = null;
         switch(this.userChoice){
 
             //ADD COLLEGE
             case 1:
-                add();
+                module = moduleExecutor.returnInitializedModule(new SuperAdminCollegeAdd(this.collegeDAO, this.moduleExecutor));
                 break;
 
             //EDIT COLLEGE
             case 2:
-                edit();
+                module = moduleExecutor.returnInitializedModule(new SuperAdminCollegeEdit(this.collegeDAO, this.moduleExecutor));
                 break;
 
             //DELETE COLLEGE
             case 3:
-                delete();
+                module = moduleExecutor.returnInitializedModule(new SuperAdminCollegeDelete(this.collegeDAO, this.moduleExecutor));
                 break;
 
             //VIEW COLLEGE
             case 4:
-                view();
+                module = new SuperAdminCollegeView(this.collegeDAO);
                 break;
 
             //GO BACK
             case 5:
-                this.exitStatus = true;
-                break;
+                this.shouldModuleExit = true;
+                return;
         }
-    }
-
-    public void add() throws SQLException {
-
-        InitializableModuleInterface addCollegeModule = new SuperAdminCollegeAdd(this.collegeDAO, this.moduleExecutor);
-        addCollegeModule.initializeModule();
-        
-        moduleExecutor.executeModule(addCollegeModule);
-
-    }
-
-    public void edit() throws SQLException {
-        
-        InitializableModuleInterface editCollegeModule = new SuperAdminCollegeEdit(this.collegeDAO, this.moduleExecutor);
-        editCollegeModule.initializeModule();
-
-        moduleExecutor.executeModule(editCollegeModule);
-
-    }
-
-    public void delete() throws SQLException {
-        
-        InitializableModuleInterface deleteCollegeModule = new SuperAdminCollegeDelete(this.collegeDAO, this.moduleExecutor);
-        deleteCollegeModule.initializeModule();
-
-        moduleExecutor.executeModule(deleteCollegeModule);
-
-    }
-
-    public void view() throws SQLException {
-
-        moduleExecutor.executeModule(new SuperAdminCollegeView(this.collegeDAO));
-        
+        moduleExecutor.executeModule(module);
     }
 
 

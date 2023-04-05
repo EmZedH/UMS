@@ -3,8 +3,8 @@ package Logic.CollegeAdminLogic.CollegeAdminRecordsManage;
 import java.sql.SQLException;
 
 import Logic.ModuleExecutor;
-import Logic.Interfaces.InitializableModuleInterface;
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.InitializableModule;
+import Logic.Interfaces.Module;
 import Model.DatabaseUtility;
 import Model.Records;
 import Model.Student;
@@ -23,7 +23,7 @@ import UI.SuperAdminUI;
 import UI.Utility.DisplayUtility;
 import UI.Utility.InputUtility;
 
-public class CollegeAdminRecordsManage implements ModuleInterface{
+public class CollegeAdminRecordsManage implements Module{
 
     private RecordsDAO recordsDAO;
     private StudentDAO studentDAO;
@@ -37,7 +37,7 @@ public class CollegeAdminRecordsManage implements ModuleInterface{
     private ModuleExecutor moduleExecutor;
     private int collegeID;
 
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
     private int userChoice;
 
     public CollegeAdminRecordsManage(RecordsDAO recordsDAO, StudentDAO studentDAO, CourseDAO courseDAO, UserDAO userDAO, DepartmentDAO departmentDAO,
@@ -54,8 +54,8 @@ public class CollegeAdminRecordsManage implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     // @Override
@@ -90,7 +90,7 @@ public class CollegeAdminRecordsManage implements ModuleInterface{
 
             //GO BACK
             case 5:
-                this.exitStatus = true;
+                this.canModuleExit = true;
                 break;
         }
     }
@@ -103,10 +103,10 @@ public class CollegeAdminRecordsManage implements ModuleInterface{
 
     public void delete() throws SQLException {
 
-        InitializableModuleInterface recordsDeleteModule = new CollegeAdminRecordsDelete(this.collegeID, this.recordsDAO,this.departmentDAO, courseDAO, studentDAO, this.userDAO, moduleExecutor);
+        InitializableModule recordsDeleteModule = new CollegeAdminRecordsDelete(this.collegeID, this.recordsDAO,this.departmentDAO, courseDAO, studentDAO, this.userDAO, moduleExecutor);
         recordsDeleteModule.initializeModule();
 
-        moduleExecutor.executeModule(recordsDeleteModule);
+        moduleExecutor.returnInitializedModule(recordsDeleteModule);
     }
 
     public void edit() throws SQLException {
@@ -186,9 +186,9 @@ public class CollegeAdminRecordsManage implements ModuleInterface{
 
     public void add() throws SQLException {
 
-        InitializableModuleInterface recordsAddModule = new CollegeAdminRecordsAdd(this.collegeID, this.transactionsDAO, studentDAO, departmentDAO, courseDAO, recordsDAO, courseProfessorDAO,this.professorDAO, userDAO, this.collegeDAO, moduleExecutor);
+        InitializableModule recordsAddModule = new CollegeAdminRecordsAdd(this.collegeID, this.transactionsDAO, studentDAO, departmentDAO, courseDAO, recordsDAO, courseProfessorDAO,this.professorDAO, userDAO, this.collegeDAO, moduleExecutor);
         recordsAddModule.initializeModule();
 
-        moduleExecutor.executeModule(recordsAddModule);
+        moduleExecutor.returnInitializedModule(recordsAddModule);
     }
 }

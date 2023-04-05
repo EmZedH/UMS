@@ -3,8 +3,8 @@ package Logic.SuperAdminLogic.SuperAdminUserManage;
 import java.sql.SQLException;
 
 import Logic.ModuleExecutor;
-import Logic.Interfaces.ReturnableModuleInterface;
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.ReturnableModule;
+import Logic.Interfaces.Module;
 import Logic.SuperAdminLogic.SuperAdminUserManage.SuperAdminUserAdd.SuperAdminUserAdd;
 import Logic.SuperAdminLogic.SuperAdminUserManage.SuperAdminUserDelete.SuperAdminLoggedInUserDelete;
 import Logic.SuperAdminLogic.SuperAdminUserManage.SuperAdminUserDelete.SuperAdminUserDelete;
@@ -25,7 +25,7 @@ import Model.DatabaseAccessObject.SuperAdminDAO;
 import Model.DatabaseAccessObject.UserDAO;
 import UI.Utility.InputUtility;
 
-public class SuperAdminUserManage implements ModuleInterface{
+public class SuperAdminUserManage implements Module{
 
     private SuperAdmin superAdmin;
     private UserDAO userDAO;
@@ -39,7 +39,7 @@ public class SuperAdminUserManage implements ModuleInterface{
 
     private ModuleExecutor moduleExecutor;
 
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
     private int userChoice;
 
         public SuperAdminUserManage(SuperAdmin superAdmin, UserDAO userDAO, StudentDAO studentDAO,
@@ -58,8 +58,8 @@ public class SuperAdminUserManage implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     // @Override
@@ -94,7 +94,7 @@ public class SuperAdminUserManage implements ModuleInterface{
 
                 //GO BACK
                 case 5:
-                    this.exitStatus = true;
+                    this.canModuleExit = true;
                     return;
 
             }
@@ -110,13 +110,13 @@ public class SuperAdminUserManage implements ModuleInterface{
     public void delete() throws SQLException {
         
         //INPUT USER ID MODULE
-        ReturnableModuleInterface userIDInputModule = new ExistingUserInput(this.userDAO);
+        ReturnableModule userIDInputModule = new ExistingUserInput(this.userDAO);
         this.moduleExecutor.executeModule(userIDInputModule);
 
         //IF USER ID SAME AS LOGGED IN USER
         if(this.superAdmin.getUser().getID() == userIDInputModule.returnValue()){
             this.moduleExecutor.executeModule(new SuperAdminLoggedInUserDelete(this.userDAO, userIDInputModule.returnValue()));
-            this.exitStatus = true;
+            this.canModuleExit = true;
             return;
         }
         
@@ -124,7 +124,7 @@ public class SuperAdminUserManage implements ModuleInterface{
     }
 
     public void edit() throws SQLException {
-        ReturnableModuleInterface userIDInputModule = new ExistingUserInput(this.userDAO);
+        ReturnableModule userIDInputModule = new ExistingUserInput(this.userDAO);
         this.moduleExecutor.executeModule(userIDInputModule);
         int userID = userIDInputModule.returnValue();
 

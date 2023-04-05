@@ -3,18 +3,18 @@ package Logic.SuperAdminLogic;
 import java.sql.SQLException;
 
 import Logic.ModuleExecutor;
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.Module;
 import Model.SuperAdmin;
 import UI.Utility.DisplayUtility;
 import UI.Utility.InputUtility;
 
-public class SuperAdminMainPage implements ModuleInterface{
+public class SuperAdminMainPage implements Module{
 
     private SuperAdmin superAdmin;
     private SuperAdminServicesFactory superAdminServicesFactory;
     private ModuleExecutor moduleExecutor;
 
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
     private int userChoice;
     
     public SuperAdminMainPage(SuperAdmin superAdmin, SuperAdminServicesFactory superAdminServicesFactory, ModuleExecutor moduleExecutor) throws SQLException {
@@ -24,8 +24,8 @@ public class SuperAdminMainPage implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     // @Override
@@ -36,8 +36,8 @@ public class SuperAdminMainPage implements ModuleInterface{
     @Override
     public void runLogic() throws SQLException {
 
-        this.userChoice = InputUtility.inputChoice("Super Admin Page",new String[]{"User","Course","Department","Students Record","Professor Course List","Section","Test Records","Transactions","Colleges","Log Out"},"Name: " + superAdmin.getUser().getName(),"ID: " + superAdmin.getUser().getID());
-        ModuleInterface module = this;
+        this.userChoice = InputUtility.inputChoice("Super Admin Page",new String[]{"Manage User","Manage Course","Manage Department","Manage Students Record","Manage Professor Course List","Manage Section","Manage Test Records","Manage Transactions","Manage Colleges","Log Out"},"Name: " + superAdmin.getUser().getName(),"ID: " + superAdmin.getUser().getID());
+        Module module = this;
 
         switch(this.userChoice){
 
@@ -88,7 +88,7 @@ public class SuperAdminMainPage implements ModuleInterface{
 
             //GO BACK TO USER LOGIN
             case 10:
-                this.exitStatus = true;
+                this.canModuleExit = true;
                 return;
 
         }
@@ -98,7 +98,7 @@ public class SuperAdminMainPage implements ModuleInterface{
         
         if(this.superAdmin==null){
             DisplayUtility.singleDialogDisplay("User Doesn't exist. Please try again");
-            this.exitStatus = true;
+            this.canModuleExit = true;
         }
     }
 }

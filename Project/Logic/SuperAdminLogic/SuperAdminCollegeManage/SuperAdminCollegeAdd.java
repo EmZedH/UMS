@@ -3,14 +3,14 @@ package Logic.SuperAdminLogic.SuperAdminCollegeManage;
 import java.sql.SQLException;
 
 import Logic.ModuleExecutor;
-import Logic.Interfaces.InitializableModuleInterface;
-import Logic.Interfaces.ReturnableModuleInterface;
+import Logic.Interfaces.InitializableModule;
+import Logic.Interfaces.ReturnableModule;
 import Logic.UserInput.CollegeInput.NonExistingCollegeInput;
 import Model.DatabaseAccessObject.CollegeDAO;
 import UI.CommonUI;
 import UI.Utility.InputUtility;
 
-public class SuperAdminCollegeAdd implements InitializableModuleInterface{
+public class SuperAdminCollegeAdd implements InitializableModule{
 
     private String collegeName;
     private String collegeAddress;
@@ -27,13 +27,13 @@ public class SuperAdminCollegeAdd implements InitializableModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
+    public boolean canModuleExit() {
         return true;
     }
 
     @Override
     public void initializeModule() throws SQLException {
-        ReturnableModuleInterface collegeInputModule = new NonExistingCollegeInput(this.collegeDAO);
+        ReturnableModule collegeInputModule = new NonExistingCollegeInput(this.collegeDAO);
         moduleExecutor.executeModule(collegeInputModule);
         
         this.collegeID = collegeInputModule.returnValue();

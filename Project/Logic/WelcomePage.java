@@ -2,11 +2,11 @@ package Logic;
 
 import java.sql.SQLException;
 
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.Module;
 import Model.FactoryDAO;
 import UI.Utility.InputUtility;
 
-public class WelcomePage implements ModuleInterface{
+public class WelcomePage implements Module{
     
     ModuleExecutor module;
     FactoryDAO factoryDAO;
@@ -18,7 +18,7 @@ public class WelcomePage implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
+    public boolean canModuleExit() {
         return true;
     }
 

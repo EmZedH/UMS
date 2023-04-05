@@ -2,18 +2,18 @@ package Logic.UserInput.TransactionInput;
 
 import java.sql.SQLException;
 
-import Logic.Interfaces.ReturnableModuleInterface;
+import Logic.Interfaces.ReturnableModule;
 import Model.DatabaseAccessObject.TransactionsDAO;
 import UI.Utility.DisplayUtility;
 import UI.Utility.InputUtility;
 
-public class ExistingTransactionInput implements ReturnableModuleInterface{
+public class ExistingTransactionInput implements ReturnableModule{
 
     private TransactionsDAO transactionsDAO;
     private Integer collegeID = null;
 
     private int returnTransactionID;
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
 
     public ExistingTransactionInput(TransactionsDAO transactionsDAO, Integer collegeID) {
         this.transactionsDAO = transactionsDAO;
@@ -25,8 +25,8 @@ public class ExistingTransactionInput implements ReturnableModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     // @Override
@@ -39,7 +39,7 @@ public class ExistingTransactionInput implements ReturnableModuleInterface{
         if(this.collegeID == null){
             this.returnTransactionID = InputUtility.posInput("Enter the Transaction ID");
             if(this.transactionsDAO.verifyTransaction(this.returnTransactionID)){
-                this.exitStatus = true;
+                this.canModuleExit = true;
                 return;
             }
             DisplayUtility.singleDialogDisplay("Transaction ID doesn't exist. Please try again");
@@ -47,7 +47,7 @@ public class ExistingTransactionInput implements ReturnableModuleInterface{
         else{
             this.returnTransactionID = InputUtility.posInput("Enter the Transaction ID");
             if(this.transactionsDAO.verifyTransaction(this.returnTransactionID, this.collegeID)){
-                this.exitStatus = true;
+                this.canModuleExit = true;
                 return;
             }
             DisplayUtility.singleDialogDisplay("Transaction ID doesn't exist. Please try again");
@@ -56,7 +56,7 @@ public class ExistingTransactionInput implements ReturnableModuleInterface{
     }
 
     @Override
-    public int returnValue() {
+    public Integer returnValue() {
         return returnTransactionID;
     }
     

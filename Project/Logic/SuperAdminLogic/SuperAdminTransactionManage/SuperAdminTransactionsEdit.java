@@ -3,8 +3,8 @@ package Logic.SuperAdminLogic.SuperAdminTransactionManage;
 import java.sql.SQLException;
 
 import Logic.ModuleExecutor;
-import Logic.Interfaces.InitializableModuleInterface;
-import Logic.Interfaces.ReturnableModuleInterface;
+import Logic.Interfaces.InitializableModule;
+import Logic.Interfaces.ReturnableModule;
 import Logic.UserInput.TransactionInput.ExistingTransactionInput;
 import Logic.UserInput.TransactionInput.NonExistingTransactionInput;
 import Model.Transactions;
@@ -12,9 +12,9 @@ import Model.DatabaseAccessObject.TransactionsDAO;
 import UI.CommonUI;
 import UI.Utility.InputUtility;
 
-public class SuperAdminTransactionsEdit implements InitializableModuleInterface{
+public class SuperAdminTransactionsEdit implements InitializableModule{
 
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
     private boolean toggleDetails = true;
     private int userChoice;
 
@@ -29,8 +29,8 @@ public class SuperAdminTransactionsEdit implements InitializableModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     // @Override
@@ -48,7 +48,7 @@ public class SuperAdminTransactionsEdit implements InitializableModuleInterface{
     public void initializeModule() throws SQLException {
 
         //INPUT TRANSACTION ID MODULE
-        ReturnableModuleInterface transactionIDInputModule = new ExistingTransactionInput(this.transactionsDAO);
+        ReturnableModule transactionIDInputModule = new ExistingTransactionInput(this.transactionsDAO);
         moduleExecutor.executeModule(transactionIDInputModule);
 
         this.transactionID = transactionIDInputModule.returnValue();
@@ -70,7 +70,7 @@ public class SuperAdminTransactionsEdit implements InitializableModuleInterface{
             //EDIT TRANSACTION ID
             case 1:
                 
-                ReturnableModuleInterface transactionIDInputModule = new NonExistingTransactionInput(this.transactionsDAO);
+                ReturnableModule transactionIDInputModule = new NonExistingTransactionInput(this.transactionsDAO);
                 moduleExecutor.executeModule(transactionIDInputModule);
 
                 transaction.setTransactionID(transactionIDInputModule.returnValue());

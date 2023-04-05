@@ -2,15 +2,15 @@ package Logic.UserInput.UserInput;
 
 import java.sql.SQLException;
 
-import Logic.Interfaces.ReturnableModuleInterface;
+import Logic.Interfaces.ReturnableModule;
 import Model.DatabaseAccessObject.UserDAO;
 import UI.Utility.DisplayUtility;
 import UI.Utility.InputUtility;
 
-public class NonExistingUserInput implements ReturnableModuleInterface{
+public class NonExistingUserInput implements ReturnableModule{
 
 
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
     private int returnUserID;
 
     private UserDAO userDAO;
@@ -20,8 +20,8 @@ public class NonExistingUserInput implements ReturnableModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     // @Override
@@ -33,14 +33,14 @@ public class NonExistingUserInput implements ReturnableModuleInterface{
     public void runLogic() throws SQLException {
         this.returnUserID = InputUtility.posInput("Enter the new User ID");
         if(!this.userDAO.verifyUser(this.returnUserID)){
-            this.exitStatus = true;
+            this.canModuleExit = true;
             return;
         }
         DisplayUtility.singleDialogDisplay("User ID already exists. Please try again");
     }
 
     @Override
-    public int returnValue() {
+    public Integer returnValue() {
         return this.returnUserID;
     }
     

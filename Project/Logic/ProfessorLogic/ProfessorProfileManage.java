@@ -2,19 +2,19 @@ package Logic.ProfessorLogic;
 
 import java.sql.SQLException;
 
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.Module;
 import Model.Professor;
 import Model.DatabaseAccessObject.ProfessorDAO;
 import UI.CommonUI;
 import UI.Utility.InputUtility;
 
-public class ProfessorProfileManage implements ModuleInterface{
+public class ProfessorProfileManage implements Module{
 
     private ProfessorDAO professorDAO;
     private Professor professor;
     private boolean toggleDetails = true;
 
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
     private int userChoice;
 
     public ProfessorProfileManage(ProfessorDAO professorDAO, Professor professor) {
@@ -23,8 +23,8 @@ public class ProfessorProfileManage implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     // @Override
@@ -70,7 +70,7 @@ public class ProfessorProfileManage implements ModuleInterface{
 
             //GO BACK
             case 7:
-                this.exitStatus = true;
+                this.canModuleExit = true;
                 return;
         }
         this.professorDAO.editProfessor(userID,this.professor);

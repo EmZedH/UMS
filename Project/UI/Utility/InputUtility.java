@@ -184,6 +184,49 @@ public class InputUtility {
         }
     }
 
+    public static Integer[] keyListUserInput(String heading, String[] optionsList, String[] dialogList){
+
+        Integer[] returnInteger = new Integer[optionsList.length];
+        String[] optionsListWithBack = new String[optionsList.length+1];
+        String[] optionsListWithBackAndContinue = new String[optionsList.length+2];
+        boolean isContinueOptionVisible = false;
+
+        for (int i = 0; i < optionsList.length; i++) {
+            
+            optionsListWithBack[i] = optionsList[i];
+            optionsListWithBackAndContinue[i] = optionsList[i];
+        }
+
+        optionsListWithBack[optionsList.length] = "Back";
+        optionsListWithBackAndContinue[optionsList.length] = "Back";
+        optionsListWithBackAndContinue[optionsList.length + 1] = "Continue";
+
+        while (true) {
+
+            int userChoice = InputUtility.inputChoice(heading, isContinueOptionVisible ? optionsListWithBackAndContinue : optionsListWithBack, "Choose field to enter values");
+
+            if(userChoice == optionsList.length + 1){
+                return null;
+            }
+            else if(userChoice == optionsList.length + 2){
+                return returnInteger;
+            }
+
+            returnInteger[userChoice-1] = InputUtility.posInput(dialogList[userChoice-1]);
+            optionsListWithBack[userChoice-1] = optionsList[userChoice-1] + " - " + returnInteger[userChoice-1];
+            optionsListWithBackAndContinue[userChoice-1] = optionsList[userChoice-1] + " - " + returnInteger[userChoice-1];
+
+            isContinueOptionVisible = true;
+
+            for (int i = 0; i < returnInteger.length; i++) {
+                
+                if(returnInteger[i] == null){
+                    isContinueOptionVisible = false;
+                }
+            }
+        }
+    }
+    
     public static int[] keyListInput(String heading, String[] fieldList){
         int[] returnInteger = new int[fieldList.length];
         boolean[] inputChecks = new boolean[fieldList.length+1];

@@ -3,8 +3,8 @@ package Logic.SuperAdminLogic.SuperAdminDepartmentManage;
 import java.sql.SQLException;
 
 import Logic.ModuleExecutor;
-import Logic.Interfaces.InitializableModuleInterface;
-import Logic.Interfaces.ReturnableModuleInterface;
+import Logic.Interfaces.InitializableModule;
+import Logic.Interfaces.ReturnableModule;
 import Logic.UserInput.CollegeInput.ExistingCollegeInput;
 import Logic.UserInput.DepartmentInput.NonExistingDepartmentInput;
 import Model.DatabaseAccessObject.CollegeDAO;
@@ -12,9 +12,9 @@ import Model.DatabaseAccessObject.DepartmentDAO;
 import UI.CommonUI;
 import UI.Utility.InputUtility;
 
-public class SuperAdminDepartmentAdd implements InitializableModuleInterface{
+public class SuperAdminDepartmentAdd implements InitializableModule{
 
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
     private String departmentName;
 
     private CollegeDAO collegeDAO;
@@ -30,20 +30,20 @@ public class SuperAdminDepartmentAdd implements InitializableModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     @Override
     public void initializeModule() throws SQLException {
         
         //INPUT COLLEGE ID
-        ReturnableModuleInterface collegeInputModule = new ExistingCollegeInput(this.collegeDAO);
+        ReturnableModule collegeInputModule = new ExistingCollegeInput(this.collegeDAO);
         moduleExecutor.executeModule(collegeInputModule);
         this.collegeID = collegeInputModule.returnValue();
 
         //INPUT DEPARTMENT ID
-        ReturnableModuleInterface departmentInputModule = new NonExistingDepartmentInput(collegeInputModule.returnValue(), this.departmentDAO);
+        ReturnableModule departmentInputModule = new NonExistingDepartmentInput(collegeInputModule.returnValue(), this.departmentDAO);
         moduleExecutor.executeModule(departmentInputModule);
         this.departmentID = departmentInputModule.returnValue();
     }

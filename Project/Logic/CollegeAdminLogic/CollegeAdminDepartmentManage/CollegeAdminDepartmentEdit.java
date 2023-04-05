@@ -3,8 +3,8 @@ package Logic.CollegeAdminLogic.CollegeAdminDepartmentManage;
 import java.sql.SQLException;
 
 import Logic.ModuleExecutor;
-import Logic.Interfaces.InitializableModuleInterface;
-import Logic.Interfaces.ReturnableModuleInterface;
+import Logic.Interfaces.InitializableModule;
+import Logic.Interfaces.ReturnableModule;
 import Logic.UserInput.DepartmentInput.ExistingDepartmentInput;
 import Logic.UserInput.DepartmentInput.NonExistingDepartmentInput;
 import Model.Department;
@@ -12,14 +12,14 @@ import Model.DatabaseAccessObject.DepartmentDAO;
 import UI.CommonUI;
 import UI.Utility.InputUtility;
 
-public class CollegeAdminDepartmentEdit implements InitializableModuleInterface{
+public class CollegeAdminDepartmentEdit implements InitializableModule{
 
     private DepartmentDAO departmentDAO;
     private int collegeID;
     private ModuleExecutor moduleExecutor;
 
     private int departmentID;
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
     private int userChoice;
     private boolean toggleDetails = true;
 
@@ -30,8 +30,8 @@ public class CollegeAdminDepartmentEdit implements InitializableModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     @Override
@@ -41,7 +41,7 @@ public class CollegeAdminDepartmentEdit implements InitializableModuleInterface{
             switch (this.userChoice){
 
                 case 1:
-                    ReturnableModuleInterface departmentIDInputModule = new NonExistingDepartmentInput(this.collegeID, this.departmentDAO);    
+                    ReturnableModule departmentIDInputModule = new NonExistingDepartmentInput(this.collegeID, this.departmentDAO);    
                     moduleExecutor.executeModule(departmentIDInputModule);
 
                     department.setDepartmentID(departmentIDInputModule.returnValue());
@@ -56,7 +56,7 @@ public class CollegeAdminDepartmentEdit implements InitializableModuleInterface{
                     return;
 
                 case 4:
-                    this.exitStatus = true;
+                    this.canModuleExit = true;
                     return;
             }
             this.departmentDAO.editDepartment(departmentID, collegeID, department);
@@ -67,7 +67,7 @@ public class CollegeAdminDepartmentEdit implements InitializableModuleInterface{
     @Override
     public void initializeModule() throws SQLException {
         
-        ReturnableModuleInterface departmentIDInputModule = new ExistingDepartmentInput(this.collegeID, this.departmentDAO);
+        ReturnableModule departmentIDInputModule = new ExistingDepartmentInput(this.collegeID, this.departmentDAO);
         moduleExecutor.executeModule(departmentIDInputModule);
         this.departmentID = departmentIDInputModule.returnValue();
         

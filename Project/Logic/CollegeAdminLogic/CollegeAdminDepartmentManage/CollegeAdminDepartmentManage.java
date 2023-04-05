@@ -2,18 +2,18 @@ package Logic.CollegeAdminLogic.CollegeAdminDepartmentManage;
 
 import java.sql.SQLException;
 import Logic.ModuleExecutor;
-import Logic.Interfaces.InitializableModuleInterface;
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.InitializableModule;
+import Logic.Interfaces.Module;
 import Model.DatabaseAccessObject.DepartmentDAO;
 import UI.Utility.InputUtility;
 
-public class CollegeAdminDepartmentManage implements ModuleInterface{
+public class CollegeAdminDepartmentManage implements Module{
 
     private int collegeID;
     private DepartmentDAO departmentDAO;
     private ModuleExecutor moduleExecutor;
 
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
     private int userChoice;
 
     public CollegeAdminDepartmentManage(int collegeID, DepartmentDAO departmentDAO, ModuleExecutor moduleExecutor) {
@@ -23,8 +23,8 @@ public class CollegeAdminDepartmentManage implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     // @Override
@@ -58,34 +58,34 @@ public class CollegeAdminDepartmentManage implements ModuleInterface{
                 break;
 
             case 5:
-                this.exitStatus = true;
+                this.canModuleExit = true;
                 break;
         }
     }
 
     public void add() throws SQLException {
 
-        InitializableModuleInterface departmentAddModule = new CollegeAdminDepartmentAdd(this.collegeID, this.departmentDAO, this.moduleExecutor);
+        InitializableModule departmentAddModule = new CollegeAdminDepartmentAdd(this.collegeID, this.departmentDAO, this.moduleExecutor);
         departmentAddModule.initializeModule();
 
-        moduleExecutor.executeModule(departmentAddModule);
+        moduleExecutor.returnInitializedModule(departmentAddModule);
 
     }
 
     public void edit() throws SQLException {
 
-        InitializableModuleInterface departmentEditModule = new CollegeAdminDepartmentEdit(this.departmentDAO, this.collegeID, this.moduleExecutor);
+        InitializableModule departmentEditModule = new CollegeAdminDepartmentEdit(this.departmentDAO, this.collegeID, this.moduleExecutor);
         departmentEditModule.initializeModule();
 
-        moduleExecutor.executeModule(departmentEditModule);
+        moduleExecutor.returnInitializedModule(departmentEditModule);
     }
 
     public void delete() throws SQLException {
 
-        InitializableModuleInterface departmentDeleteModule = new CollegeAdminDepartmentDelete(this.moduleExecutor, this.collegeID, this.departmentDAO);
+        InitializableModule departmentDeleteModule = new CollegeAdminDepartmentDelete(this.moduleExecutor, this.collegeID, this.departmentDAO);
         departmentDeleteModule.initializeModule();
 
-        moduleExecutor.executeModule(departmentDeleteModule);
+        moduleExecutor.returnInitializedModule(departmentDeleteModule);
     }
 
     public void view() throws SQLException {

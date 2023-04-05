@@ -3,14 +3,14 @@ package Logic.CollegeAdminLogic.CollegeAdminTransactionManage;
 import java.sql.SQLException;
 
 import Logic.ModuleExecutor;
-import Logic.Interfaces.InitializableModuleInterface;
-import Logic.Interfaces.ReturnableModuleInterface;
+import Logic.Interfaces.InitializableModule;
+import Logic.Interfaces.ReturnableModule;
 import Logic.UserInput.TransactionInput.ExistingTransactionInput;
 import Model.DatabaseAccessObject.TransactionsDAO;
 import UI.CommonUI;
 import UI.Utility.InputUtility;
 
-public class CollegeAdminTransactionDelete implements InitializableModuleInterface{
+public class CollegeAdminTransactionDelete implements InitializableModule{
 
     private TransactionsDAO transactionsDAO;
     private int collegeID;
@@ -27,7 +27,7 @@ public class CollegeAdminTransactionDelete implements InitializableModuleInterfa
     }
 
     @Override
-    public boolean getExitStatus() {
+    public boolean canModuleExit() {
         return true;
     }
 
@@ -45,7 +45,7 @@ public class CollegeAdminTransactionDelete implements InitializableModuleInterfa
     @Override
     public void initializeModule() throws SQLException {
         
-        ReturnableModuleInterface transactionIDInputModule = new ExistingTransactionInput(this.transactionsDAO, this.collegeID);
+        ReturnableModule transactionIDInputModule = new ExistingTransactionInput(this.transactionsDAO, this.collegeID);
         moduleExecutor.executeModule(transactionIDInputModule);
 
         this.transactionID = transactionIDInputModule.returnValue();

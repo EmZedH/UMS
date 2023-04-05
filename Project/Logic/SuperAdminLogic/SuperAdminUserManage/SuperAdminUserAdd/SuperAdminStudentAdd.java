@@ -3,8 +3,8 @@ package Logic.SuperAdminLogic.SuperAdminUserManage.SuperAdminUserAdd;
 import java.sql.SQLException;
 
 import Logic.ModuleExecutor;
-import Logic.Interfaces.ReturnableModuleInterface;
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.ReturnableModule;
+import Logic.Interfaces.Module;
 import Logic.UserInput.CollegeInput.ExistingCollegeInput;
 import Logic.UserInput.DepartmentInput.ExistingDepartmentInput;
 import Logic.UserInput.SectionInput.ExistingSectionInput;
@@ -18,7 +18,7 @@ import Model.DatabaseAccessObject.StudentDAO;
 import UI.CommonUI;
 import UI.Utility.InputUtility;
 
-public class SuperAdminStudentAdd implements ModuleInterface{
+public class SuperAdminStudentAdd implements Module{
 
     private ModuleExecutor moduleExecutor;
     private CollegeDAO collegeDAO;
@@ -49,7 +49,7 @@ public class SuperAdminStudentAdd implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
+    public boolean canModuleExit() {
         return true;
     }
 
@@ -100,15 +100,15 @@ public class SuperAdminStudentAdd implements ModuleInterface{
             }
 
         //EXISTING COLLEGE ID INPUT MODULE
-        ReturnableModuleInterface collegeIDInputModule = new ExistingCollegeInput(this.collegeDAO);
+        ReturnableModule collegeIDInputModule = new ExistingCollegeInput(this.collegeDAO);
         moduleExecutor.executeModule(collegeIDInputModule);
 
         //EXISTING DEPARTMENT ID INPUT MODULE
-        ReturnableModuleInterface departmentIDInputModule = new ExistingDepartmentInput(collegeIDInputModule.returnValue(), this.departmentDAO);
+        ReturnableModule departmentIDInputModule = new ExistingDepartmentInput(collegeIDInputModule.returnValue(), this.departmentDAO);
         moduleExecutor.executeModule(departmentIDInputModule);
 
         //EXISTING SECTION ID INPUT MODULE
-        ReturnableModuleInterface sectionIDInputModule = new ExistingSectionInput(this.sectionDAO, collegeIDInputModule.returnValue(), departmentIDInputModule.returnValue());
+        ReturnableModule sectionIDInputModule = new ExistingSectionInput(this.sectionDAO, collegeIDInputModule.returnValue(), departmentIDInputModule.returnValue());
         moduleExecutor.executeModule(sectionIDInputModule);
 
         //GET SECTION OBJECT

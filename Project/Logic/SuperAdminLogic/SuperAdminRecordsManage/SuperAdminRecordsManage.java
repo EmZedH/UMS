@@ -3,8 +3,8 @@ package Logic.SuperAdminLogic.SuperAdminRecordsManage;
 import java.sql.SQLException;
 
 import Logic.ModuleExecutor;
-import Logic.Interfaces.InitializableModuleInterface;
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.InitializableModule;
+import Logic.Interfaces.Module;
 import Model.DatabaseAccessObject.CourseDAO;
 import Model.DatabaseAccessObject.CourseProfessorDAO;
 import Model.DatabaseAccessObject.DepartmentDAO;
@@ -13,7 +13,7 @@ import Model.DatabaseAccessObject.StudentDAO;
 import Model.DatabaseAccessObject.TransactionsDAO;
 import UI.Utility.InputUtility;
 
-public class SuperAdminRecordsManage implements ModuleInterface{
+public class SuperAdminRecordsManage implements Module{
 
     private RecordsDAO recordsDAO;
     private CourseDAO courseDAO;
@@ -23,7 +23,7 @@ public class SuperAdminRecordsManage implements ModuleInterface{
     private CourseProfessorDAO courseProfessorDAO;
     private ModuleExecutor moduleExecutor;
 
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
     private int userChoice;
 
     public SuperAdminRecordsManage(RecordsDAO recordsDAO, CourseDAO courseDAO, TransactionsDAO transactionsDAO,
@@ -38,8 +38,8 @@ public class SuperAdminRecordsManage implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     // @Override
@@ -74,33 +74,33 @@ public class SuperAdminRecordsManage implements ModuleInterface{
 
             //BACK
             case 5:
-                this.exitStatus = true;
+                this.canModuleExit = true;
                 break;
         }
     }
 
     public void add() throws SQLException {
 
-        InitializableModuleInterface recordsAddModule = new SuperAdminRecordsAdd(this.transactionsDAO, this.studentDAO, this.courseDAO, this.recordsDAO, this.departmentDAO, courseProfessorDAO, this.moduleExecutor);
+        InitializableModule recordsAddModule = new SuperAdminRecordsAdd(this.transactionsDAO, this.studentDAO, this.courseDAO, this.recordsDAO, this.departmentDAO, courseProfessorDAO, this.moduleExecutor);
         recordsAddModule.initializeModule();
 
-        moduleExecutor.executeModule(recordsAddModule);
+        moduleExecutor.returnInitializedModule(recordsAddModule);
     }
 
     public void edit() throws SQLException {
         
-        InitializableModuleInterface recordsEditModule = new SuperAdminRecordsEdit(this.studentDAO, this.departmentDAO, this.courseProfessorDAO, this.recordsDAO, this.courseDAO, this.moduleExecutor);
+        InitializableModule recordsEditModule = new SuperAdminRecordsEdit(this.studentDAO, this.departmentDAO, this.courseProfessorDAO, this.recordsDAO, this.courseDAO, this.moduleExecutor);
         recordsEditModule.initializeModule();
 
-        moduleExecutor.executeModule(recordsEditModule);
+        moduleExecutor.returnInitializedModule(recordsEditModule);
     }
 
     public void delete() throws SQLException {
 
-        InitializableModuleInterface recordsDeleteModule = new SuperAdminRecordsDelete(this.recordsDAO, this.studentDAO, this.courseDAO, this.departmentDAO, this.moduleExecutor);
+        InitializableModule recordsDeleteModule = new SuperAdminRecordsDelete(this.recordsDAO, this.studentDAO, this.courseDAO, this.departmentDAO, this.moduleExecutor);
         recordsDeleteModule.initializeModule();
 
-        moduleExecutor.executeModule(recordsDeleteModule);
+        moduleExecutor.returnInitializedModule(recordsDeleteModule);
     }
 
     public void view() throws SQLException {

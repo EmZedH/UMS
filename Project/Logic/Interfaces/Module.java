@@ -2,9 +2,9 @@ package Logic.Interfaces;
 
 import java.sql.SQLException;
 
-public interface ModuleInterface {
+public interface Module {
 
-    public boolean getExitStatus();
+    public boolean canModuleExit();
 
     // public void runUserInterface() throws SQLException;
 

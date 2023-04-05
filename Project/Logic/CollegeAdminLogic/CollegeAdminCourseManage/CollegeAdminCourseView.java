@@ -4,16 +4,16 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.Module;
 import Model.DatabaseAccessObject.CourseDAO;
 import UI.CollegeAdminUI;
 import UI.CommonUI;
 import UI.Utility.DisplayUtility;
 import UI.Utility.InputUtility;
 
-public class CollegeAdminCourseView implements ModuleInterface{
+public class CollegeAdminCourseView implements Module{
 
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
     private int userChoice;
 
     private CourseDAO courseDAO;
@@ -25,8 +25,8 @@ public class CollegeAdminCourseView implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     @Override

@@ -2,19 +2,19 @@ package Logic.UserInput.CourseInput;
 
 import java.sql.SQLException;
 
-import Logic.Interfaces.ReturnableModuleInterface;
+import Logic.Interfaces.ReturnableModule;
 import Model.DatabaseAccessObject.CourseDAO;
 import UI.Utility.DisplayUtility;
 import UI.Utility.InputUtility;
 
-public class NonExistingCourseInput implements ReturnableModuleInterface{
+public class NonExistingCourseInput implements ReturnableModule{
 
     private int collegeID;
     private int departmentID;
     private CourseDAO courseDAO;
 
     private int returnCourseID;
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
 
     public NonExistingCourseInput(int collegeID, int departmentID, CourseDAO courseDAO) {
         this.collegeID = collegeID;
@@ -23,8 +23,8 @@ public class NonExistingCourseInput implements ReturnableModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     // @Override
@@ -36,14 +36,14 @@ public class NonExistingCourseInput implements ReturnableModuleInterface{
     public void runLogic() throws SQLException {
         this.returnCourseID = InputUtility.posInput("Enter the New Course ID");
         if(!this.courseDAO.verifyCourse(this.returnCourseID, this.departmentID, this.collegeID)){
-            this.exitStatus = true;
+            this.canModuleExit = true;
             return;
         }
         DisplayUtility.singleDialogDisplay("Course ID already exists. Please try again");
     }
 
     @Override
-    public int returnValue() {
+    public Integer returnValue() {
         return this.returnCourseID;
     }
     

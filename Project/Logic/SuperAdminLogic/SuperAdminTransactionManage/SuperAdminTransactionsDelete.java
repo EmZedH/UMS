@@ -3,14 +3,14 @@ package Logic.SuperAdminLogic.SuperAdminTransactionManage;
 import java.sql.SQLException;
 
 import Logic.ModuleExecutor;
-import Logic.Interfaces.InitializableModuleInterface;
-import Logic.Interfaces.ReturnableModuleInterface;
+import Logic.Interfaces.InitializableModule;
+import Logic.Interfaces.ReturnableModule;
 import Logic.UserInput.TransactionInput.ExistingTransactionInput;
 import Model.DatabaseAccessObject.TransactionsDAO;
 import UI.CommonUI;
 import UI.Utility.InputUtility;
 
-public class SuperAdminTransactionsDelete implements InitializableModuleInterface{
+public class SuperAdminTransactionsDelete implements InitializableModule{
 
     private int userChoice;
 
@@ -24,7 +24,7 @@ public class SuperAdminTransactionsDelete implements InitializableModuleInterfac
     }
 
     @Override
-    public boolean getExitStatus() {
+    public boolean canModuleExit() {
         return true;
     }
 
@@ -37,7 +37,7 @@ public class SuperAdminTransactionsDelete implements InitializableModuleInterfac
     public void initializeModule() throws SQLException {
 
         //INPUT TRANSACTION ID MODULE
-        ReturnableModuleInterface transactionIDInputModule = new ExistingTransactionInput(this.transactionsDAO);
+        ReturnableModule transactionIDInputModule = new ExistingTransactionInput(this.transactionsDAO);
         moduleExecutor.executeModule(transactionIDInputModule);
         this.transactionID = transactionIDInputModule.returnValue();
     }

@@ -3,11 +3,11 @@ package Logic.CollegeAdminLogic.CollegeAdminCourseProfManage;
 import java.sql.SQLException;
 import java.util.List;
 
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.Module;
 import Model.DatabaseAccessObject.CourseProfessorDAO;
 import UI.Utility.DisplayUtility;
 
-public class CollegeAdminCourseProfView implements ModuleInterface{
+public class CollegeAdminCourseProfView implements Module{
 
     private CourseProfessorDAO courseProfessorDAO;
     private int collegeID;
@@ -18,7 +18,7 @@ public class CollegeAdminCourseProfView implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
+    public boolean canModuleExit() {
         return true;
     }
 

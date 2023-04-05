@@ -4,7 +4,7 @@ import java.sql.SQLException;
 
 import Logic.CollegeAdminLogic.CollegeAdminServicesFactory;
 import Logic.CollegeAdminLogic.CollegeAdminStartup;
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.Module;
 import Logic.ProfessorLogic.ProfessorServicesFactory;
 import Logic.ProfessorLogic.ProfessorStartup;
 import Logic.StudentLogic.StudentServicesFactory;
@@ -19,12 +19,12 @@ import Model.DatabaseAccessObject.SuperAdminDAO;
 import UI.Utility.DisplayUtility;
 import UI.Utility.InputUtility;
 
-public class UserStartPage implements ModuleInterface{
+public class UserStartPage implements Module{
 
     FactoryDAO factoryDAO;
     ModuleExecutor module;
 
-    boolean exitStatus = false;
+    boolean canModuleExit = false;
     int userChoice;
 
     public UserStartPage(FactoryDAO factoryDAO, ModuleExecutor module) {
@@ -33,8 +33,8 @@ public class UserStartPage implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     // @Override
@@ -66,7 +66,7 @@ public class UserStartPage implements ModuleInterface{
                     break;
 
                 case 5:
-                    this.exitStatus = true;
+                    this.canModuleExit = true;
                     return;
             }
         } catch (SQLException e) {

@@ -2,17 +2,17 @@ package Logic.ProfessorLogic;
 
 import java.sql.SQLException;
 import Logic.ModuleExecutor;
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.Module;
 import Model.Professor;
 import UI.Utility.InputUtility;
 
-public class ProfessorMainPage implements ModuleInterface{
+public class ProfessorMainPage implements Module{
 
     private ProfessorServicesFactory professorServicesFactory;
     private Professor professor;
     private ModuleExecutor module;
 
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
     private int userChoice;
 
     public ProfessorMainPage(ProfessorServicesFactory professorServicesFactory,Professor professor, ModuleExecutor module) {
@@ -23,8 +23,8 @@ public class ProfessorMainPage implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     // @Override
@@ -34,8 +34,8 @@ public class ProfessorMainPage implements ModuleInterface{
 
     @Override
     public void runLogic() throws SQLException {
-        this.userChoice = InputUtility.inputChoice("Professor Page", new String[]{"Manage Profile","Student Records","Manage Tests","Log Out"},"ID: "+ professor.getUser().getID(), "Name: "+ professor.getUser().getName());
-        ModuleInterface manageClass = this;
+        this.userChoice = InputUtility.inputChoice("Professor Page", new String[]{"Manage Your Profile","Student Records","Manage Tests","Log Out"},"ID: "+ professor.getUser().getID(), "Name: "+ professor.getUser().getName());
+        Module manageClass = this;
         switch (this.userChoice) {
 
             //MANAGE PROFILE
@@ -55,7 +55,7 @@ public class ProfessorMainPage implements ModuleInterface{
 
             //GO BACK
             case 4:
-                this.exitStatus = true;
+                this.canModuleExit = true;
                 return;
 
         }

@@ -2,21 +2,21 @@ package Logic.SuperAdminLogic.SuperAdminSectionManage;
 
 import java.sql.SQLException;
 import Logic.ModuleExecutor;
-import Logic.Interfaces.InitializableModuleInterface;
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.InitializableModule;
+import Logic.Interfaces.Module;
 import Model.DatabaseAccessObject.CollegeDAO;
 import Model.DatabaseAccessObject.DepartmentDAO;
 import Model.DatabaseAccessObject.SectionDAO;
 import UI.Utility.InputUtility;
 
-public class SuperAdminSectionManage implements  ModuleInterface{
+public class SuperAdminSectionManage implements  Module{
 
     private CollegeDAO collegeDAO;
     private DepartmentDAO departmentDAO;
     private SectionDAO sectionDAO;
     private ModuleExecutor moduleExecutor;
 
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
     private int userChoice;
     public SuperAdminSectionManage(DepartmentDAO departmentDAO, SectionDAO sectionDAO, CollegeDAO collegeDAO, ModuleExecutor moduleExecutor) {
         this.collegeDAO = collegeDAO;
@@ -26,8 +26,8 @@ public class SuperAdminSectionManage implements  ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     // @Override
@@ -62,36 +62,36 @@ public class SuperAdminSectionManage implements  ModuleInterface{
 
             //GO BACK
             case 5:
-                this.exitStatus = true;
+                this.canModuleExit = true;
                 break;
         }
     }
 
     public void add() throws SQLException {
         
-        InitializableModuleInterface sectionAddModule = new SuperAdminSectionAdd(this.sectionDAO, this.departmentDAO, this.collegeDAO, this.moduleExecutor);
+        InitializableModule sectionAddModule = new SuperAdminSectionAdd(this.sectionDAO, this.departmentDAO, this.collegeDAO, this.moduleExecutor);
         sectionAddModule.initializeModule();
 
         //ADD SECTION TO DATABASE
-        moduleExecutor.executeModule(sectionAddModule);
+        moduleExecutor.returnInitializedModule(sectionAddModule);
     }
 
     public void edit() throws SQLException {
         
-        InitializableModuleInterface sectionEditModule = new SuperAdminSectionEdit(this.sectionDAO, this.departmentDAO, this.collegeDAO, this.moduleExecutor);
+        InitializableModule sectionEditModule = new SuperAdminSectionEdit(this.sectionDAO, this.departmentDAO, this.collegeDAO, this.moduleExecutor);
         sectionEditModule.initializeModule();
 
         //EDIT SECTION IN DATABASE
-        moduleExecutor.executeModule(sectionEditModule);
+        moduleExecutor.returnInitializedModule(sectionEditModule);
     }
 
     public void delete() throws SQLException {
        
-        InitializableModuleInterface sectionDeleteModule = new SuperAdminSectionDelete(this.sectionDAO, this.departmentDAO, this.collegeDAO, this.moduleExecutor);
+        InitializableModule sectionDeleteModule = new SuperAdminSectionDelete(this.sectionDAO, this.departmentDAO, this.collegeDAO, this.moduleExecutor);
         sectionDeleteModule.initializeModule();
         
         //DELETE SECTION MODULE
-        moduleExecutor.executeModule(sectionDeleteModule);
+        moduleExecutor.returnInitializedModule(sectionDeleteModule);
     
     }
 

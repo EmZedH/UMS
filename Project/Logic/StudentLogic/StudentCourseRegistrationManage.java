@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Random;
 
 import Logic.ModuleExecutor;
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.Module;
 import Model.Student;
 import Model.Transactions;
 import Model.DatabaseAccessObject.CourseDAO;
@@ -15,9 +15,9 @@ import Model.DatabaseAccessObject.TransactionsDAO;
 import UI.Utility.DisplayUtility;
 import UI.Utility.InputUtility;
 
-public class StudentCourseRegistrationManage implements ModuleInterface{
+public class StudentCourseRegistrationManage implements Module{
 
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
     private int transactionID;
 
     private TransactionsDAO transactionsDAO;
@@ -37,8 +37,8 @@ public class StudentCourseRegistrationManage implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-      return this.exitStatus;
+    public boolean canModuleExit() {
+      return this.canModuleExit;
     }
 
     // @Override
@@ -51,7 +51,7 @@ public class StudentCourseRegistrationManage implements ModuleInterface{
         this.transactionID = InputUtility.posInput("Enter the Transaction ID");
         if(this.recordsDAO.verifyCurrentSemesterRecord(this.student.getUser().getID())){
             DisplayUtility.singleDialogDisplay("You Already Registered for this Course this Semester");
-            this.exitStatus = true;
+            this.canModuleExit = true;
         }
         else if(this.transactionsDAO.verifyTransaction(this.transactionID)){
             Transactions transaction = this.transactionsDAO.returnTransaction(this.transactionID);
@@ -64,7 +64,7 @@ public class StudentCourseRegistrationManage implements ModuleInterface{
                 }
 
                 module.executeModule(new StudentOpenElectiveRegistration(this.transactionID, this.student, this.recordsDAO, this.courseProfessorDAO));
-                this.exitStatus = true;
+                this.canModuleExit = true;
                 
             }
             else{

@@ -2,15 +2,15 @@ package Logic.UserInput.UserInput;
 
 import java.sql.SQLException;
 
-import Logic.Interfaces.ReturnableModuleInterface;
+import Logic.Interfaces.ReturnableModule;
 import Model.DatabaseAccessObject.StudentDAO;
 import Model.DatabaseAccessObject.UserDAO;
 import UI.Utility.DisplayUtility;
 import UI.Utility.InputUtility;
 
-public class ExistingStudentInput implements ReturnableModuleInterface{
+public class ExistingStudentInput implements ReturnableModule{
 
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
     private int returnStudentID;
 
     private StudentDAO studentDAO;
@@ -28,8 +28,8 @@ public class ExistingStudentInput implements ReturnableModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     // @Override
@@ -43,7 +43,7 @@ public class ExistingStudentInput implements ReturnableModuleInterface{
             
             this.returnStudentID = InputUtility.posInput("Enter the Student ID");
             if(this.studentDAO.verifyStudent(this.returnStudentID)){
-                this.exitStatus = true;
+                this.canModuleExit = true;
                 return;
             }
             DisplayUtility.singleDialogDisplay("Student ID doesn't exist. Please try again");
@@ -53,7 +53,7 @@ public class ExistingStudentInput implements ReturnableModuleInterface{
 
             this.returnStudentID = InputUtility.posInput("Enter the Student ID");
             if(this.userDAO.verifyUser(this.returnStudentID, this.collegeID) && this.studentDAO.verifyStudent(this.returnStudentID)){
-                this.exitStatus = true;
+                this.canModuleExit = true;
                 return;
             }
             DisplayUtility.singleDialogDisplay("Student ID doesn't exist. Please try again");
@@ -61,7 +61,7 @@ public class ExistingStudentInput implements ReturnableModuleInterface{
     }
 
     @Override
-    public int returnValue() {
+    public Integer returnValue() {
         return this.returnStudentID;
     }
     

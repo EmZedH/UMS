@@ -3,8 +3,8 @@ package Logic.CollegeAdminLogic.CollegeAdminCourseManage;
 import java.sql.SQLException;
 
 import Logic.ModuleExecutor;
-import Logic.Interfaces.InitializableModuleInterface;
-import Logic.Interfaces.ReturnableModuleInterface;
+import Logic.Interfaces.InitializableModule;
+import Logic.Interfaces.ReturnableModule;
 import Logic.UserInput.CourseInput.NonExistingCourseInput;
 import Logic.UserInput.DepartmentInput.ExistingDepartmentInput;
 import Model.Course;
@@ -13,7 +13,7 @@ import Model.DatabaseAccessObject.DepartmentDAO;
 import UI.CommonUI;
 import UI.Utility.InputUtility;
 
-public class CollegeAdminCourseAdd implements InitializableModuleInterface{
+public class CollegeAdminCourseAdd implements InitializableModule{
 
     private int departmentID;
     private int courseID;
@@ -37,7 +37,7 @@ public class CollegeAdminCourseAdd implements InitializableModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
+    public boolean canModuleExit() {
         return true;
     }
 
@@ -56,12 +56,12 @@ public class CollegeAdminCourseAdd implements InitializableModuleInterface{
     @Override
     public void initializeModule() throws SQLException {
 
-        ReturnableModuleInterface departmentIDInputModule = new ExistingDepartmentInput(this.collegeID, this.departmentDAO);
+        ReturnableModule departmentIDInputModule = new ExistingDepartmentInput(this.collegeID, this.departmentDAO);
         moduleExecutor.executeModule(departmentIDInputModule);
 
         this.departmentID = departmentIDInputModule.returnValue();
 
-        ReturnableModuleInterface courseIDInputModule = new NonExistingCourseInput(this.collegeID, this.departmentID, this.courseDAO);
+        ReturnableModule courseIDInputModule = new NonExistingCourseInput(this.collegeID, this.departmentID, this.courseDAO);
         moduleExecutor.executeModule(courseIDInputModule);
 
         this.courseID = courseIDInputModule.returnValue();

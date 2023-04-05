@@ -2,16 +2,16 @@ package Logic.SuperAdminLogic.SuperAdminCourseManage;
 
 import java.sql.SQLException;
 
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.Module;
 import Model.DatabaseAccessObject.CourseDAO;
 import UI.CommonUI;
 import UI.Utility.DisplayUtility;
 import UI.Utility.InputUtility;
 
-public class SuperAdminCourseView implements ModuleInterface{
+public class SuperAdminCourseView implements Module{
     
     private int userChoice;
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
 
     private CourseDAO courseDAO;
 
@@ -20,8 +20,8 @@ public class SuperAdminCourseView implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     // @Override
@@ -80,7 +80,7 @@ public class SuperAdminCourseView implements ModuleInterface{
         
             //GO BACK
             case 8:
-                this.exitStatus = true;
+                this.canModuleExit = true;
                 return;
         }
     }

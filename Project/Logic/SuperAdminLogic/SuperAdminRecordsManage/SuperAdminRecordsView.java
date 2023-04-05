@@ -2,11 +2,11 @@ package Logic.SuperAdminLogic.SuperAdminRecordsManage;
 
 import java.sql.SQLException;
 
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.Module;
 import Model.DatabaseAccessObject.RecordsDAO;
 import UI.Utility.DisplayUtility;
 
-public class SuperAdminRecordsView implements ModuleInterface{
+public class SuperAdminRecordsView implements Module{
 
     private RecordsDAO recordsDAO;
 
@@ -15,7 +15,7 @@ public class SuperAdminRecordsView implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
+    public boolean canModuleExit() {
         return true;
     }
 

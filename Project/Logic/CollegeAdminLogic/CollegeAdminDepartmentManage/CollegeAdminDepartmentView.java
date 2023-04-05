@@ -4,15 +4,15 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.Module;
 import Model.DatabaseAccessObject.DepartmentDAO;
 import UI.CommonUI;
 import UI.Utility.DisplayUtility;
 import UI.Utility.InputUtility;
 
-public class CollegeAdminDepartmentView implements ModuleInterface{
+public class CollegeAdminDepartmentView implements Module{
 
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
     private int userChoice;
 
     private DepartmentDAO departmentDAO;
@@ -24,8 +24,8 @@ public class CollegeAdminDepartmentView implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     @Override

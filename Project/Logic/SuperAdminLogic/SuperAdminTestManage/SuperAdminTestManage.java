@@ -3,8 +3,8 @@ package Logic.SuperAdminLogic.SuperAdminTestManage;
 import java.sql.SQLException;
 
 import Logic.ModuleExecutor;
-import Logic.Interfaces.InitializableModuleInterface;
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.InitializableModule;
+import Logic.Interfaces.Module;
 import Model.DatabaseAccessObject.CollegeDAO;
 import Model.DatabaseAccessObject.CourseDAO;
 import Model.DatabaseAccessObject.DepartmentDAO;
@@ -13,7 +13,7 @@ import Model.DatabaseAccessObject.StudentDAO;
 import Model.DatabaseAccessObject.TestDAO;
 import UI.Utility.InputUtility;
 
-public class SuperAdminTestManage implements ModuleInterface{
+public class SuperAdminTestManage implements Module{
 
     private CollegeDAO collegeDAO;
     private DepartmentDAO departmentDAO;
@@ -23,7 +23,7 @@ public class SuperAdminTestManage implements ModuleInterface{
     private RecordsDAO recordsDAO;
     private ModuleExecutor moduleExecutor;
 
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
     private int userChoice;
 
     public SuperAdminTestManage(CollegeDAO collegeDAO, DepartmentDAO departmentDAO, StudentDAO studentDAO, CourseDAO courseDAO, TestDAO testDAO, RecordsDAO recordsDAO, ModuleExecutor moduleExecutor){
@@ -37,8 +37,8 @@ public class SuperAdminTestManage implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     // @Override
@@ -73,37 +73,37 @@ public class SuperAdminTestManage implements ModuleInterface{
 
             //BACK
             case 5:
-                this.exitStatus = true;
+                this.canModuleExit = true;
                 break;
         }
     }
 
     public void add() throws SQLException {
         
-        InitializableModuleInterface testAddModule = new SuperAdminTestAdd(this.testDAO, this.recordsDAO, this.studentDAO, this.courseDAO, this.departmentDAO, this.collegeDAO, this.moduleExecutor);
+        InitializableModule testAddModule = new SuperAdminTestAdd(this.testDAO, this.recordsDAO, this.studentDAO, this.courseDAO, this.departmentDAO, this.collegeDAO, this.moduleExecutor);
         testAddModule.initializeModule();
 
         //ADD TEST TO DATABASE
-        moduleExecutor.executeModule(testAddModule);
+        moduleExecutor.returnInitializedModule(testAddModule);
     }
 
     public void edit() throws SQLException {
         
-        InitializableModuleInterface testEditModule = new SuperAdminTestEdit(this.testDAO, this.studentDAO, this.courseDAO, this.departmentDAO, this.collegeDAO, this.moduleExecutor);
+        InitializableModule testEditModule = new SuperAdminTestEdit(this.testDAO, this.studentDAO, this.courseDAO, this.departmentDAO, this.collegeDAO, this.moduleExecutor);
         testEditModule.initializeModule();
 
         //EDIT TEST DETAILS MODULE
-        moduleExecutor.executeModule(testEditModule);
+        moduleExecutor.returnInitializedModule(testEditModule);
     
     }
 
     public void delete() throws SQLException {
         
-        InitializableModuleInterface testDeleteModule = new SuperAdminTestDelete(this.testDAO, this.studentDAO, this.courseDAO, this.departmentDAO, this.collegeDAO, this.moduleExecutor);
+        InitializableModule testDeleteModule = new SuperAdminTestDelete(this.testDAO, this.studentDAO, this.courseDAO, this.departmentDAO, this.collegeDAO, this.moduleExecutor);
         testDeleteModule.initializeModule();
         
         //DELETE TEST FROM DATABASE
-        moduleExecutor.executeModule(testDeleteModule);
+        moduleExecutor.returnInitializedModule(testDeleteModule);
     }
 
     public void view() throws SQLException {

@@ -3,8 +3,8 @@ package Logic.SuperAdminLogic.SuperAdminRecordsManage;
 import java.sql.SQLException;
 
 import Logic.ModuleExecutor;
-import Logic.Interfaces.InitializableModuleInterface;
-import Logic.Interfaces.ReturnableModuleInterface;
+import Logic.Interfaces.InitializableModule;
+import Logic.Interfaces.ReturnableModule;
 import Logic.UserInput.CourseInput.ExistingCourseInput;
 import Logic.UserInput.DepartmentInput.ExistingDepartmentInput;
 import Logic.UserInput.UserInput.ExistingStudentInput;
@@ -14,7 +14,7 @@ import Model.DatabaseAccessObject.RecordsDAO;
 import Model.DatabaseAccessObject.StudentDAO;
 import UI.CommonUI;
 
-public class SuperAdminRecordsDelete implements InitializableModuleInterface{
+public class SuperAdminRecordsDelete implements InitializableModule{
 
     private RecordsDAO recordsDAO;
     private StudentDAO studentDAO;
@@ -37,7 +37,7 @@ public class SuperAdminRecordsDelete implements InitializableModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
+    public boolean canModuleExit() {
         return true;
     }
 
@@ -52,17 +52,17 @@ public class SuperAdminRecordsDelete implements InitializableModuleInterface{
     @Override
     public void initializeModule() throws SQLException {
 
-        ReturnableModuleInterface studentIDInputModule = new ExistingStudentInput(this.studentDAO);
+        ReturnableModule studentIDInputModule = new ExistingStudentInput(this.studentDAO);
         moduleExecutor.executeModule(studentIDInputModule);
         this.studentID = studentIDInputModule.returnValue();
 
         this.collegeID = this.studentDAO.returnStudent(studentID).getSection().getCollegeID();
 
-        ReturnableModuleInterface departmentIDInputModule = new ExistingDepartmentInput(this.collegeID, this.departmentDAO);
+        ReturnableModule departmentIDInputModule = new ExistingDepartmentInput(this.collegeID, this.departmentDAO);
         moduleExecutor.executeModule(departmentIDInputModule);
         this.departmentID = departmentIDInputModule.returnValue();
 
-        ReturnableModuleInterface courseIDInputModule = new ExistingCourseInput(this.collegeID, this.departmentID, this.courseDAO);
+        ReturnableModule courseIDInputModule = new ExistingCourseInput(this.collegeID, this.departmentID, this.courseDAO);
         moduleExecutor.executeModule(courseIDInputModule);
         this.courseID = courseIDInputModule.returnValue();
 

@@ -2,14 +2,14 @@ package Logic.CollegeAdminLogic.CollegeAdminTransactionManage;
 
 import java.sql.SQLException;
 import Logic.ModuleExecutor;
-import Logic.Interfaces.InitializableModuleInterface;
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.InitializableModule;
+import Logic.Interfaces.Module;
 import Model.DatabaseAccessObject.StudentDAO;
 import Model.DatabaseAccessObject.TransactionsDAO;
 import Model.DatabaseAccessObject.UserDAO;
 import UI.Utility.InputUtility;
 
-public class CollegeAdminTransactionManage implements ModuleInterface{
+public class CollegeAdminTransactionManage implements Module{
 
     private int collegeID;
     private StudentDAO studentDAO;
@@ -17,7 +17,7 @@ public class CollegeAdminTransactionManage implements ModuleInterface{
     private TransactionsDAO transactionsDAO;
     private ModuleExecutor moduleExecutor;
 
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
     private int userChoice;
 
     public CollegeAdminTransactionManage(int collegeID, StudentDAO studentDAO, TransactionsDAO transactionsDAO, UserDAO userDAO, ModuleExecutor moduleExecutor) {
@@ -29,8 +29,8 @@ public class CollegeAdminTransactionManage implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     // @Override
@@ -65,7 +65,7 @@ public class CollegeAdminTransactionManage implements ModuleInterface{
 
             //GO BACK
             case 5:
-                this.exitStatus = true;
+                this.canModuleExit = true;
                 return;
         }
     }
@@ -78,26 +78,26 @@ public class CollegeAdminTransactionManage implements ModuleInterface{
 
     public void delete() throws SQLException {
 
-        InitializableModuleInterface transactionDeleteModule = new CollegeAdminTransactionDelete(this.transactionsDAO, this.collegeID,this.moduleExecutor);
+        InitializableModule transactionDeleteModule = new CollegeAdminTransactionDelete(this.transactionsDAO, this.collegeID,this.moduleExecutor);
         transactionDeleteModule.initializeModule();
 
-        moduleExecutor.executeModule(transactionDeleteModule);
+        moduleExecutor.returnInitializedModule(transactionDeleteModule);
     }
 
     public void edit() throws SQLException {
 
-        InitializableModuleInterface transactionEditModule = new CollegeAdminTransactionEdit(this.transactionsDAO, this.collegeID, this.moduleExecutor);
+        InitializableModule transactionEditModule = new CollegeAdminTransactionEdit(this.transactionsDAO, this.collegeID, this.moduleExecutor);
         transactionEditModule.initializeModule();
 
-        moduleExecutor.executeModule(transactionEditModule);
+        moduleExecutor.returnInitializedModule(transactionEditModule);
     }
 
     public void add() throws SQLException {
 
-        InitializableModuleInterface transactionAddModule = new CollegeAdminTransactionAdd(this.transactionsDAO, this.studentDAO, this.userDAO, this.moduleExecutor, this.collegeID);
+        InitializableModule transactionAddModule = new CollegeAdminTransactionAdd(this.transactionsDAO, this.studentDAO, this.userDAO, this.moduleExecutor, this.collegeID);
         transactionAddModule.initializeModule();
 
-        moduleExecutor.executeModule(transactionAddModule);
+        moduleExecutor.returnInitializedModule(transactionAddModule);
     }
     
 }

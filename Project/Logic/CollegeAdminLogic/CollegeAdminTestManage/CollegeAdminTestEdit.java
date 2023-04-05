@@ -3,8 +3,8 @@ package Logic.CollegeAdminLogic.CollegeAdminTestManage;
 import java.sql.SQLException;
 
 import Logic.ModuleExecutor;
-import Logic.Interfaces.InitializableModuleInterface;
-import Logic.Interfaces.ReturnableModuleInterface;
+import Logic.Interfaces.InitializableModule;
+import Logic.Interfaces.ReturnableModule;
 import Logic.UserInput.CourseInput.ExistingCourseInput;
 import Logic.UserInput.DepartmentInput.ExistingDepartmentInput;
 import Logic.UserInput.TestInput.ExistingTestInput;
@@ -18,9 +18,9 @@ import Model.DatabaseAccessObject.UserDAO;
 import UI.CommonUI;
 import UI.Utility.InputUtility;
 
-public class CollegeAdminTestEdit implements InitializableModuleInterface{
+public class CollegeAdminTestEdit implements InitializableModule{
 
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
     private int userChoice;
     private boolean toggleDetails = true;
     private int testID;
@@ -48,8 +48,8 @@ public class CollegeAdminTestEdit implements InitializableModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     @Override
@@ -61,7 +61,7 @@ public class CollegeAdminTestEdit implements InitializableModuleInterface{
             //EDIT TEST ID
             case 1:
 
-                ReturnableModuleInterface testIDInputModule = new ExistingTestInput(this.testDAO, this.studentID, this.courseID, this.departmentID, this.collegeID);
+                ReturnableModule testIDInputModule = new ExistingTestInput(this.testDAO, this.studentID, this.courseID, this.departmentID, this.collegeID);
                 moduleExecutor.executeModule(testIDInputModule);
 
                 test.setTestID(testIDInputModule.returnValue());
@@ -78,7 +78,7 @@ public class CollegeAdminTestEdit implements InitializableModuleInterface{
                 return;
 
             case 4:
-                this.exitStatus = true;
+                this.canModuleExit = true;
                 return;
         }
         this.testDAO.editTest(testID, studentID, courseID, departmentID, collegeID, test);
@@ -89,19 +89,19 @@ public class CollegeAdminTestEdit implements InitializableModuleInterface{
     @Override
     public void initializeModule() throws SQLException {
         
-        ReturnableModuleInterface departmentIDInputModule = new ExistingDepartmentInput(this.collegeID, this.departmentDAO);
+        ReturnableModule departmentIDInputModule = new ExistingDepartmentInput(this.collegeID, this.departmentDAO);
         moduleExecutor.executeModule(departmentIDInputModule);
         this.departmentID = departmentIDInputModule.returnValue();
 
-        ReturnableModuleInterface courseIDInputModule = new ExistingCourseInput(this.collegeID, this.departmentID, this.courseDAO);
+        ReturnableModule courseIDInputModule = new ExistingCourseInput(this.collegeID, this.departmentID, this.courseDAO);
         moduleExecutor.executeModule(courseIDInputModule);
         this.courseID = courseIDInputModule.returnValue();
 
-        ReturnableModuleInterface studentIDInputModule = new ExistingStudentInput(this.studentDAO, this.userDAO, this.collegeID);
+        ReturnableModule studentIDInputModule = new ExistingStudentInput(this.studentDAO, this.userDAO, this.collegeID);
         moduleExecutor.executeModule(studentIDInputModule);
         this.studentID = studentIDInputModule.returnValue();
 
-        ReturnableModuleInterface testIDInputModule = new ExistingTestInput(this.testDAO, this.studentID, this.courseID, this.departmentID, this.collegeID);
+        ReturnableModule testIDInputModule = new ExistingTestInput(this.testDAO, this.studentID, this.courseID, this.departmentID, this.collegeID);
         moduleExecutor.executeModule(testIDInputModule);
         this.testID = testIDInputModule.returnValue();
 

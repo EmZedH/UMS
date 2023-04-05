@@ -3,8 +3,8 @@ package Logic.SuperAdminLogic.SuperAdminDepartmentManage;
 import java.sql.SQLException;
 
 import Logic.ModuleExecutor;
-import Logic.Interfaces.InitializableModuleInterface;
-import Logic.Interfaces.ReturnableModuleInterface;
+import Logic.Interfaces.InitializableModule;
+import Logic.Interfaces.ReturnableModule;
 import Logic.UserInput.CollegeInput.ExistingCollegeInput;
 import Logic.UserInput.DepartmentInput.ExistingDepartmentInput;
 import Model.Department;
@@ -14,7 +14,7 @@ import UI.CommonUI;
 import UI.Utility.DisplayUtility;
 import UI.Utility.InputUtility;
 
-public class SuperAdminDepartmentDelete implements InitializableModuleInterface{
+public class SuperAdminDepartmentDelete implements InitializableModule{
     
     private int userChoice;
 
@@ -31,7 +31,7 @@ public class SuperAdminDepartmentDelete implements InitializableModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
+    public boolean canModuleExit() {
         return true;
     }
 
@@ -46,11 +46,11 @@ public class SuperAdminDepartmentDelete implements InitializableModuleInterface{
     public void initializeModule() throws SQLException {
 
         //INPUT COLLEGE ID
-        ReturnableModuleInterface collegeInputModule = new ExistingCollegeInput(this.collegeDAO);
+        ReturnableModule collegeInputModule = new ExistingCollegeInput(this.collegeDAO);
         moduleExecutor.executeModule(collegeInputModule);
 
         //INPUT DEPARTMENT ID
-        ReturnableModuleInterface departmentInputModule = new ExistingDepartmentInput(collegeInputModule.returnValue(), this.departmentDAO);
+        ReturnableModule departmentInputModule = new ExistingDepartmentInput(collegeInputModule.returnValue(), this.departmentDAO);
         moduleExecutor.executeModule(departmentInputModule);
 
         this.departmentID = departmentInputModule.returnValue();

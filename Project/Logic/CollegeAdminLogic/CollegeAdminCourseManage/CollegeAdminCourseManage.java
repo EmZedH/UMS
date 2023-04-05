@@ -2,21 +2,21 @@ package Logic.CollegeAdminLogic.CollegeAdminCourseManage;
 
 import java.sql.SQLException;
 import Logic.ModuleExecutor;
-import Logic.Interfaces.InitializableModuleInterface;
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.InitializableModule;
+import Logic.Interfaces.Module;
 import Model.DatabaseAccessObject.CourseDAO;
 import Model.DatabaseAccessObject.DepartmentDAO;
 import UI.Utility.DisplayUtility;
 import UI.Utility.InputUtility;
 
-public class CollegeAdminCourseManage implements ModuleInterface{
+public class CollegeAdminCourseManage implements Module{
 
     private CourseDAO courseDAO;
     private DepartmentDAO departmentDAO;
     private ModuleExecutor moduleExecutor;
     private int collegeID;
 
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
     private int userChoice;
 
     public CollegeAdminCourseManage(CourseDAO courseDAO, DepartmentDAO departmentDAO, int collegeID, ModuleExecutor moduleExecutor) {
@@ -27,8 +27,8 @@ public class CollegeAdminCourseManage implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     // @Override
@@ -63,7 +63,7 @@ public class CollegeAdminCourseManage implements ModuleInterface{
 
             //GO BACK
             case 5:
-                this.exitStatus = true;
+                this.canModuleExit = true;
                 return;
         }
     }
@@ -76,28 +76,28 @@ public class CollegeAdminCourseManage implements ModuleInterface{
 
     public void delete() throws SQLException {
 
-        InitializableModuleInterface courseDeleteModule = new CollegeAdminCourseDelete(this.courseDAO, this.departmentDAO, this.moduleExecutor, this.collegeID);
+        InitializableModule courseDeleteModule = new CollegeAdminCourseDelete(this.courseDAO, this.departmentDAO, this.moduleExecutor, this.collegeID);
         courseDeleteModule.initializeModule();
 
-        moduleExecutor.executeModule(courseDeleteModule);
+        moduleExecutor.returnInitializedModule(courseDeleteModule);
         
     }
 
     public void edit() throws SQLException {
 
-        InitializableModuleInterface courseEditModule = new CollegeAdminCourseEdit(this.collegeID, this.departmentDAO, this.courseDAO, this.moduleExecutor);
+        InitializableModule courseEditModule = new CollegeAdminCourseEdit(this.collegeID, this.departmentDAO, this.courseDAO, this.moduleExecutor);
         courseEditModule.initializeModule();
         
-        moduleExecutor.executeModule(courseEditModule);
+        moduleExecutor.returnInitializedModule(courseEditModule);
     
     }
 
     public void add() throws SQLException {
 
-        InitializableModuleInterface courseAddModule = new CollegeAdminCourseAdd(this.moduleExecutor, this.departmentDAO, this.courseDAO, this.collegeID);
+        InitializableModule courseAddModule = new CollegeAdminCourseAdd(this.moduleExecutor, this.departmentDAO, this.courseDAO, this.collegeID);
         courseAddModule.initializeModule();
 
-        moduleExecutor.executeModule(courseAddModule);
+        moduleExecutor.returnInitializedModule(courseAddModule);
     }
 
     public int[] inputCourseKeyList(boolean returnExistingCourse) throws SQLException{

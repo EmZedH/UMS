@@ -3,7 +3,7 @@ package Logic.ProfessorLogic;
 import java.sql.SQLException;
 import java.util.List;
 
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.Module;
 import Model.DatabaseUtility;
 import Model.Professor;
 import Model.Records;
@@ -14,13 +14,13 @@ import UI.ProfessorUI;
 import UI.Utility.DisplayUtility;
 import UI.Utility.InputUtility;
 
-public class ProfessorRecordsManage implements ModuleInterface{
+public class ProfessorRecordsManage implements Module{
 
     private TestDAO testDAO;
     private RecordsDAO recordsDAO;
     private Professor professor;
 
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
     private int userChoice;
 
     public ProfessorRecordsManage(RecordsDAO recordsDAO, TestDAO testDAO, Professor professor) {
@@ -30,8 +30,8 @@ public class ProfessorRecordsManage implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     // @Override
@@ -56,7 +56,7 @@ public class ProfessorRecordsManage implements ModuleInterface{
 
             //GO BACK
             case 3:
-                this.exitStatus = true;
+                this.canModuleExit = true;
                 break;
         }
     }

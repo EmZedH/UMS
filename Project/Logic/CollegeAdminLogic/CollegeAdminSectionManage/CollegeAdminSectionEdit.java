@@ -3,8 +3,8 @@ package Logic.CollegeAdminLogic.CollegeAdminSectionManage;
 import java.sql.SQLException;
 
 import Logic.ModuleExecutor;
-import Logic.Interfaces.InitializableModuleInterface;
-import Logic.Interfaces.ReturnableModuleInterface;
+import Logic.Interfaces.InitializableModule;
+import Logic.Interfaces.ReturnableModule;
 import Logic.UserInput.DepartmentInput.ExistingDepartmentInput;
 import Logic.UserInput.SectionInput.ExistingSectionInput;
 import Logic.UserInput.SectionInput.NonExistingSectionInput;
@@ -14,13 +14,13 @@ import Model.DatabaseAccessObject.SectionDAO;
 import UI.CommonUI;
 import UI.Utility.InputUtility;
 
-public class CollegeAdminSectionEdit implements InitializableModuleInterface{
+public class CollegeAdminSectionEdit implements InitializableModule{
 
     private int userChoice;
     private boolean toggleDetails = true;
     private int sectionID;
     private int departmentID;
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
 
     private SectionDAO sectionDAO;
     private DepartmentDAO departmentDAO;
@@ -37,8 +37,8 @@ public class CollegeAdminSectionEdit implements InitializableModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     @Override
@@ -49,7 +49,7 @@ public class CollegeAdminSectionEdit implements InitializableModuleInterface{
 
             case 1:
 
-                ReturnableModuleInterface sectionIDInputModule = new NonExistingSectionInput(this.sectionDAO, this.collegeID, this.departmentID);
+                ReturnableModule sectionIDInputModule = new NonExistingSectionInput(this.sectionDAO, this.collegeID, this.departmentID);
                 moduleExecutor.executeModule(sectionIDInputModule);
 
                 section.setSectionID(sectionIDInputModule.returnValue());
@@ -64,7 +64,7 @@ public class CollegeAdminSectionEdit implements InitializableModuleInterface{
                 return;
 
             case 4:
-                this.exitStatus = true;
+                this.canModuleExit = true;
                 return;
         }
         this.sectionDAO.editSection(sectionID, departmentID, collegeID, section);
@@ -75,12 +75,12 @@ public class CollegeAdminSectionEdit implements InitializableModuleInterface{
     @Override
     public void initializeModule() throws SQLException {
         
-        ReturnableModuleInterface departmentIDInputModule = new ExistingDepartmentInput(this.collegeID, this.departmentDAO);
+        ReturnableModule departmentIDInputModule = new ExistingDepartmentInput(this.collegeID, this.departmentDAO);
         moduleExecutor.executeModule(departmentIDInputModule);
 
         this.departmentID = departmentIDInputModule.returnValue();
 
-        ReturnableModuleInterface sectionIDInputModule = new ExistingSectionInput(this.sectionDAO, this.collegeID, this.departmentID);
+        ReturnableModule sectionIDInputModule = new ExistingSectionInput(this.sectionDAO, this.collegeID, this.departmentID);
         moduleExecutor.executeModule(sectionIDInputModule);
 
         this.sectionID = sectionIDInputModule.returnValue();

@@ -3,21 +3,20 @@ package Logic.SuperAdminLogic.SuperAdminCourseProfManage;
 import java.sql.SQLException;
 
 import Logic.ModuleExecutor;
-import Logic.Interfaces.InitializableModuleInterface;
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.Module;
 import Model.DatabaseAccessObject.CourseDAO;
 import Model.DatabaseAccessObject.CourseProfessorDAO;
 import Model.DatabaseAccessObject.ProfessorDAO;
 import UI.Utility.InputUtility;
 
-public class SuperAdminCourseProfManage implements ModuleInterface{
+public class SuperAdminCourseProfManage implements Module{
 
     private ProfessorDAO professorDAO;
     private CourseProfessorDAO courseProfessorDAO;
     private CourseDAO courseDAO;
     private ModuleExecutor moduleExecutor;
 
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
     private int userChoice;
 
     public SuperAdminCourseProfManage(ProfessorDAO professorDAO, CourseDAO courseDAO, CourseProfessorDAO courseProfessorDAO, ModuleExecutor moduleExecutor) {
@@ -28,69 +27,36 @@ public class SuperAdminCourseProfManage implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
-
-    // @Override
-    // public void runUserInterface() throws SQLException {
-    //     this.userChoice = InputUtility.inputChoice("Select Option", new String[]{"Add Course to Professor","Edit Professor for Course","View List","Back"});
-    // }
 
     @Override
     public void runLogic() throws SQLException {
+        Module module = null;
         this.userChoice = InputUtility.inputChoice("Select Option", new String[]{"Add Course to Professor","Edit Professor for Course","View List","Back"});
         switch(this.userChoice){
             
             //ADD COURSE TO PROFESSOR
             case 1:
-                add();
+                module = moduleExecutor.returnInitializedModule(new SuperAdminCourseProfAdd(courseProfessorDAO, professorDAO, courseDAO, moduleExecutor));
                 break;
 
             //EDIT PROFESSOR FOR COURSE
             case 2:    
-                edit();
+                module = moduleExecutor.returnInitializedModule(new SuperAdminCourseProfEdit(courseProfessorDAO, professorDAO, courseDAO, moduleExecutor));
                 break;
 
             //VIEW PROFESSOR COURSE LIST
             case 3:
-                view();
+                module = new SuperAdminCourseProfView(courseProfessorDAO);
                 break;
 
             //BACK
             case 4:
-                this.exitStatus = true;
+                this.canModuleExit = true;
                 break;
         }
+        moduleExecutor.executeModule(module);
     }
-    
-    public void view() throws SQLException {
-
-        moduleExecutor.executeModule(new SuperAdminCourseProfView(this.courseProfessorDAO));
-    }
-    
-    public void edit() throws SQLException {
-        
-        InitializableModuleInterface courseProfEditModule = new SuperAdminCourseProfEdit(this.courseProfessorDAO, this.professorDAO, this.courseDAO, this.moduleExecutor);
-        courseProfEditModule.initializeModule();
-
-        moduleExecutor.executeModule(courseProfEditModule);
-    }
-    
-    public void add() throws SQLException {
-
-        InitializableModuleInterface courseProfAddModule = new SuperAdminCourseProfAdd(this.courseProfessorDAO, this.professorDAO, this.courseDAO, this.moduleExecutor);
-        courseProfAddModule.initializeModule();
-
-        moduleExecutor.executeModule(courseProfAddModule);
-    }
-
-    public void delete() throws SQLException {
-
-        InitializableModuleInterface courseProfDeleteModule = new SuperAdminCourseProfDelete(this.courseProfessorDAO, this.professorDAO, this.courseDAO, this.moduleExecutor);
-        courseProfDeleteModule.initializeModule();
-
-        moduleExecutor.executeModule(courseProfDeleteModule);
-    }
-    
 }

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import Logic.ModuleExecutor;
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.Module;
 import Model.DatabaseAccessObject.CollegeAdminDAO;
 import Model.DatabaseAccessObject.ProfessorDAO;
 import Model.DatabaseAccessObject.StudentDAO;
@@ -15,7 +15,7 @@ import UI.CommonUI;
 import UI.Utility.DisplayUtility;
 import UI.Utility.InputUtility;
 
-public class SuperAdminUserView implements ModuleInterface{
+public class SuperAdminUserView implements Module{
 
     private UserDAO userDAO;
     private StudentDAO studentDAO;
@@ -24,7 +24,7 @@ public class SuperAdminUserView implements ModuleInterface{
     private SuperAdminDAO superAdminDAO;
     private ModuleExecutor moduleExecutor;
 
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
     private int userChoice;
 
     public SuperAdminUserView(UserDAO userDAO, StudentDAO studentDAO, ProfessorDAO professorDAO,
@@ -38,8 +38,8 @@ public class SuperAdminUserView implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     // @Override
@@ -103,7 +103,7 @@ public class SuperAdminUserView implements ModuleInterface{
 
             //GO BACK
             case 9:
-                this.exitStatus = true;
+                this.canModuleExit = true;
                 return;
         }
         DisplayUtility.printTable(headings, tableHeadings, table);

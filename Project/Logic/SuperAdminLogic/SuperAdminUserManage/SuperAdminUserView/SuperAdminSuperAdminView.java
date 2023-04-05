@@ -4,14 +4,14 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.Module;
 import Model.DatabaseAccessObject.SuperAdminDAO;
 import UI.Utility.DisplayUtility;
 import UI.Utility.InputUtility;
 
-public class SuperAdminSuperAdminView implements ModuleInterface{
+public class SuperAdminSuperAdminView implements Module{
 
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
     private int userChoice;
 
     private SuperAdminDAO superAdminDAO;
@@ -21,8 +21,8 @@ public class SuperAdminSuperAdminView implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     // @Override
@@ -52,7 +52,7 @@ public class SuperAdminSuperAdminView implements ModuleInterface{
 
             //GO BACK
             case 3:
-                this.exitStatus = true;
+                this.canModuleExit = true;
                 return;
         }
         DisplayUtility.printTable(headings, tableHeadings, table);

@@ -3,8 +3,8 @@ package Logic.SuperAdminLogic.SuperAdminUserManage.SuperAdminUserAdd;
 import java.sql.SQLException;
 
 import Logic.ModuleExecutor;
-import Logic.Interfaces.ReturnableModuleInterface;
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.ReturnableModule;
+import Logic.Interfaces.Module;
 import Logic.UserInput.UserInput.NonExistingUserInput;
 import Model.DatabaseAccessObject.CollegeAdminDAO;
 import Model.DatabaseAccessObject.CollegeDAO;
@@ -17,7 +17,7 @@ import Model.DatabaseAccessObject.UserDAO;
 import UI.CommonUI;
 import UI.Utility.InputUtility;
 
-public class SuperAdminUserAdd implements ModuleInterface{
+public class SuperAdminUserAdd implements Module{
     
     private UserDAO userDAO;
     private StudentDAO studentDAO;
@@ -46,7 +46,7 @@ public class SuperAdminUserAdd implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
+    public boolean canModuleExit() {
         return true;
     }
 
@@ -60,10 +60,10 @@ public class SuperAdminUserAdd implements ModuleInterface{
         this.userChoice = InputUtility.inputChoice("Select User to Add", new String[]{"Student","Professor","College Admin","Super Admin","Back"});
 
         //USER ID INPUT MODULE
-        ReturnableModuleInterface userIDInputModule = new NonExistingUserInput(this.userDAO);
+        ReturnableModule userIDInputModule = new NonExistingUserInput(this.userDAO);
         moduleExecutor.executeModule(userIDInputModule);
 
-        ModuleInterface module = null;
+        Module module = null;
     
         switch (this.userChoice) {
 

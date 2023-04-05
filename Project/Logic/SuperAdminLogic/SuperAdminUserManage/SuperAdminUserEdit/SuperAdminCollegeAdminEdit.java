@@ -3,8 +3,8 @@ package Logic.SuperAdminLogic.SuperAdminUserManage.SuperAdminUserEdit;
 import java.sql.SQLException;
 
 import Logic.ModuleExecutor;
-import Logic.Interfaces.ReturnableModuleInterface;
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.ReturnableModule;
+import Logic.Interfaces.Module;
 import Logic.UserInput.CollegeInput.ExistingCollegeInput;
 import Logic.UserInput.UserInput.NonExistingUserInput;
 import Model.College;
@@ -15,10 +15,10 @@ import Model.DatabaseAccessObject.UserDAO;
 import UI.CommonUI;
 import UI.Utility.InputUtility;
 
-public class SuperAdminCollegeAdminEdit implements ModuleInterface{
+public class SuperAdminCollegeAdminEdit implements Module{
 
 
-    private boolean exitStatus = false;;
+    private boolean canModuleExit = false;;
     private boolean toggleDetails = true;
     private int userChoice;
 
@@ -39,8 +39,8 @@ public class SuperAdminCollegeAdminEdit implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     // @Override
@@ -78,7 +78,7 @@ public class SuperAdminCollegeAdminEdit implements ModuleInterface{
             case 1:
                 
                 //USER ID INPUT MODULE
-                ReturnableModuleInterface userIDInputModule = new NonExistingUserInput(this.userDAO);
+                ReturnableModule userIDInputModule = new NonExistingUserInput(this.userDAO);
                 this.moduleExecutor.executeModule(userIDInputModule);
 
                 collegeAdmin.getUser().setID(userIDInputModule.returnValue());
@@ -118,7 +118,7 @@ public class SuperAdminCollegeAdminEdit implements ModuleInterface{
             case 8:
 
                 //COLLEGE ID INPUT MODULE
-                ReturnableModuleInterface collegeIDInputModule = new ExistingCollegeInput(this.collegeDAO);
+                ReturnableModule collegeIDInputModule = new ExistingCollegeInput(this.collegeDAO);
                 moduleExecutor.executeModule(collegeIDInputModule);
 
                 College college = this.collegeDAO.returnCollege(collegeIDInputModule.returnValue());
@@ -132,7 +132,7 @@ public class SuperAdminCollegeAdminEdit implements ModuleInterface{
 
             //GO BACK
             case 10:
-                this.exitStatus = true;
+                this.canModuleExit = true;
                 return;
         }
         this.collegeAdminDAO.editCollegeAdmin(userID, collegeAdmin);

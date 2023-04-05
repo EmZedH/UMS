@@ -3,8 +3,8 @@ package Logic.SuperAdminLogic.SuperAdminUserManage.SuperAdminUserAdd;
 import java.sql.SQLException;
 
 import Logic.ModuleExecutor;
-import Logic.Interfaces.ReturnableModuleInterface;
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.ReturnableModule;
+import Logic.Interfaces.Module;
 import Logic.UserInput.CollegeInput.ExistingCollegeInput;
 import Logic.UserInput.DepartmentInput.ExistingDepartmentInput;
 import Model.Department;
@@ -16,7 +16,7 @@ import Model.DatabaseAccessObject.ProfessorDAO;
 import UI.CommonUI;
 import UI.Utility.InputUtility;
 
-public class SuperAdminProfessorAdd implements ModuleInterface{
+public class SuperAdminProfessorAdd implements Module{
 
     private ModuleExecutor moduleExecutor;
     private CollegeDAO collegeDAO;
@@ -42,7 +42,7 @@ public class SuperAdminProfessorAdd implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
+    public boolean canModuleExit() {
         return true;
     }
 
@@ -66,11 +66,11 @@ public class SuperAdminProfessorAdd implements ModuleInterface{
         this.userPassword = InputUtility.inputString("Enter the password");
 
         //EXISTING COLLEGE ID INPUT MODULE
-        ReturnableModuleInterface collegeIDInputModule = new ExistingCollegeInput(this.collegeDAO);
+        ReturnableModule collegeIDInputModule = new ExistingCollegeInput(this.collegeDAO);
         moduleExecutor.executeModule(collegeIDInputModule);
 
         //EXISTING DEPARTMENT ID INPUT MODULE
-        ReturnableModuleInterface departmentIDInputModule = new ExistingDepartmentInput(collegeIDInputModule.returnValue(), this.departmentDAO);
+        ReturnableModule departmentIDInputModule = new ExistingDepartmentInput(collegeIDInputModule.returnValue(), this.departmentDAO);
         moduleExecutor.executeModule(departmentIDInputModule);
 
         //GET DEPARTMENT OBJECT

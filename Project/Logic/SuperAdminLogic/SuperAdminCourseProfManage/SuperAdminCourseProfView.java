@@ -2,11 +2,11 @@ package Logic.SuperAdminLogic.SuperAdminCourseProfManage;
 
 import java.sql.SQLException;
 
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.Module;
 import Model.DatabaseAccessObject.CourseProfessorDAO;
 import UI.Utility.DisplayUtility;
 
-public class SuperAdminCourseProfView implements ModuleInterface{
+public class SuperAdminCourseProfView implements Module{
     
     private CourseProfessorDAO courseProfessorDAO;
 
@@ -15,7 +15,7 @@ public class SuperAdminCourseProfView implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
+    public boolean canModuleExit() {
         return true;
     }
 

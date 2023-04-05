@@ -2,19 +2,19 @@ package Logic.CollegeAdminLogic;
 
 import java.sql.SQLException;
 
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.Module;
 import Model.CollegeAdmin;
 import Model.DatabaseAccessObject.CollegeDAO;
 import UI.CommonUI;
 import UI.Utility.InputUtility;
 
-public class CollegeAdminCollegeManage implements ModuleInterface{
+public class CollegeAdminCollegeManage implements Module{
     
     private CollegeDAO collegeDAO;
     private CollegeAdmin collegeAdmin;
     private boolean toggleDetails = true;
 
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
     private int userChoice;
 
     public CollegeAdminCollegeManage(CollegeDAO collegeDAO, CollegeAdmin collegeAdmin) {
@@ -23,8 +23,8 @@ public class CollegeAdminCollegeManage implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     // @Override
@@ -61,7 +61,7 @@ public class CollegeAdminCollegeManage implements ModuleInterface{
                 return;
 
             case 5:
-                this.exitStatus = true;
+                this.canModuleExit = true;
                 return;
         }
         this.collegeDAO.editCollege(this.collegeAdmin.getCollege());

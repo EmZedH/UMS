@@ -3,8 +3,8 @@ package Logic.CollegeAdminLogic.CollegeAdminTransactionManage;
 import java.sql.SQLException;
 
 import Logic.ModuleExecutor;
-import Logic.Interfaces.InitializableModuleInterface;
-import Logic.Interfaces.ReturnableModuleInterface;
+import Logic.Interfaces.InitializableModule;
+import Logic.Interfaces.ReturnableModule;
 import Logic.UserInput.TransactionInput.NonExistingTransactionInput;
 import Logic.UserInput.UserInput.ExistingStudentInput;
 import Model.DatabaseAccessObject.StudentDAO;
@@ -13,7 +13,7 @@ import Model.DatabaseAccessObject.UserDAO;
 import UI.CommonUI;
 import UI.Utility.InputUtility;
 
-public class CollegeAdminTransactionAdd implements InitializableModuleInterface{
+public class CollegeAdminTransactionAdd implements InitializableModule{
 
     private TransactionsDAO transactionsDAO;
     private StudentDAO studentDAO;
@@ -36,7 +36,7 @@ public class CollegeAdminTransactionAdd implements InitializableModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
+    public boolean canModuleExit() {
         return true;
     }
 
@@ -53,12 +53,12 @@ public class CollegeAdminTransactionAdd implements InitializableModuleInterface{
     @Override
     public void initializeModule() throws SQLException {
         
-        ReturnableModuleInterface transactionIDInputModule = new NonExistingTransactionInput(this.transactionsDAO);
+        ReturnableModule transactionIDInputModule = new NonExistingTransactionInput(this.transactionsDAO);
         moduleExecutor.executeModule(transactionIDInputModule);
 
         this.transactionID = transactionIDInputModule.returnValue();
 
-        ReturnableModuleInterface studentIDInputModule = new ExistingStudentInput(this.studentDAO, this.userDAO, this.collegeID);
+        ReturnableModule studentIDInputModule = new ExistingStudentInput(this.studentDAO, this.userDAO, this.collegeID);
         moduleExecutor.executeModule(studentIDInputModule);
 
         this.studentID = studentIDInputModule.returnValue();

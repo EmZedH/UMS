@@ -9,13 +9,12 @@ public class Main{
 
     public static void main(String[] args){
         
-        ModuleExecutor module = new ModuleExecutor();
-
+        ModuleExecutor moduleExecutor = new ModuleExecutor();
+        
         try {
-            module.executeModule(new WelcomePage(module, new FactoryDAO()));
+            moduleExecutor.executeModule(new WelcomePage(moduleExecutor, new FactoryDAO()));
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
     }
 }

@@ -3,8 +3,8 @@ package Logic.CollegeAdminLogic.CollegeAdminCourseProfManage;
 import java.sql.SQLException;
 
 import Logic.ModuleExecutor;
-import Logic.Interfaces.InitializableModuleInterface;
-import Logic.Interfaces.ReturnableModuleInterface;
+import Logic.Interfaces.InitializableModule;
+import Logic.Interfaces.ReturnableModule;
 import Logic.UserInput.CourseInput.ExistingCourseInput;
 import Logic.UserInput.UserInput.ExistingProfessorInput;
 import Model.Professor;
@@ -16,7 +16,7 @@ import Model.DatabaseAccessObject.UserDAO;
 import UI.CommonUI;
 import UI.Utility.DisplayUtility;
 
-public class CollegeAdminCourseProfEdit implements InitializableModuleInterface{
+public class CollegeAdminCourseProfEdit implements InitializableModule{
 
     private ProfessorDAO professorDAO;
     private UserDAO userDAO;
@@ -43,14 +43,14 @@ public class CollegeAdminCourseProfEdit implements InitializableModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
+    public boolean canModuleExit() {
         return true;
     }
 
     @Override
     public void runLogic() throws SQLException {
 
-        ReturnableModuleInterface newProfessorIDInputModule = new ExistingProfessorInput(this.professorDAO, this.userDAO, this.collegeDAO, this.collegeID);
+        ReturnableModule newProfessorIDInputModule = new ExistingProfessorInput(this.professorDAO, this.userDAO, this.collegeDAO, this.collegeID);
         moduleExecutor.executeModule(newProfessorIDInputModule);
 
         this.newProfessorID = newProfessorIDInputModule.returnValue();
@@ -67,7 +67,7 @@ public class CollegeAdminCourseProfEdit implements InitializableModuleInterface{
     @Override
     public void initializeModule() throws SQLException {
         
-        ReturnableModuleInterface professorIDInputModule = new ExistingProfessorInput(this.professorDAO, this.userDAO, this.collegeDAO, this.collegeID);
+        ReturnableModule professorIDInputModule = new ExistingProfessorInput(this.professorDAO, this.userDAO, this.collegeDAO, this.collegeID);
         moduleExecutor.executeModule(professorIDInputModule);
 
         this.professorID = professorIDInputModule.returnValue();
@@ -75,7 +75,7 @@ public class CollegeAdminCourseProfEdit implements InitializableModuleInterface{
         Professor professor = this.professorDAO.returnProfessor(this.professorID);
         this.departmentID = professor.getDepartment().getDepartmentID();
 
-        ReturnableModuleInterface courseIDInputModule = new ExistingCourseInput(this.collegeID, this.departmentID, this.courseDAO);
+        ReturnableModule courseIDInputModule = new ExistingCourseInput(this.collegeID, this.departmentID, this.courseDAO);
         moduleExecutor.executeModule(courseIDInputModule);
         this.courseID = courseIDInputModule.returnValue();
         

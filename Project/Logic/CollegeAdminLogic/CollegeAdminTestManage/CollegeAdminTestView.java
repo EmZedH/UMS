@@ -4,17 +4,17 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.Module;
 import Model.DatabaseAccessObject.TestDAO;
 import UI.Utility.DisplayUtility;
 import UI.Utility.InputUtility;
 
-public class CollegeAdminTestView implements ModuleInterface{
+public class CollegeAdminTestView implements Module{
 
     private TestDAO testDAO;
     private int collegeID;
 
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
     private int userChoice;
 
     public CollegeAdminTestView(TestDAO testDAO, int collegeID) {
@@ -23,8 +23,8 @@ public class CollegeAdminTestView implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     @Override
@@ -53,7 +53,7 @@ public class CollegeAdminTestView implements ModuleInterface{
                 break;
 
             case 5:
-                this.exitStatus = true;
+                this.canModuleExit = true;
                 return;
         }
         DisplayUtility.printTable(heading, tableHeading, testTable);

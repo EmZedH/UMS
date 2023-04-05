@@ -2,19 +2,19 @@ package Logic.StudentLogic;
 
 import java.sql.SQLException;
 
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.Module;
 import Model.Student;
 import Model.DatabaseAccessObject.StudentDAO;
 import UI.CommonUI;
 import UI.Utility.InputUtility;
 
-public class StudentManageProfile implements ModuleInterface{
+public class StudentManageProfile implements Module{
 
     private Student student;
     private StudentDAO studentDAO;
     private boolean toggleDetails = true;
 
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
     private int userChoice;
 
     public StudentManageProfile(Student student, StudentDAO studentDAO) {
@@ -24,8 +24,8 @@ public class StudentManageProfile implements ModuleInterface{
 
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
 
@@ -73,7 +73,7 @@ public class StudentManageProfile implements ModuleInterface{
 
             //GO BACK
             case 7:
-                this.exitStatus = true;
+                this.canModuleExit = true;
                 return;
         }
         this.studentDAO.editStudent(userID,this.student);

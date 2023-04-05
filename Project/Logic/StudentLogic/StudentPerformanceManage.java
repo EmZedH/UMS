@@ -3,7 +3,7 @@ package Logic.StudentLogic;
 import java.sql.SQLException;
 import java.util.List;
 
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.Module;
 import Model.DatabaseUtility;
 import Model.Student;
 import Model.DatabaseAccessObject.RecordsDAO;
@@ -13,13 +13,13 @@ import UI.StudentUI;
 import UI.Utility.DisplayUtility;
 import UI.Utility.InputUtility;
 
-public class StudentPerformanceManage implements ModuleInterface{
+public class StudentPerformanceManage implements Module{
 
     private Student student;
     private TestDAO testDAO;
     private RecordsDAO recordsDAO;
 
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
     private int userChoice;
 
     public StudentPerformanceManage(Student student, TestDAO testDAO, RecordsDAO recordsDAO) {
@@ -29,8 +29,8 @@ public class StudentPerformanceManage implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     // @Override
@@ -54,7 +54,7 @@ public class StudentPerformanceManage implements ModuleInterface{
 
             //GO BACK
             case 3:
-                this.exitStatus = true;
+                this.canModuleExit = true;
                 break;
         }
     }

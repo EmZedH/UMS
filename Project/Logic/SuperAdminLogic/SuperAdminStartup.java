@@ -4,14 +4,14 @@ import java.sql.SQLException;
 
 import Logic.UserCredentialsWrongWindow;
 import Logic.ModuleExecutor;
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.Module;
 import Model.SuperAdmin;
 import Model.DatabaseAccessObject.SuperAdminDAO;
 import UI.CommonUI;
 
-public class SuperAdminStartup implements ModuleInterface{
+public class SuperAdminStartup implements Module{
 
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
 
     private SuperAdminDAO superAdminDAO;
     private ModuleExecutor module;
@@ -27,8 +27,8 @@ public class SuperAdminStartup implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     // @Override
@@ -55,7 +55,7 @@ public class SuperAdminStartup implements ModuleInterface{
             SuperAdmin superAdmin = this.superAdminDAO.returnSuperAdmin(userID);
             module.executeModule(new SuperAdminMainPage(superAdmin, this.superAdminServicesFactory, module));
         }
-        this.exitStatus = true;
+        this.canModuleExit = true;
     }
     
 }

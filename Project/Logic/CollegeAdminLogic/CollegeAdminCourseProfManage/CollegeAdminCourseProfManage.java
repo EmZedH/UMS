@@ -2,8 +2,8 @@ package Logic.CollegeAdminLogic.CollegeAdminCourseProfManage;
 
 import java.sql.SQLException;
 import Logic.ModuleExecutor;
-import Logic.Interfaces.InitializableModuleInterface;
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.InitializableModule;
+import Logic.Interfaces.Module;
 import Model.DatabaseAccessObject.CollegeDAO;
 import Model.DatabaseAccessObject.CourseDAO;
 import Model.DatabaseAccessObject.CourseProfessorDAO;
@@ -12,7 +12,7 @@ import Model.DatabaseAccessObject.ProfessorDAO;
 import Model.DatabaseAccessObject.UserDAO;
 import UI.Utility.InputUtility;
 
-public class CollegeAdminCourseProfManage implements ModuleInterface{
+public class CollegeAdminCourseProfManage implements Module{
 
     private CourseProfessorDAO courseProfessorDAO;
     private DepartmentDAO departmentDAO;
@@ -24,7 +24,7 @@ public class CollegeAdminCourseProfManage implements ModuleInterface{
     private ProfessorDAO professorDAO;
     private int collegeID;
 
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
     private int userChoice;
 
     public CollegeAdminCourseProfManage(CourseProfessorDAO courseProfessorDAO, DepartmentDAO departmentDAO, CourseDAO courseDAO, ProfessorDAO professorDAO, UserDAO userDAO, CollegeDAO collegeDAO, int collegeID, ModuleExecutor moduleExecutor) {
@@ -39,8 +39,8 @@ public class CollegeAdminCourseProfManage implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     // @Override
@@ -70,7 +70,7 @@ public class CollegeAdminCourseProfManage implements ModuleInterface{
 
             //GO BACK
             case 4:
-                this.exitStatus = true;
+                this.canModuleExit = true;
                 break;
         }
     }
@@ -83,26 +83,26 @@ public class CollegeAdminCourseProfManage implements ModuleInterface{
 
     public void edit() throws SQLException {
 
-        InitializableModuleInterface courseProfEditModule = new CollegeAdminCourseProfEdit(this.professorDAO, this.userDAO, this.collegeDAO, this.collegeID, this.courseDAO, this.courseProfessorDAO, this.moduleExecutor);
+        InitializableModule courseProfEditModule = new CollegeAdminCourseProfEdit(this.professorDAO, this.userDAO, this.collegeDAO, this.collegeID, this.courseDAO, this.courseProfessorDAO, this.moduleExecutor);
         courseProfEditModule.initializeModule();
 
-        moduleExecutor.executeModule(courseProfEditModule);
+        moduleExecutor.returnInitializedModule(courseProfEditModule);
     }
 
     public void add() throws SQLException {
 
-        InitializableModuleInterface courseProfAddModule = new CollegeAdminCourseProfAdd(this.collegeID, this.courseProfessorDAO, this.departmentDAO, this.courseDAO, this.professorDAO, this.userDAO, this.collegeDAO, this.moduleExecutor);
+        InitializableModule courseProfAddModule = new CollegeAdminCourseProfAdd(this.collegeID, this.courseProfessorDAO, this.departmentDAO, this.courseDAO, this.professorDAO, this.userDAO, this.collegeDAO, this.moduleExecutor);
         courseProfAddModule.initializeModule();
 
-        moduleExecutor.executeModule(courseProfAddModule);
+        moduleExecutor.returnInitializedModule(courseProfAddModule);
     }
 
     public void delete() throws SQLException {
 
-        InitializableModuleInterface courseProfDeleteModule = new CollegeAdminCourseProfDelete(this.collegeID, this.professorDAO, this.courseDAO, this.courseProfessorDAO, this.moduleExecutor);
+        InitializableModule courseProfDeleteModule = new CollegeAdminCourseProfDelete(this.collegeID, this.professorDAO, this.courseDAO, this.courseProfessorDAO, this.moduleExecutor);
         courseProfDeleteModule.initializeModule();
 
-        moduleExecutor.executeModule(courseProfDeleteModule);
+        moduleExecutor.returnInitializedModule(courseProfDeleteModule);
     }
     
 }

@@ -3,8 +3,8 @@ package Logic.CollegeAdminLogic.CollegeAdminRecordsManage;
 import java.sql.SQLException;
 
 import Logic.ModuleExecutor;
-import Logic.Interfaces.InitializableModuleInterface;
-import Logic.Interfaces.ReturnableModuleInterface;
+import Logic.Interfaces.InitializableModule;
+import Logic.Interfaces.ReturnableModule;
 import Logic.UserInput.CourseInput.ExistingCourseInput;
 import Logic.UserInput.DepartmentInput.ExistingDepartmentInput;
 import Logic.UserInput.UserInput.ExistingProfessorInput;
@@ -25,7 +25,7 @@ import UI.SuperAdminUI;
 import UI.Utility.DisplayUtility;
 import UI.Utility.InputUtility;
 
-public class CollegeAdminRecordsAdd implements InitializableModuleInterface{
+public class CollegeAdminRecordsAdd implements InitializableModule{
 
     private int collegeID;
     private TransactionsDAO transactionsDAO;
@@ -64,7 +64,7 @@ public class CollegeAdminRecordsAdd implements InitializableModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
+    public boolean canModuleExit() {
         return true;
     }
 
@@ -93,7 +93,7 @@ public class CollegeAdminRecordsAdd implements InitializableModuleInterface{
     @Override
     public void initializeModule() throws SQLException {
 
-        ReturnableModuleInterface transactionIDInputModule = new ExistingDepartmentInput(this.collegeID, this.departmentDAO);
+        ReturnableModule transactionIDInputModule = new ExistingDepartmentInput(this.collegeID, this.departmentDAO);
         moduleExecutor.executeModule(transactionIDInputModule);
         this.transactionID = transactionIDInputModule.returnValue();
 
@@ -104,12 +104,12 @@ public class CollegeAdminRecordsAdd implements InitializableModuleInterface{
         Student student = this.studentDAO.returnStudent(studentID);
         int studentDepartmentID = student.getSection().getDepartmentID();
 
-        ReturnableModuleInterface departmentIDInputModule = new ExistingDepartmentInput(this.collegeID, this.departmentDAO);
+        ReturnableModule departmentIDInputModule = new ExistingDepartmentInput(this.collegeID, this.departmentDAO);
         moduleExecutor.executeModule(departmentIDInputModule);
 
         this.departmentID = departmentIDInputModule.returnValue();
 
-        ReturnableModuleInterface courseIDInputModule = new ExistingCourseInput(this.collegeID, this.departmentID, this.courseDAO);
+        ReturnableModule courseIDInputModule = new ExistingCourseInput(this.collegeID, this.departmentID, this.courseDAO);
         moduleExecutor.executeModule(courseIDInputModule);
 
         this.courseID = courseIDInputModule.returnValue();
@@ -126,7 +126,7 @@ public class CollegeAdminRecordsAdd implements InitializableModuleInterface{
             initializeModule();
         }
 
-        ReturnableModuleInterface professorIDInputModule = new ExistingProfessorInput(this.professorDAO, this.userDAO, this.collegeDAO, this.collegeID);
+        ReturnableModule professorIDInputModule = new ExistingProfessorInput(this.professorDAO, this.userDAO, this.collegeDAO, this.collegeID);
         moduleExecutor.executeModule(professorIDInputModule);
 
         this.professorID = professorIDInputModule.returnValue();

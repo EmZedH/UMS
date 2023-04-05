@@ -3,8 +3,8 @@ package Logic.SuperAdminLogic.SuperAdminUserManage.SuperAdminUserEdit;
 import java.sql.SQLException;
 
 import Logic.ModuleExecutor;
-import Logic.Interfaces.ReturnableModuleInterface;
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.ReturnableModule;
+import Logic.Interfaces.Module;
 import Logic.UserInput.SectionInput.ExistingSectionInput;
 import Logic.UserInput.UserInput.NonExistingUserInput;
 import Model.Student;
@@ -14,9 +14,9 @@ import Model.DatabaseAccessObject.UserDAO;
 import UI.CommonUI;
 import UI.Utility.InputUtility;
 
-public class SuperAdminStudentEdit implements ModuleInterface{
+public class SuperAdminStudentEdit implements Module{
 
-    private boolean exitStatus = false;;
+    private boolean canModuleExit = false;;
     private boolean toggleDetails = true;
     private int userChoice;
 
@@ -37,8 +37,8 @@ public class SuperAdminStudentEdit implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     // @Override
@@ -64,7 +64,7 @@ public class SuperAdminStudentEdit implements ModuleInterface{
             case 1:
                 
                 //USER ID INPUT MODULE
-                ReturnableModuleInterface userIDInputModule = new NonExistingUserInput(this.userDAO);
+                ReturnableModule userIDInputModule = new NonExistingUserInput(this.userDAO);
                 this.moduleExecutor.executeModule(userIDInputModule);
 
                 student.getUser().setID(userIDInputModule.returnValue());
@@ -104,7 +104,7 @@ public class SuperAdminStudentEdit implements ModuleInterface{
             case 8:
 
                 //SECTION ID INPUT MODULE
-                ReturnableModuleInterface sectionIDInputModule = new ExistingSectionInput(this.sectionDAO, student.getSection().getCollegeID(), student.getSection().getDepartmentID());
+                ReturnableModule sectionIDInputModule = new ExistingSectionInput(this.sectionDAO, student.getSection().getCollegeID(), student.getSection().getDepartmentID());
                 this.moduleExecutor.executeModule(sectionIDInputModule);
                 
                 student.getSection().setSectionID(sectionIDInputModule.returnValue());;
@@ -117,7 +117,7 @@ public class SuperAdminStudentEdit implements ModuleInterface{
 
             //GO BACK
             case 10:
-                this.exitStatus = true;
+                this.canModuleExit = true;
                 return;
             }
             this.studentDAO.editStudent(userID, student);

@@ -2,11 +2,11 @@ package Logic.CollegeAdminLogic.CollegeAdminRecordsManage;
 
 import java.sql.SQLException;
 
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.Module;
 import Model.DatabaseAccessObject.RecordsDAO;
 import UI.Utility.DisplayUtility;
 
-public class CollegeAdminRecordsView implements ModuleInterface{
+public class CollegeAdminRecordsView implements Module{
 
     private RecordsDAO recordsDAO;
     private int collegeID;
@@ -17,7 +17,7 @@ public class CollegeAdminRecordsView implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
+    public boolean canModuleExit() {
         return true;
     }
 

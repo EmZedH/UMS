@@ -2,15 +2,15 @@ package Logic.UserInput.TestInput;
 
 import java.sql.SQLException;
 
-import Logic.Interfaces.ReturnableModuleInterface;
+import Logic.Interfaces.ReturnableModule;
 import Model.DatabaseAccessObject.TestDAO;
 import UI.CommonUI;
 import UI.Utility.DisplayUtility;
 import UI.Utility.InputUtility;
 
-public class ExistingTestInput implements ReturnableModuleInterface{
+public class ExistingTestInput implements ReturnableModule{
 
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
     private int returnTestID;
 
     private TestDAO testDAO;
@@ -28,8 +28,8 @@ public class ExistingTestInput implements ReturnableModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     // @Override
@@ -41,14 +41,14 @@ public class ExistingTestInput implements ReturnableModuleInterface{
     public void runLogic() throws SQLException {
         this.returnTestID = InputUtility.posInput("Enter the Test ID");
         if(testDAO.verifyTest(this.returnTestID, this.studentID, this.courseID, this.departmentID, this.collegeID)){
-            this.exitStatus = true;
+            this.canModuleExit = true;
             CommonUI.processSuccessDisplay();
         }
         DisplayUtility.singleDialogDisplay("Test ID doesn't exist. Please try again");
     }
 
     @Override
-    public int returnValue() {
+    public Integer returnValue() {
         return this.returnTestID;
     }
     

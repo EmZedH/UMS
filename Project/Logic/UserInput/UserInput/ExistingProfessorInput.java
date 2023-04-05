@@ -2,16 +2,16 @@ package Logic.UserInput.UserInput;
 
 import java.sql.SQLException;
 
-import Logic.Interfaces.ReturnableModuleInterface;
+import Logic.Interfaces.ReturnableModule;
 import Model.DatabaseAccessObject.CollegeDAO;
 import Model.DatabaseAccessObject.ProfessorDAO;
 import Model.DatabaseAccessObject.UserDAO;
 import UI.Utility.DisplayUtility;
 import UI.Utility.InputUtility;
 
-public class ExistingProfessorInput implements ReturnableModuleInterface{
+public class ExistingProfessorInput implements ReturnableModule{
 
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
     private int returnProfessorID;
     
     private ProfessorDAO professorDAO;
@@ -32,8 +32,8 @@ public class ExistingProfessorInput implements ReturnableModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     @Override
@@ -42,7 +42,7 @@ public class ExistingProfessorInput implements ReturnableModuleInterface{
             
             this.returnProfessorID = InputUtility.posInput("Enter the Professor ID");
             if(this.professorDAO.verifyProfessor(this.returnProfessorID)){
-                this.exitStatus = true;
+                this.canModuleExit = true;
                 return;
             }
             DisplayUtility.singleDialogDisplay("Professor ID doesn't exist. Please try again");
@@ -52,7 +52,7 @@ public class ExistingProfessorInput implements ReturnableModuleInterface{
 
             this.returnProfessorID = InputUtility.posInput("Enter the Professor ID");
             if(this.professorDAO.verifyProfessor(this.returnProfessorID) && this.userDAO.verifyUser(this.returnProfessorID, this.collegeID)){
-                this.exitStatus = true;
+                this.canModuleExit = true;
                 return;
             }
             DisplayUtility.singleDialogDisplay("Professor ID doesn't exist. Please try again");
@@ -60,7 +60,7 @@ public class ExistingProfessorInput implements ReturnableModuleInterface{
     }
 
     @Override
-    public int returnValue() {
+    public Integer returnValue() {
         return returnProfessorID;
     }
     

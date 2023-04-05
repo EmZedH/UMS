@@ -3,8 +3,8 @@ package Logic.SuperAdminLogic.SuperAdminCourseProfManage;
 import java.sql.SQLException;
 
 import Logic.ModuleExecutor;
-import Logic.Interfaces.InitializableModuleInterface;
-import Logic.Interfaces.ReturnableModuleInterface;
+import Logic.Interfaces.InitializableModule;
+import Logic.Interfaces.ReturnableModule;
 import Logic.UserInput.CourseInput.ExistingCourseInput;
 import Logic.UserInput.UserInput.ExistingProfessorInput;
 import Model.Professor;
@@ -14,9 +14,9 @@ import Model.DatabaseAccessObject.ProfessorDAO;
 import UI.CommonUI;
 import UI.Utility.DisplayUtility;
 
-public class SuperAdminCourseProfEdit implements InitializableModuleInterface{
+public class SuperAdminCourseProfEdit implements InitializableModule{
 
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
 
     private CourseProfessorDAO courseProfessorDAO;
     private ProfessorDAO professorDAO;
@@ -38,8 +38,8 @@ public class SuperAdminCourseProfEdit implements InitializableModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     @Override
@@ -52,7 +52,7 @@ public class SuperAdminCourseProfEdit implements InitializableModuleInterface{
 
     @Override
     public void initializeModule() throws SQLException {
-        ReturnableModuleInterface professorIDInputModule = new ExistingProfessorInput(this.professorDAO);
+        ReturnableModule professorIDInputModule = new ExistingProfessorInput(this.professorDAO);
         moduleExecutor.executeModule(professorIDInputModule);
         this.professorID = professorIDInputModule.returnValue();
 
@@ -60,11 +60,11 @@ public class SuperAdminCourseProfEdit implements InitializableModuleInterface{
         this.departmentID = professor.getDepartment().getDepartmentID();
         this.collegeID = professor.getDepartment().getCollegeID();
 
-        ReturnableModuleInterface courseIDInputModule = new ExistingCourseInput(this.collegeID, this.departmentID, this.courseDAO);
+        ReturnableModule courseIDInputModule = new ExistingCourseInput(this.collegeID, this.departmentID, this.courseDAO);
         moduleExecutor.executeModule(courseIDInputModule);
         this.courseID = courseIDInputModule.returnValue();
 
-        ReturnableModuleInterface newProfessorIDInputModule = new ExistingProfessorInput(this.professorDAO);
+        ReturnableModule newProfessorIDInputModule = new ExistingProfessorInput(this.professorDAO);
         moduleExecutor.executeModule(newProfessorIDInputModule);
         this.newProfessorID = newProfessorIDInputModule.returnValue();
     

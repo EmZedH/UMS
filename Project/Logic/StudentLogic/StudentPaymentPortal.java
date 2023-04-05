@@ -4,7 +4,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 
 import Logic.Interfaces.PaymentInterface;
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.Module;
 import Logic.Payment.CreditCard;
 import Logic.Payment.DebitCard;
 import Logic.Payment.UPIPayment;
@@ -13,7 +13,7 @@ import Model.DatabaseAccessObject.TransactionsDAO;
 import UI.StudentUI;
 import UI.Utility.DisplayUtility;
 
-public class StudentPaymentPortal implements ModuleInterface{
+public class StudentPaymentPortal implements Module{
 
     private int userChoice;
 
@@ -26,7 +26,7 @@ public class StudentPaymentPortal implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
+    public boolean canModuleExit() {
         return true;
     }
 

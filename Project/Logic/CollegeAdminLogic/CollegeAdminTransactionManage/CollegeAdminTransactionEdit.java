@@ -3,22 +3,22 @@ package Logic.CollegeAdminLogic.CollegeAdminTransactionManage;
 import java.sql.SQLException;
 
 import Logic.ModuleExecutor;
-import Logic.Interfaces.InitializableModuleInterface;
-import Logic.Interfaces.ReturnableModuleInterface;
+import Logic.Interfaces.InitializableModule;
+import Logic.Interfaces.ReturnableModule;
 import Logic.UserInput.TransactionInput.ExistingTransactionInput;
 import Model.Transactions;
 import Model.DatabaseAccessObject.TransactionsDAO;
 import UI.CommonUI;
 import UI.Utility.InputUtility;
 
-public class CollegeAdminTransactionEdit implements InitializableModuleInterface{
+public class CollegeAdminTransactionEdit implements InitializableModule{
 
     private TransactionsDAO transactionsDAO;
     private int collegeID;
     private ModuleExecutor moduleExecutor;
 
 
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
     private int userChoice;
     private boolean toggleDetails = true;
     private int transactionID;
@@ -30,8 +30,8 @@ public class CollegeAdminTransactionEdit implements InitializableModuleInterface
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     @Override
@@ -47,7 +47,7 @@ public class CollegeAdminTransactionEdit implements InitializableModuleInterface
         switch(this.userChoice){
             case 1:
                 
-                ReturnableModuleInterface transactionIDInputModule = new ExistingTransactionInput(this.transactionsDAO, this.collegeID);
+                ReturnableModule transactionIDInputModule = new ExistingTransactionInput(this.transactionsDAO, this.collegeID);
                 moduleExecutor.executeModule(transactionIDInputModule);
 
                 transaction.setTransactionID(transactionIDInputModule.returnValue());
@@ -63,7 +63,7 @@ public class CollegeAdminTransactionEdit implements InitializableModuleInterface
                 return;
 
             case 5:
-                this.exitStatus = true;
+                this.canModuleExit = true;
                 return;
         }
         this.transactionsDAO.editTransaction(transactionID, transaction);
@@ -74,7 +74,7 @@ public class CollegeAdminTransactionEdit implements InitializableModuleInterface
     @Override
     public void initializeModule() throws SQLException {
         
-        ReturnableModuleInterface transactionIDInputModule = new ExistingTransactionInput(this.transactionsDAO, this.collegeID);
+        ReturnableModule transactionIDInputModule = new ExistingTransactionInput(this.transactionsDAO, this.collegeID);
         moduleExecutor.executeModule(transactionIDInputModule);
 
         this.transactionID = transactionIDInputModule.returnValue();

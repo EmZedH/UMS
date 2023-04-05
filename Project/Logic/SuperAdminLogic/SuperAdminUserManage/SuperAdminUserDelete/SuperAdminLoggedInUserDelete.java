@@ -2,13 +2,13 @@ package Logic.SuperAdminLogic.SuperAdminUserManage.SuperAdminUserDelete;
 
 import java.sql.SQLException;
 
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.Module;
 import Model.DatabaseAccessObject.UserDAO;
 import UI.CommonUI;
 import UI.Utility.DisplayUtility;
 import UI.Utility.InputUtility;
 
-public class SuperAdminLoggedInUserDelete implements ModuleInterface{
+public class SuperAdminLoggedInUserDelete implements Module{
 
     private int userChoice;
 
@@ -21,7 +21,7 @@ public class SuperAdminLoggedInUserDelete implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
+    public boolean canModuleExit() {
         return true;
     }
 

@@ -6,7 +6,7 @@ import java.util.List;
 
 import Logic.UserStartPage;
 import Logic.ModuleExecutor;
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.Module;
 import Model.College;
 import Model.CollegeAdmin;
 import Model.DatabaseUtility;
@@ -26,7 +26,7 @@ import UI.CollegeAdminUI;
 import UI.CommonUI;
 import UI.Utility.InputUtility;
 
-public class CollegeAdminUserManage implements ModuleInterface{
+public class CollegeAdminUserManage implements Module{
 
     private CollegeAdmin collegeAdmin;
     private CollegeAdminDAO collegeAdminDAO;
@@ -37,7 +37,7 @@ public class CollegeAdminUserManage implements ModuleInterface{
     private SectionDAO sectionDAO;
     private ModuleExecutor module;
 
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
     private int userChoice;
 
     public CollegeAdminUserManage(CollegeAdmin collegeAdmin, CollegeAdminDAO collegeAdminDAO, ProfessorDAO professorDAO,
@@ -53,8 +53,8 @@ public class CollegeAdminUserManage implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     // @Override
@@ -89,7 +89,7 @@ public class CollegeAdminUserManage implements ModuleInterface{
 
             //GO BACK
             case 5:
-                this.exitStatus = true;
+                this.canModuleExit = true;
                 break;
         }
     }
@@ -181,7 +181,7 @@ public class CollegeAdminUserManage implements ModuleInterface{
                 this.userDAO.deleteUser(userID);
                 CommonUI.processSuccessDisplay();
                 module.executeModule(new UserStartPage(new FactoryDAO(), module));
-                this.exitStatus = true;
+                this.canModuleExit = true;
                 return;
             }
         }

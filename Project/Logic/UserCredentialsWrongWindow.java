@@ -2,23 +2,23 @@ package Logic;
 
 import java.sql.SQLException;
 
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.Module;
 import UI.CommonUI;
 
-public class UserCredentialsWrongWindow implements ModuleInterface{
+public class UserCredentialsWrongWindow implements Module{
 
     private int userChoice;
     
     private ModuleExecutor module;
-    private ModuleInterface userStartupWindow;
+    private Module userStartupWindow;
 
-    public UserCredentialsWrongWindow(ModuleExecutor module, ModuleInterface userStartupWindow) {
+    public UserCredentialsWrongWindow(ModuleExecutor module, Module userStartupWindow) {
         this.module = module;
         this.userStartupWindow = userStartupWindow;
     }
 
     @Override
-    public boolean getExitStatus() {
+    public boolean canModuleExit() {
         return true;
     }
 

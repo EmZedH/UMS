@@ -3,8 +3,8 @@ package Logic.SuperAdminLogic.SuperAdminUserManage.SuperAdminUserEdit;
 import java.sql.SQLException;
 
 import Logic.ModuleExecutor;
-import Logic.Interfaces.ReturnableModuleInterface;
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.ReturnableModule;
+import Logic.Interfaces.Module;
 import Logic.UserInput.UserInput.NonExistingUserInput;
 import Model.SuperAdmin;
 import Model.DatabaseAccessObject.SuperAdminDAO;
@@ -12,9 +12,9 @@ import Model.DatabaseAccessObject.UserDAO;
 import UI.CommonUI;
 import UI.Utility.InputUtility;
 
-public class SuperAdminSuperAdminEdit implements ModuleInterface{
+public class SuperAdminSuperAdminEdit implements Module{
 
-    private boolean exitStatus = false;;
+    private boolean canModuleExit = false;;
     private boolean toggleDetails = true;
     private int userChoice;
 
@@ -32,8 +32,8 @@ public class SuperAdminSuperAdminEdit implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     // @Override
@@ -71,7 +71,7 @@ public class SuperAdminSuperAdminEdit implements ModuleInterface{
             case 1:
 
                 //USER ID INPUT MODULE
-                ReturnableModuleInterface userIDInputModule = new NonExistingUserInput(this.userDAO);
+                ReturnableModule userIDInputModule = new NonExistingUserInput(this.userDAO);
                 this.moduleExecutor.executeModule(userIDInputModule);
 
                 superAdmin.getUser().setID(userIDInputModule.returnValue());
@@ -114,7 +114,7 @@ public class SuperAdminSuperAdminEdit implements ModuleInterface{
             
             //GO BACK
             case 9:
-                this.exitStatus = true;
+                this.canModuleExit = true;
                 return;
         }
         this.superAdminDAO.editSuperAdmin(userID, superAdmin);

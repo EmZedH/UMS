@@ -7,31 +7,30 @@ import Model.DatabaseAccessObject.CollegeDAO;
 import UI.Utility.DisplayUtility;
 import UI.Utility.InputUtility;
 
-public class ExistingCollegeInput implements ReturnableModule{
+public class ExistingCollege implements ReturnableModule{
 
     private CollegeDAO collegeDAO;
-
+    private Integer collegeID;
     private boolean canModuleExit = false;
-    private int returnCollegeID;
-
-    public ExistingCollegeInput(CollegeDAO collegeDAO) {
-        this.collegeDAO = collegeDAO;
-    }
 
     @Override
     public boolean canModuleExit() {
         return this.canModuleExit;
     }
 
-    // @Override
-    // public void runUserInterface() throws SQLException {
-    //     this.returnCollegeID = InputUtility.posInput("Enter the College ID");
-    // }
-
     @Override
     public void runLogic() throws SQLException {
-        this.returnCollegeID = InputUtility.posInput("Enter the College ID");
-        if(this.collegeDAO.verifyCollege(returnCollegeID)){
+        
+        int userChoice = InputUtility.inputChoice("Enter the College ID", new String[]{"College ID","Back"});
+
+        if(userChoice == 2){
+            this.canModuleExit = true;
+            this.collegeID = null;
+            return;
+        }
+
+        this.collegeID = InputUtility.posInput("Enter the College ID");
+        if(this.collegeDAO.verifyCollege(this.collegeID)){
             this.canModuleExit = true;
             return;
         }
@@ -40,7 +39,7 @@ public class ExistingCollegeInput implements ReturnableModule{
 
     @Override
     public Integer returnValue() {
-        return this.returnCollegeID;
+        return this.collegeID;
     }
     
 }

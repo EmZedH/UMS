@@ -4,7 +4,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Random;
 
-import Logic.Interfaces.ModuleInterface;
+import Logic.Interfaces.Module;
 import Model.DatabaseUtility;
 import Model.Student;
 import Model.DatabaseAccessObject.CourseProfessorDAO;
@@ -12,9 +12,9 @@ import Model.DatabaseAccessObject.RecordsDAO;
 import UI.CommonUI;
 import UI.StudentUI;
 
-public class StudentOpenElectiveRegistration implements ModuleInterface{
+public class StudentOpenElectiveRegistration implements Module{
 
-    private boolean exitStatus = false;
+    private boolean canModuleExit = false;
     private int userChoice;
     
     private int transactionID;
@@ -31,8 +31,8 @@ public class StudentOpenElectiveRegistration implements ModuleInterface{
     }
 
     @Override
-    public boolean getExitStatus() {
-        return this.exitStatus;
+    public boolean canModuleExit() {
+        return this.canModuleExit;
     }
 
     // @Override
@@ -52,7 +52,7 @@ public class StudentOpenElectiveRegistration implements ModuleInterface{
 
             case 3:
                 StudentUI.displayCourseRegistrationSuccessful(this.transactionID);
-                this.exitStatus = true;
+                this.canModuleExit = true;
                 break;
         }
     }
@@ -60,7 +60,7 @@ public class StudentOpenElectiveRegistration implements ModuleInterface{
     public void addOpenElectiveRecord(int transactionID, int count) throws SQLException {
         if(count==0){
             StudentUI.displayCourseRegistrationSuccessful(transactionID);
-            this.exitStatus = true;
+            this.canModuleExit = true;
             return;
         }
         int departmentID = DatabaseUtility.inputOtherDepartment(this.student.getSection().getDepartmentID(), this.student.getSection().getCollegeID());
